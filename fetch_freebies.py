@@ -19,7 +19,7 @@ from playwright.async_api import async_playwright
 # 参考： https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=6&count=6
 EPIC_API_URL = os.getenv(
     "EPIC_API_URL",
-    "https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=6&count=6",
+    "https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=0&count=30",
 )
 PSN_SOURCE_URL = "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/"
 STEAM_FREEBIES_URL = "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese"
@@ -334,13 +334,20 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                     if not isinstance(offer, dict):
                         continue
 
-                    # 过滤：仅保留“当前价格为 0”的条目（官方接口里表示免费）
-                    total_price = (offer.get("price") or {}).get("totalPrice") if isinstance(offer.get("price"), dict) else None
+                    # 过滤：仅保留"限时免费"的条目（原价>0 且折扣价=0）
+                    price_obj = offer.get("price")
+                    if not isinstance(price_obj, dict):
+                        continue
+                    total_price = price_obj.get("totalPrice")
                     if not isinstance(total_price, dict):
                         continue
                     discount_price = total_price.get("discountPrice")
                     original_price = total_price.get("originalPrice")
+                    
+                    # 核心筛选：折扣价为0 且 原价>0（排除永久免费的DLC/Add-on）
                     if discount_price != 0:
+                        continue
+                    if not isinstance(original_price, (int, float)) or original_price <= 0:
                         continue
 
                     offer_id = str(offer.get("id") or block.get("id") or "")
@@ -355,9 +362,18 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                     seller_obj = offer.get("seller")
                     seller_name = seller_obj.get("name") if isinstance(seller_obj, dict) else None
 
-                    # 官方数据中常见字段：effectiveDate/expiryDate（ISO）
+                    # 时间窗口：优先从 lineOffers[].appliedRules[].endDate 提取限免结束时间
+                    line_offers = price_obj.get("lineOffers")
+                    promo_end_ms = None
+                    if isinstance(line_offers, list) and len(line_offers) > 0:
+                        applied_rules = line_offers[0].get("appliedRules") if isinstance(line_offers[0], dict) else None
+                        if isinstance(applied_rules, list) and len(applied_rules) > 0:
+                            rule_end = applied_rules[0].get("endDate") if isinstance(applied_rules[0], dict) else None
+                            promo_end_ms = _parse_iso_datetime_ms(rule_end)
+                    
+                    # 回退：若 lineOffers 无数据，使用 effectiveDate/expiryDate
                     start_ms = _parse_iso_datetime_ms(offer.get("effectiveDate") or offer.get("viewableDate"))
-                    end_ms = _parse_iso_datetime_ms(offer.get("expiryDate"))
+                    end_ms = promo_end_ms or _parse_iso_datetime_ms(offer.get("expiryDate"))
 
                     # 过滤：已过期则跳过
                     if end_ms is not None and now_ms >= end_ms:
