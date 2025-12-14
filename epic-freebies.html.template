@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>白嫖游戏速报 | GBTGAME官方网站</title>
+    <link rel="icon" type="image/png" href="data:image/png;base64,">
+    <style>
+        :root {
+            --steam-body-bg: #0a151f;
+            --steam-body-gradient: radial-gradient(120% 80% at 10% 10%, rgba(102, 192, 244, 0.18), transparent 65%), linear-gradient(160deg, #060e17 0%, #0b1826 40%, #02070d 100%);
+            --steam-text-primary: #f3f6fb;
+            --steam-text-muted: #9bb5d0;
+            --steam-accent: #66c0f4;
+            --steam-accent-strong: #1994d6;
+            --steam-border: rgba(102, 192, 244, 0.32);
+            --steam-panel-border: rgba(12, 22, 32, 0.8);
+            --steam-radius-xl: 28px;
+            --steam-radius-lg: 20px;
+            --steam-radius-md: 14px;
+            --steam-transition: 0.25s ease;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: var(--steam-body-gradient);
+            color: var(--steam-text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(45% 60% at 10% 10%, rgba(102, 192, 244, 0.18), transparent 60%),
+                radial-gradient(30% 40% at 80% 0%, rgba(19, 126, 207, 0.18), transparent 70%);
+            pointer-events: none;
+        }
+
+        .steam-page {
+            position: relative;
+            min-height: 100vh;
+            padding: 48px 0 80px;
+        }
+
+        .steam-shell {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .epic-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--steam-radius-xl);
+            background:
+                linear-gradient(135deg, rgba(17, 28, 42, 0.95), rgba(9, 15, 24, 0.9)),
+                linear-gradient(145deg, rgba(19, 126, 207, 0.22), transparent 65%);
+            border: 1px solid rgba(102, 192, 244, 0.18);
+            box-shadow: 0 40px 80px rgba(5, 10, 18, 0.55);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 48px 56px;
+            margin-bottom: 40px;
+        }
+
+        .epic-hero__content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            max-width: 640px;
+        }
+
+        .epic-hero__eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(102, 192, 244, 0.16);
+            color: var(--steam-accent);
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .epic-hero__title {
+            font-size: clamp(32px, 5vw, 46px);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            margin: 0;
+        }
+
+        .epic-hero__desc {
+            margin: 0;
+            max-width: 520px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--steam-text-muted);
+        }
+
+        .epic-hero__callout {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .epic-hero__pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: var(--steam-radius-md);
+            background: rgba(11, 26, 41, 0.8);
+            border: 1px solid rgba(102, 192, 244, 0.18);
+            color: var(--steam-text-muted);
+            font-size: 13px;
+            letter-spacing: 0.04em;
+        }
+
+        .epic-freebies {
+            position: relative;
+            padding: 36px 42px 48px;
+            border-radius: var(--steam-radius-xl);
+            background: linear-gradient(150deg, rgba(12, 22, 35, 0.95), rgba(7, 14, 22, 0.92));
+            border: 1px solid rgba(102, 192, 244, 0.12);
+            box-shadow: 0 32px 70px rgba(4, 9, 16, 0.6);
+        }
+
+        .epic-freebies__heading {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .epic-freebies__heading-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .epic-freebies__title {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .epic-freebies__subtitle {
+            margin: 0;
+            max-width: 600px;
+            font-size: 14px;
+            color: var(--steam-text-muted);
+            line-height: 1.7;
+        }
+
+        .epic-freebies__share-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 22px;
+            border-radius: 999px;
+            border: 1px solid rgba(102, 192, 244, 0.24);
+            background: linear-gradient(135deg, rgba(102, 192, 244, 0.25), rgba(102, 192, 244, 0.05));
+            color: var(--steam-text-primary);
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform var(--steam-transition), box-shadow var(--steam-transition), border-color var(--steam-transition), color var(--steam-transition);
+            min-width: 180px;
+        }
+
+        .epic-freebies__share-button:hover:not([aria-disabled="true"]) {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 35px rgba(102, 192, 244, 0.25);
+            border-color: rgba(102, 192, 244, 0.35);
+        }
+
+        .epic-freebies__share-button[aria-disabled="true"] {
+            cursor: not-allowed;
+            opacity: 0.55;
+            border-color: rgba(102, 192, 244, 0.16);
+            box-shadow: none;
+            pointer-events: none;
+        }
+
+        .epic-freebies__section {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            padding: 28px 32px 32px;
+            border-radius: var(--steam-radius-lg);
+            background: linear-gradient(145deg, rgba(10, 19, 29, 0.92), rgba(6, 12, 21, 0.9));
+            border: 1px solid rgba(102, 192, 244, 0.12);
+            box-shadow: 0 24px 50px rgba(4, 9, 16, 0.55);
+        }
+
+        .epic-freebies__section + .epic-freebies__section {
+            margin-top: 28px;
+        }
+
+        .epic-freebies__section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .epic-freebies__section-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        .epic-freebies__section-count {
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(102, 192, 244, 0.16);
+            color: var(--steam-accent);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .epic-freebies__section-body {
+            display: block;
+        }
+
+        .epic-freebies__tabs {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(102, 192, 244, 0.16);
+            background: rgba(9, 18, 28, 0.75);
+            gap: 6px;
+        }
+
+        .epic-freebies__tab {
+            position: relative;
+            padding: 12px 22px;
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            color: var(--steam-text-muted);
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background var(--steam-transition), color var(--steam-transition), transform var(--steam-transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .epic-freebies__tab:hover {
+            color: var(--steam-text-primary);
+            transform: translateY(-2px);
+        }
+
+        .epic-freebies__tab.is-active {
+            color: var(--steam-accent);
+            background: linear-gradient(135deg, rgba(102, 192, 244, 0.25), rgba(102, 192, 244, 0.05));
+            box-shadow: inset 0 0 0 1px rgba(102, 192, 244, 0.2);
+        }
+
+        .epic-freebies__tab-badge {
+            min-width: 28px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(102, 192, 244, 0.18);
+            color: var(--steam-text-primary);
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            text-align: center;
+        }
+
+        .epic-freebies__panels {
+            margin-top: 32px;
+        }
+
+        .epic-freebies__panel {
+            display: none;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity var(--steam-transition), transform var(--steam-transition);
+        }
+
+        .epic-freebies__panel.is-active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .epic-freebies__panel-empty {
+            padding: 72px 40px;
+            border-radius: var(--steam-radius-lg);
+            border: 1px dashed rgba(102, 192, 244, 0.25);
+            text-align: center;
+            color: var(--steam-text-muted);
+            background: rgba(8, 16, 26, 0.6);
+            line-height: 1.8;
+        }
+
+        .epic-freebies__grid {
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+        }
+
+        .epic-freebies__card {
+            position: relative;
+            display: flex;
+            gap: 30px;
+            padding: 26px;
+            border-radius: var(--steam-radius-lg);
+            background:
+                linear-gradient(180deg, rgba(16, 28, 43, 0.92), rgba(11, 18, 29, 0.9)),
+                rgba(10, 18, 28, 0.88);
+            border: 1px solid rgba(102, 192, 244, 0.14);
+            box-shadow: 0 24px 45px rgba(4, 8, 16, 0.55);
+            transition: transform var(--steam-transition), border-color var(--steam-transition), box-shadow var(--steam-transition);
+        }
+
+        .epic-freebies__card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(circle at 15% 20%, rgba(102, 192, 244, 0.16), transparent 55%);
+            opacity: 0;
+            transition: opacity var(--steam-transition);
+            pointer-events: none;
+        }
+
+        .epic-freebies__card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(102, 192, 244, 0.32);
+            box-shadow: 0 36px 70px rgba(4, 8, 16, 0.7);
+        }
+
+        .epic-freebies__card:hover::before {
+            opacity: 1;
+        }
+
+        .epic-freebies__card-cover {
+            position: relative;
+            flex: 0 0 320px;
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(7, 13, 21, 0.9);
+            border: 1px solid rgba(102, 192, 244, 0.16);
+            aspect-ratio: var(--cover-aspect, 16 / 9);
+        }
+
+        .epic-freebies__card-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+            filter: saturate(1.08);
+        }
+
+        .epic-freebies__card-body {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        .epic-freebies__card-content {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        .epic-freebies__card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .epic-freebies__card-title-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .epic-freebies__card-title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .epic-freebies__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(19, 126, 207, 0.18);
+            color: var(--steam-accent);
+            font-size: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .epic-freebies__card-desc {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--steam-text-muted);
+            max-height: 5.1em;
+            overflow: hidden;
+        }
+
+        .epic-freebies__card-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            color: var(--steam-text-muted);
+            font-size: 13px;
+            letter-spacing: 0.03em;
+        }
+
+        .epic-freebies__card-summary span {
+            white-space: nowrap;
+        }
+
+        .epic-freebies__card-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(102, 192, 244, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .epic-freebies__card-timing {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            color: var(--steam-text-muted);
+            font-size: 13px;
+            letter-spacing: 0.04em;
+        }
+
+        .epic-freebies__meta-primary {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--steam-text-primary);
+        }
+
+        .epic-freebies__meta-secondary {
+            font-size: 13px;
+            color: var(--steam-text-muted);
+        }
+
+        .epic-freebies__card-link {
+            margin-left: auto;
+            padding: 12px 26px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(102, 192, 244, 0.3), rgba(102, 192, 244, 0.65));
+            color: var(--steam-text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: transform var(--steam-transition), box-shadow var(--steam-transition);
+            white-space: nowrap;
+        }
+
+        .epic-freebies__card-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 35px rgba(102, 192, 244, 0.35);
+        }
+
+        .epic-footer {
+            margin-top: 48px;
+            padding: 24px 0 16px;
+            border-top: 1px solid rgba(102, 192, 244, 0.18);
+            color: var(--steam-text-muted);
+            font-size: 13px;
+            letter-spacing: 0.04em;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 14px 20px;
+            text-align: center;
+        }
+
+        .epic-footer a {
+            color: var(--steam-accent);
+            text-decoration: none;
+        }
+
+        .epic-footer a:hover {
+            color: var(--steam-accent-strong);
+            text-decoration: underline;
+        }
+
+        .epic-footer__avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(102, 192, 244, 0.35);
+        }
+
+        .epic-footer__details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px 18px;
+        }
+
+        @media (max-width: 1024px) {
+            .epic-hero {
+                padding: 40px;
+                gap: 32px;
+            }
+
+            .epic-freebies {
+                padding: 32px 28px 40px;
+            }
+
+            .epic-freebies__card {
+                flex-direction: column;
+            }
+
+            .epic-freebies__section {
+                padding: 24px 24px 28px;
+            }
+
+            .epic-freebies__card-cover {
+                width: 100%;
+                flex: none;
+                aspect-ratio: var(--cover-aspect, 16 / 9);
+            }
+
+            .epic-freebies__card-link {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .steam-shell {
+                padding: 0 20px;
+            }
+
+            .steam-page {
+                padding: 32px 0 64px;
+            }
+
+            .epic-hero {
+                padding: 32px 28px;
+            }
+
+            .epic-freebies__heading-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .epic-freebies__share-button {
+                width: 100%;
+            }
+
+            .epic-freebies {
+                padding: 28px 22px 36px;
+            }
+
+            .epic-freebies__tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .epic-freebies__section {
+                padding: 22px 20px 26px;
+            }
+
+            .epic-freebies__card-footer {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .epic-freebies__card-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .epic-freebies__card-link {
+                width: 100%;
+                text-align: center;
+            }
+
+            .epic-freebies__section {
+                padding: 20px 18px 24px;
+            }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="steam-page">
+        <div class="steam-shell">
+            <header class="epic-hero" role="banner">
+                <div class="epic-hero__content">
+                    <span class="epic-hero__eyebrow">Game Freebie Radar</span>
+                    <h1 class="epic-hero__title">白嫖游戏信息</h1>
+                    <p class="epic-hero__desc">聚合 EPIC | Steam | PlayStation 限免信息，实时同步官方档期。</p>
+                    <div class="epic-hero__callout">
+                        <span class="epic-hero__pill">定时刷新缓存 · 自动生成分享长图</span>
+                        <span class="epic-hero__pill">最后同步：{{FETCHED_AT}}</span>
+                    </div>
+                </div>
+            </header>
+
+            <section class="epic-freebies" role="main">
+                <div class="epic-freebies__heading">
+                    <div class="epic-freebies__heading-row">
+                        <h2 class="epic-freebies__title">限免目录</h2>
+                        <a class="epic-freebies__share-button" data-share-button href="{{SHARE_BUTTON_URL}}" download="{{SHARE_BUTTON_FILENAME}}" rel="noopener"{{SHARE_BUTTON_DISABLED}}>
+                            {{SHARE_BUTTON_LABEL}}
+                        </a>
+                    </div>
+                    <p class="epic-freebies__subtitle">当前已收录 {{TOTAL_COUNT}} 条限免记录，可在下方切换平台查看详情。</p>
+                </div>
+
+                <nav class="epic-freebies__tabs" role="tablist" aria-label="限免平台切换">
+                    <button class="epic-freebies__tab is-active" role="tab" aria-selected="true" aria-controls="free-panel-epic" data-tab="epic">
+                        Epic 限免
+                        <span class="epic-freebies__tab-badge" data-badge="epic">{{TAB_BADGE_EPIC}}</span>
+                    </button>
+                    <button class="epic-freebies__tab" role="tab" aria-selected="false" aria-controls="free-panel-steam" data-tab="steam">
+                        Steam 限免
+                        <span class="epic-freebies__tab-badge" data-badge="steam">{{TAB_BADGE_STEAM}}</span>
+                    </button>
+                    <button class="epic-freebies__tab" role="tab" aria-selected="false" aria-controls="free-panel-psn" data-tab="psn">
+                        PlayStation 限免
+                        <span class="epic-freebies__tab-badge" data-badge="psn">{{TAB_BADGE_PSN}}</span>
+                    </button>
+                </nav>
+
+                <section class="epic-freebies__panels">
+                    <div class="epic-freebies__panel is-active" role="tabpanel" id="free-panel-epic" data-panel="epic">
+                        <div class="epic-freebies__section" data-section="now">
+                            <header class="epic-freebies__section-header">
+                                <h3 class="epic-freebies__section-title">EPIC 正在免费</h3>
+                                <span class="epic-freebies__section-count" data-count="now">{{EPIC_NOW_COUNT}}</span>
+                            </header>
+                            <div class="epic-freebies__section-body" data-section-body="now">
+                                {{EPIC_NOW_CONTENT}}
+                            </div>
+                        </div>
+                        <div class="epic-freebies__section" data-section="upcoming">
+                            <header class="epic-freebies__section-header">
+                                <h3 class="epic-freebies__section-title">EPIC 即将免费</h3>
+                                <span class="epic-freebies__section-count" data-count="upcoming">{{EPIC_UPCOMING_COUNT}}</span>
+                            </header>
+                            <div class="epic-freebies__section-body" data-section-body="upcoming">
+                                {{EPIC_UPCOMING_CONTENT}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="epic-freebies__panel" role="tabpanel" id="free-panel-steam" data-panel="steam" hidden>
+                        <div class="epic-freebies__section" data-section="steam">
+                            <header class="epic-freebies__section-header">
+                                <h3 class="epic-freebies__section-title">Steam 限免</h3>
+                                <span class="epic-freebies__section-count" data-count="steam">{{STEAM_COUNT}}</span>
+                            </header>
+                            <div class="epic-freebies__section-body" data-section-body="steam">
+                                {{STEAM_CONTENT}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="epic-freebies__panel" role="tabpanel" id="free-panel-psn" data-panel="psn" hidden>
+                        <div class="epic-freebies__section" data-section="psn">
+                            <header class="epic-freebies__section-header">
+                                <h3 class="epic-freebies__section-title">PlayStation 本月会员免费</h3>
+                                <span class="epic-freebies__section-count" data-count="psn">{{PSN_COUNT}}</span>
+                            </header>
+                            <div class="epic-freebies__section-body" data-section-body="psn">
+                                {{PSN_CONTENT}}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+            <footer class="epic-footer">
+                <img class="epic-footer__avatar" src="https://avatars.githubusercontent.com/u/63827263?v=4" alt="AFEI 头像" width="32" height="32">
+                <div class="epic-footer__details">
+                    <span>作者：AFEI</span>
+                    <span>邮箱：<a href="mailto:amocnfk@gmail.com">amocnfk@gmail.com</a></span>
+                    <span>GitHub：<a href="https://github.com/nodesire7/" target="_blank" rel="noopener noreferrer">nodesire7</a></span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script type="application/json" id="share-payload">{{SHARE_DATA_JSON}}</script>
+    <script>
+    {{CLIENT_SCRIPT}}
+    </script>
+</body>
+</html>
+

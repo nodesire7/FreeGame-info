@@ -1,0 +1,42 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache / build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Playwright downloads / caches (optional)
+.cache/
+ms-playwright/
+
+# Generated outputs
+snapshot.json
+psn.html
+index.html
+public/
+*.webp
+*.png
+
+# Allow the HTML template to be tracked
+!epic-freebies.html.template
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+
