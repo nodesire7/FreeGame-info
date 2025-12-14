@@ -735,14 +735,14 @@ def _map_epic_game(
 
 
 def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
-    """解析 PlayStation Plus HTML（适配 gdk/gpdc-section 结构）"""
+    """解析 PlayStation Plus HTML，适配 gdk/root gpdc-section 结构（实例.html）"""
     soup = BeautifulSoup(html_content, "html.parser")
     base_url = "https://www.playstation.com"
 
     items: List[Dict[str, Any]] = []
     seen_links: set[str] = set()
 
-    # 优先 gdk root 容器下的 gpdc-section（实测实例.html）
+    # 优先 gdk root 容器
     sections = soup.select("div.gdk.root.container section.gpdc-section")
     if not sections:
         sections = soup.select("section#monthly-games, section.gpdc-section")
@@ -752,14 +752,23 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
         if not boxes:
             boxes = section.select(".box")
 
-        # box 可能成对出现（图+文），逐个收集
+        pending_image: Optional[str] = None
+
         for box in boxes:
-            # 标题/描述
+            # 尝试提取图片（可能与文字分开）
+            media_block = box.select_one(".media-block") or box.select_one(".imageblock") or box.select_one("img")
+            image = _extract_image_url(media_block, base_url)
+            if image and not box.find(["h1", "h2", "h3", "h4", "strong", "b"]):
+                pending_image = image
+                continue
+
             text_block = box.select_one(".txt-block__paragraph") or box
             title_el = text_block.find(["h1", "h2", "h3", "h4", "strong", "b"]) or box.find(
                 ["h1", "h2", "h3", "h4", "strong", "b"]
             )
             title = title_el.get_text(strip=True) if title_el else ""
+            if not title:
+                continue
 
             paragraph = text_block.find("p") or box.find("p")
             lines = _collect_text_lines(paragraph)
@@ -768,18 +777,8 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
             highlight = " / ".join(line.lstrip("·•-— ").strip() for line in highlight_lines) or None
             description = " ".join(description_lines).strip() or None
 
-            # 图片
-            media_block = (
-                box.select_one(".media-block")
-                or box.select_one(".imageblock")
-                or box.select_one("img")
-            )
-            image = _extract_image_url(media_block, base_url)
-
-            # 链接
-            link_el = (
-                box.select_one(".btn--cta__btn-container a")
-                or box.select_one("a[href*='playstation'], a[href*='store'], a[href*='games']")
+            link_el = box.select_one(".btn--cta__btn-container a") or box.select_one(
+                "a[href*='playstation'], a[href*='store'], a[href*='games']"
             )
             link = link_el.get("href").strip() if link_el and link_el.get("href") else ""
             if link:
@@ -793,13 +792,14 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
                     "id": link,
                     "title": title,
                     "link": link,
-                    "image": image,
+                    "image": image or pending_image,
                     "description": description or highlight or "PlayStation 官方暂未提供详细描述。",
                     "highlight": highlight,
                     "platforms": None,
                 }
             )
             seen_links.add(link)
+            pending_image = None
 
         if items:
             break
