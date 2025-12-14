@@ -81,7 +81,7 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
             """)
             
             if not share_payload:
-                print("❌ 未找到分享数据，无法生成拼图")
+                print("[FAIL] 未找到分享数据，无法生成拼图")
                 print("提示: HTML 文件中需要包含 <script type='application/json' id='share-payload'> 元素")
                 browser.close()
                 sys.exit(1)
@@ -89,7 +89,7 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
             # 检查是否有有效的分享数据
             sections = share_payload.get('sections', [])
             if not sections or not any(section.get('items') for section in sections):
-                print("❌ 分享数据中没有有效的条目，无法生成拼图")
+                print("[FAIL] 分享数据中没有有效的条目，无法生成拼图")
                 browser.close()
                 sys.exit(1)
             
@@ -381,7 +381,7 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
             
             # 从 base64 数据 URL 中提取图片数据
             if not image_base64 or not image_base64.startswith('data:image'):
-                print("❌ Canvas 渲染失败，未生成图片数据")
+                print("[FAIL] Canvas 渲染失败，未生成图片数据")
                 browser.close()
                 sys.exit(1)
             
@@ -417,7 +417,7 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
                 except Exception as e:
                     # 如果转换失败，使用 PNG
                     actual_output_file = str(temp_png)
-                    print(f"⚠️  WebP 转换失败: {e}")
+                    print(f"[WARN] WebP 转换失败: {e}")
                     print(f"⚠️  已保存为 PNG 格式: {actual_output_file}")
             else:
                 # 直接保存 PNG 或其他格式
@@ -432,11 +432,11 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
                 file_size = os.path.getsize(actual_output_file)
                 print(f"✅ 拼图生成成功: {actual_output_file} ({file_size} bytes)")
             else:
-                print(f"❌ 图片文件未生成: {actual_output_file}")
+                print(f"[FAIL] 图片文件未生成: {actual_output_file}")
                 sys.exit(1)
             
     except Exception as e:
-        print(f"❌ 图片生成失败: {e}")
+        print(f"[FAIL] 图片生成失败: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

@@ -1,0 +1,129 @@
+{
+  "fetchedAt": "2025-12-14T20:25:45.333816+00:00",
+  "epic": {
+    "now": [
+      {
+        "id": "e4f007a25ee8426e97c16e994f6127e9",
+        "title": "Hogwarts Legacy",
+        "description": "《霍格沃茨之遗》是一款基于《哈利·波特》系列书籍设定的沉浸式开放世界动作角色扮演游戏。 在旅程中，你将造访那些熟悉的和陌生的地点，发现奇妙的野兽，自定义你的角色并制造魔药，掌握施放咒语的技巧，升级天赋并成为你所向往的巫师。\n\n体验 1800 年代的霍格沃茨。 你将扮演一名握有古老秘密之钥匙的学生，而这个秘密可能会威胁到整个魔法世界。 结识盟友、与黑巫师战斗，并最终决定魔法世界的命运。 书写你的传奇。 留给后人传唱。\n\n内含“闹鬼的霍格莫德商店”任务，该任务将允许进入额外的地牢、店主的装饰品套装以及游戏中的霍格莫德商店。\n\n新功能包括：\n\n• 拍照模式\n\n拍照模式\n\n• 天赋重置\n\n天赋重置\n\n全新装饰品现可供所有玩家使用：幸存者眼镜、阿兹卡班囚服和外套、玛瑙鹰马翼兽坐骑、福灵剂魔药配方、黑巫师扫帚（2）",
+        "cover": "https://cdn1.epicgames.com/offer/d5241c76f178492ea1540fce45616757/Dec11_giveaway_1200x1600_1200x1600-7ad17188c1b54a35b62bf2122101b5fd",
+        "link": "https://store.epicgames.com/zh-CN/p/hogwarts-legacy?locale=zh-CN&country=CN",
+        "seller": "Epic Dev Test Account",
+        "developer": "Avalanche Software",
+        "publisher": "Warner Bros. Games",
+        "platforms": [
+          "Windows"
+        ],
+        "genres": [
+          "冒险",
+          "动作",
+          "角色扮演"
+        ],
+        "originalPrice": 79.9,
+        "originalPriceDesc": "SGD 79.90",
+        "isBundle": false,
+        "isCodeRedemptionOnly": true,
+        "freeStartAt": 1765506180000,
+        "freeEndAt": 1766073600000,
+        "isFreeNow": true,
+        "discount": "-100%",
+        "features": [
+          "云存储",
+          "单人",
+          "成就"
+        ],
+        "releaseDate": "23/02/11"
+      }
+    ],
+    "upcoming": [
+      {
+        "id": "fb619f823a844e69a2d18f032325da96",
+        "title": "Mystery Game 2",
+        "description": "Mystery Game 2",
+        "cover": "https://cdn1.epicgames.com/offer/d5241c76f178492ea1540fce45616757/Holiday25_FreeGames_Teaser_2560x1440_2560x1440-012542ce76be0f7521af765ba97d3453",
+        "link": "https://store.epicgames.com/zh-CN/p/mysterygame2025-2?locale=zh-CN&country=CN",
+        "seller": "Epic Dev Test Account",
+        "developer": null,
+        "publisher": null,
+        "platforms": null,
+        "genres": null,
+        "originalPrice": "0",
+        "originalPriceDesc": null,
+        "isBundle": false,
+        "isCodeRedemptionOnly": true,
+        "freeStartAt": 1766073600000,
+        "freeEndAt": 1766160000000,
+        "isFreeNow": false
+      }
+    ]
+  },
+  "steam": [
+    {
+      "id": "https://store.steampowered.com/app/582660/Black_Desert/?snr=1_7_7_2300_150_1",
+      "title": "Black Desert",
+      "link": "https://store.steampowered.com/app/582660/Black_Desert/?snr=1_7_7_2300_150_1",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/582660/8bc9b1c77608e30042d876da0cfb9f838ac535c9/capsule_231x87_alt_assets_27.jpg?t=1765621416",
+      "releaseDate": "2021 年 7 月 20 日",
+      "platforms": [
+        "Windows"
+      ],
+      "discountText": "-100%",
+      "originalPrice": "¥900",
+      "finalPrice": "¥0",
+      "reviewSummary": "褒贬不一 此游戏的 978 篇用户评测中有 62% 为好评。 此产品的总体评价是基于您的偏好用以您语言撰写的评测计算得出的。"
+    },
+    {
+      "id": "https://store.steampowered.com/app/561770/Just_Ignore_Them/?snr=1_7_7_2300_150_1",
+      "title": "Just Ignore Them",
+      "link": "https://store.steampowered.com/app/561770/Just_Ignore_Them/?snr=1_7_7_2300_150_1",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/561770/capsule_231x87.jpg?t=1765702177",
+      "releaseDate": "2017 年 4 月 28 日",
+      "platforms": [
+        "Windows"
+      ],
+      "discountText": "-100%",
+      "originalPrice": "¥470",
+      "finalPrice": "¥0",
+      "reviewSummary": "多半好评 此游戏的 637 篇用户评测中有 79% 为好评。"
+    }
+  ],
+  "psn": [
+    {
+      "id": "https://www.playstation.com/zh-hans-hk/games/killing-floor-3/",
+      "title": "Killing Floor 3",
+      "link": "https://www.playstation.com/zh-hans-hk/games/killing-floor-3/",
+      "image": "https://gmedia.playstation.com/is/image/SIEPDC/killing-floor-3-screenshot-08-en-3dec24",
+      "description": "在这款最多支持六名玩家合作的第一人称动作恐怖游戏中，与成群的生物工程生物战斗。",
+      "platforms": null
+    },
+    {
+      "id": "https://www.playstation.com/zh-hans-hk/games/the-outlast-trials/",
+      "title": "The Outlast Trials",
+      "link": "https://www.playstation.com/zh-hans-hk/games/the-outlast-trials/",
+      "image": "https://gmedia.playstation.com/is/image/SIEPDC/the-outlast-trials-screenshot-01-en-24nov25",
+      "description": "在冷战时期的研究设施中，独自一人或与好友经历各种实验，体验令人精神崩溃的恐怖。",
+      "platforms": null
+    },
+    {
+      "id": "https://www.playstation.com/zh-hans-hk/games/synduality/",
+      "title": "奇异贤伴 爱达之歌",
+      "link": "https://www.playstation.com/zh-hans-hk/games/synduality/",
+      "image": "https://gmedia.playstation.com/is/image/SIEPDC/synduality-echo-of-ada-screenshot-01-en-24nov25",
+      "description": "在这款PvPvE撤离射击游戏中，玩家将从地下上升到地表，来到被充满敌意的“终结者”和酸雨蹂躏的世界。",
+      "platforms": null
+    },
+    {
+      "id": "https://www.playstation.com/zh-hans-hk/games/neon-white/",
+      "title": "Neon White",
+      "link": "https://www.playstation.com/zh-hans-hk/games/neon-white/",
+      "image": "https://gmedia.playstation.com/is/image/SIEPDC/neon-white-screenshot-01-en-24nov25",
+      "description": "化身来自地狱特选出的刺客消灭恶魔、与其他屠魔者竞争，寻求救赎。",
+      "platforms": null
+    }
+  ],
+  "sources": {
+    "epic": "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions",
+    "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese",
+    "psn": "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/"
+  }
+}
