@@ -7,7 +7,7 @@ import json
 import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 
 import aiohttp
 from bs4 import BeautifulSoup, NavigableString, Tag
@@ -262,26 +262,72 @@ def _pick_epic_cover(game: Dict[str, Any]) -> str:
 
 def _build_epic_link(game: Dict[str, Any]) -> str:
     """构建 Epic 商店链接"""
-    url_slug = game.get("urlSlug")
-    if isinstance(url_slug, str) and url_slug.strip() and url_slug not in ("[]", ""):
-        return f"https://store.epicgames.com/p/{url_slug.strip()}"
-    product_slug = game.get("productSlug")
-    if isinstance(product_slug, str) and product_slug.strip() and product_slug not in ("[]", ""):
-        return f"https://store.epicgames.com/p/{product_slug.strip()}"
-    # 尝试从 offerMappings 提取
+    locale_prefix = "https://store.epicgames.com/zh-CN/p/"
+
+    # 1) productSlug/urlSlug（去掉末尾 /home）
+    slug = _extract_epic_slug(game)
+    if slug:
+        return f"{locale_prefix}{slug}"
+
+    # 2) offerMappings.pageSlug
     mappings = game.get("offerMappings")
     if isinstance(mappings, list):
         for mapping in mappings:
             if isinstance(mapping, dict):
                 page_slug = mapping.get("pageSlug")
-                if isinstance(page_slug, str) and page_slug.strip():
-                    return f"https://store.epicgames.com/p/{page_slug.strip()}"
-    # 回退：使用 namespace/id
+                page_slug = _sanitize_slug(page_slug)
+                if page_slug:
+                    return f"{locale_prefix}{page_slug}"
+
+    # 3) catalogNs.mappings.pageSlug
+    catalog_ns = game.get("catalogNs")
+    if isinstance(catalog_ns, dict):
+        ns_maps = catalog_ns.get("mappings")
+        if isinstance(ns_maps, list):
+            for mapping in ns_maps:
+                if isinstance(mapping, dict):
+                    page_slug = mapping.get("pageSlug")
+                    page_slug = _sanitize_slug(page_slug)
+                    if page_slug:
+                        return f"{locale_prefix}{page_slug}"
+
+    # 4) 回退：使用 namespace/id
     namespace = game.get("namespace")
     game_id = game.get("id")
     if namespace and game_id:
-        return f"https://store.epicgames.com/p/{namespace}/{game_id}"
+        return f"{locale_prefix}{namespace}/{game_id}"
     return "https://store.epicgames.com/free-games"
+
+
+def _extract_epic_slug(game: Dict[str, Any]) -> Optional[str]:
+    """提取 Epic 商品 slug（优先 productSlug，再 urlSlug，再 customAttributes）"""
+    for key in ("productSlug", "urlSlug"):
+        slug = _sanitize_slug(game.get(key))
+        if slug:
+            return slug
+
+    # customAttributes 中的 com.epicgames.app.productSlug
+    attrs = game.get("customAttributes")
+    if isinstance(attrs, list):
+        for attr in attrs:
+            if isinstance(attr, dict) and attr.get("key") == "com.epicgames.app.productSlug":
+                slug = _sanitize_slug(attr.get("value"))
+                if slug:
+                    return slug
+    return None
+
+
+def _sanitize_slug(value: Any) -> Optional[str]:
+    if not isinstance(value, str):
+        return None
+    slug = value.strip()
+    if not slug or slug in ("[]", "/"):
+        return None
+    # 去掉末尾 /home 或开头/结尾斜杠
+    slug = slug.strip("/")
+    if slug.endswith("/home"):
+        slug = slug[:-5]
+    return slug or None
 
 
 async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
@@ -363,6 +409,13 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                     if not mapped:
                         continue
 
+                    # 若原价信息缺失，则尝试调用 getCatalogOffer 补全
+                    if (mapped.get("originalPrice") in (None, "0", "0.0")) and namespace and game_id:
+                        detail_price = await _fetch_epic_offer_detail(session, game_id, namespace)
+                        if detail_price:
+                            mapped["originalPrice"] = detail_price.get("originalPrice") or mapped["originalPrice"]
+                            mapped["originalPriceDesc"] = detail_price.get("originalPriceDesc") or mapped["originalPriceDesc"]
+
                     has_window = True
                     if is_free_now:
                         now_list.append(mapped)
@@ -399,6 +452,42 @@ def _iter_promo_windows(promotions: Dict[str, Any]):
             start_ms = _parse_iso_datetime_ms(promo.get("startDate"))
             end_ms = _parse_iso_datetime_ms(promo.get("endDate"))
             yield is_current, start_ms, end_ms
+
+
+async def _fetch_epic_offer_detail(session: aiohttp.ClientSession, offer_id: str, namespace: str) -> Optional[Dict[str, Any]]:
+    """调用 getCatalogOffer 接口补全价格信息"""
+    try:
+        variables = {"locale": "zh-CN", "country": "CN", "offerId": offer_id, "sandboxId": namespace}
+        extensions = {"persistedQuery": {"version": 1, "sha256Hash": "ec112951b1824e1e215daecae17db4069c737295d4a697ddb9832923f93a326e"}}
+        var_str = quote(json.dumps(variables, separators=(",", ":")))
+        ext_str = quote(json.dumps(extensions, separators=(",", ":")))
+        url = f"https://store.epicgames.com/graphql?operationName=getCatalogOffer&variables={var_str}&extensions={ext_str}"
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=20)) as resp:
+            if resp.status != 200:
+                return None
+            data = await resp.json()
+        offer = (
+            data.get("data", {})
+            .get("Catalog", {})
+            .get("catalogOffer")
+        )
+        if not isinstance(offer, dict):
+            return None
+        price_obj = offer.get("price")
+        if not isinstance(price_obj, dict):
+            return None
+        total_price = price_obj.get("totalPrice")
+        if not isinstance(total_price, dict):
+            return None
+        original_price = total_price.get("originalPrice")
+        fmt_price = total_price.get("fmtPrice") if isinstance(total_price.get("fmtPrice"), dict) else None
+        original_price_desc = fmt_price.get("originalPrice") if isinstance(fmt_price, dict) else None
+        return {
+            "originalPrice": str(original_price) if original_price not in (None, "") else None,
+            "originalPriceDesc": original_price_desc,
+        }
+    except Exception:
+        return None
 
 
 def _map_epic_game(
