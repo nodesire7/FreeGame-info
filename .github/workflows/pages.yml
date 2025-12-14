@@ -43,8 +43,7 @@ jobs:
       - name: Generate site
         run: |
           mkdir -p site
-          python fetch_freebies.py site/snapshot.json
-          python render_html.py site/snapshot.json epic-freebies.html.template site/index.html
+          python main.py site
           python generate_image.py site/index.html site/gameinfo.webp 1200
           touch site/.nojekyll
 
