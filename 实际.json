@@ -1,0 +1,175 @@
+                {
+                    "namespace": "e97659b501af4e3981d5430dad170911",
+                    "id": "a31950aa730b4ae391e42a1c3f26b839",
+                    "offer": {
+                        "title": "Hogwarts Legacy",
+                        "id": "a31950aa730b4ae391e42a1c3f26b839",
+                        "namespace": "e97659b501af4e3981d5430dad170911",
+                        "offerType": "BASE_GAME",
+                        "expiryDate": null,
+                        "status": "ACTIVE",
+                        "isCodeRedemptionOnly": false,
+                        "description": "Hogwarts Legacy",
+                        "effectiveDate": "2023-02-10T18:00:00.000Z",
+                        "viewableDate": "2023-02-10T18:00:00.000Z",
+                        "pcReleaseDate": "2023-02-10T18:00:00.000Z",
+                        "releaseDate": "2023-02-10T18:00:00.000Z",
+                        "approximateReleasePlan": null,
+                        "prePurchase": null,
+                        "keyImages": [
+                            {
+                                "type": "OfferImageTall",
+                                "url": "https://cdn1.epicgames.com/offer/e97659b501af4e3981d5430dad170911/EGS_HogwartsLegacy_AvalancheSoftware_S2_1200x1600-bb9f789b6628ff2aa935f06f5e0f218a"
+                            },
+                            {
+                                "type": "OfferImageWide",
+                                "url": "https://cdn1.epicgames.com/offer/e97659b501af4e3981d5430dad170911/EGS_HogwartsLegacy_AvalancheSoftware_S1_2560x1440-aa80981dd7c9b3f26b12606974a76dba_2560x1440-aa80981dd7c9b3f26b12606974a76dba"
+                            },
+                            {
+                                "type": "Thumbnail",
+                                "url": "https://cdn1.epicgames.com/offer/e97659b501af4e3981d5430dad170911/EGS_HogwartsLegacy_AvalancheSoftware_S2_1200x1600-bb9f789b6628ff2aa935f06f5e0f218a"
+                            }
+                        ],
+                        "seller": {
+                            "id": "o-7kyv8uwtz74njnl544kbxzt5xqephw",
+                            "name": "Warner Bros."
+                        },
+                        "productSlug": "hogwarts-legacy",
+                        "urlSlug": "hogwarts-legacy",
+                        "items": [
+                            {
+                                "id": "5dca75f685e542c784e6a028ce71487b",
+                                "namespace": "e97659b501af4e3981d5430dad170911"
+                            }
+                        ],
+                        "customAttributes": [
+                            {
+                                "key": "com.epicgames.app.productSlug",
+                                "value": "hogwarts-legacy"
+                            }
+                        ],
+                        "developerDisplayName": "Avalanche Software",
+                        "publisherDisplayName": "Warner Bros. Games",
+                        "categories": [
+                            {
+                                "path": "games"
+                            },
+                            {
+                                "path": "games/edition"
+                            },
+                            {
+                                "path": "games/edition/base"
+                            },
+                            {
+                                "path": "applications"
+                            }
+                        ],
+                        "catalogNs": {
+                            "mappings": [
+                                {
+                                    "pageSlug": "hogwarts-legacy",
+                                    "pageType": "productHome"
+                                }
+                            ]
+                        },
+                        "offerMappings": [],
+                        "price": {
+                            "totalPrice": {
+                                "discountPrice": 0,
+                                "originalPrice": 38400,
+                                "voucherDiscount": 0,
+                                "discount": 38400,
+                                "fmtPrice": {
+                                    "originalPrice": "¥384.00",
+                                    "discountPrice": "0",
+                                    "intermediatePrice": "0"
+                                },
+                                "currencyCode": "CNY",
+                                "currencyInfo": {
+                                    "decimals": 2,
+                                    "symbol": "¥"
+                                },
+                                "dualPrice": null
+                            },
+                            "lineOffers": [
+                                {
+                                    "appliedRules": [
+                                        {
+                                            "id": "002fafb0187e41ccbb175865675436c7",
+                                            "endDate": "2025-12-18T16:00:00.000Z"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "linkedOfferId": null,
+                        "linkedOffer": null,
+                        "countriesBlacklist": [
+                            "RU",
+                            "BY"
+                        ],
+                        "countriesWhitelist": null,
+                        "tags": [
+                            {
+                                "id": "1216"
+                            },
+                            {
+                                "id": "21122"
+                            },
+                            {
+                                "id": "1188"
+                            },
+                            {
+                                "id": "21894"
+                            },
+                            {
+                                "id": "19847"
+                            },
+                            {
+                                "id": "21127"
+                            },
+                            {
+                                "id": "9547"
+                            },
+                            {
+                                "id": "21134"
+                            },
+                            {
+                                "id": "21138"
+                            },
+                            {
+                                "id": "21139"
+                            },
+                            {
+                                "id": "21140"
+                            },
+                            {
+                                "id": "21109"
+                            },
+                            {
+                                "id": "21141"
+                            },
+                            {
+                                "id": "1367"
+                            },
+                            {
+                                "id": "1370"
+                            },
+                            {
+                                "id": "21147"
+                            },
+                            {
+                                "id": "1117"
+                            },
+                            {
+                                "id": "21149"
+                            },
+                            {
+                                "id": "21119"
+                            },
+                            {
+                                "id": "38815"
+                            }
+                        ]
+                    }
+                },

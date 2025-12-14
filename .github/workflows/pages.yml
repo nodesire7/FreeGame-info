@@ -3,8 +3,8 @@ name: Build & Deploy (FreeGame-info)
 on:
   workflow_dispatch:
   schedule:
-    # Every 6 hours. GitHub cron uses UTC.
-    - cron: "0 */6 * * *"
+    # Every 3 hours. GitHub cron uses UTC.
+    - cron: "0 */3 * * *"
 
 permissions:
   contents: read
