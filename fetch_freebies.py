@@ -15,11 +15,10 @@ from playwright.async_api import Page, TimeoutError as PlaywrightTimeoutError
 from playwright.async_api import async_playwright
 
 # 配置
-# Epic 官方 storefrontLayout 接口（可通过环境变量 EPIC_API_URL 覆盖）
-# 参考： https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=6&count=6
+# Epic 官方免费游戏促销接口（专门用于获取每周限免）
 EPIC_API_URL = os.getenv(
     "EPIC_API_URL",
-    "https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=0&count=30",
+    "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?locale=zh-CN&country=CN&allowCountries=CN",
 )
 PSN_SOURCE_URL = "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/"
 STEAM_FREEBIES_URL = "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese"
@@ -239,70 +238,54 @@ def _parse_iso_datetime_ms(value: Optional[str]) -> Optional[int]:
         return None
 
 
-def _iter_epic_offer_blocks(node: Any) -> List[Dict[str, Any]]:
-    """
-    从 storefrontLayout 的 modules 结构中递归提取 offer block（即包含 offer 字段的对象）。
-    返回形如 {"namespace": "...", "id": "...", "offer": {...}} 的列表。
-    """
-    found: List[Dict[str, Any]] = []
-    if isinstance(node, dict):
-        offers = node.get("offers")
-        if isinstance(offers, list):
-            for entry in offers:
-                if isinstance(entry, dict) and isinstance(entry.get("offer"), dict):
-                    found.append(entry)
-        modules = node.get("modules")
-        if isinstance(modules, list):
-            for child in modules:
-                found.extend(_iter_epic_offer_blocks(child))
-    elif isinstance(node, list):
-        for child in node:
-            found.extend(_iter_epic_offer_blocks(child))
-    return found
-
-
-def _pick_epic_cover(offer: Dict[str, Any]) -> str:
-    images = offer.get("keyImages")
+def _pick_epic_cover(game: Dict[str, Any]) -> str:
+    """从 Epic 游戏数据中提取封面图片 URL"""
+    images = game.get("keyImages")
     if not isinstance(images, list):
         return ""
-    preferred = [
-        "OfferImageTall",
-        "Thumbnail",
-        "DieselStoreFrontTall",
-        "featuredMedia",
-        "OfferImageWide",
-    ]
+    # 优先选择竖版封面
+    preferred = ["OfferImageTall", "Thumbnail", "DieselStoreFrontTall", "DieselStoreFrontWide", "OfferImageWide"]
     for image_type in preferred:
         for item in images:
-            if (
-                isinstance(item, dict)
-                and item.get("type") == image_type
-                and isinstance(item.get("url"), str)
-                and item["url"].strip()
-            ):
-                return item["url"].strip()
+            if isinstance(item, dict) and item.get("type") == image_type:
+                url = item.get("url")
+                if isinstance(url, str) and url.strip():
+                    return url.strip()
+    # 回退：任意图片
     for item in images:
-        if isinstance(item, dict) and isinstance(item.get("url"), str) and item["url"].strip():
-            return item["url"].strip()
+        if isinstance(item, dict):
+            url = item.get("url")
+            if isinstance(url, str) and url.strip():
+                return url.strip()
     return ""
 
 
-def _build_epic_link(offer: Dict[str, Any]) -> str:
-    slug = offer.get("urlSlug") or offer.get("productSlug")
-    if isinstance(slug, str) and slug.strip():
-        return f"https://store.epicgames.com/p/{slug.strip()}"
-    mappings = offer.get("offerMappings")
+def _build_epic_link(game: Dict[str, Any]) -> str:
+    """构建 Epic 商店链接"""
+    url_slug = game.get("urlSlug")
+    if isinstance(url_slug, str) and url_slug.strip() and url_slug not in ("[]", ""):
+        return f"https://store.epicgames.com/p/{url_slug.strip()}"
+    product_slug = game.get("productSlug")
+    if isinstance(product_slug, str) and product_slug.strip() and product_slug not in ("[]", ""):
+        return f"https://store.epicgames.com/p/{product_slug.strip()}"
+    # 尝试从 offerMappings 提取
+    mappings = game.get("offerMappings")
     if isinstance(mappings, list):
         for mapping in mappings:
             if isinstance(mapping, dict):
                 page_slug = mapping.get("pageSlug")
                 if isinstance(page_slug, str) and page_slug.strip():
                     return f"https://store.epicgames.com/p/{page_slug.strip()}"
-    return ""
+    # 回退：使用 namespace/id
+    namespace = game.get("namespace")
+    game_id = game.get("id")
+    if namespace and game_id:
+        return f"https://store.epicgames.com/p/{namespace}/{game_id}"
+    return "https://store.epicgames.com/free-games"
 
 
 async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
-    """抓取 Epic 限免游戏"""
+    """抓取 Epic 限免游戏（使用 freeGamesPromotions 接口）"""
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(EPIC_API_URL, timeout=aiohttp.ClientTimeout(total=30)) as resp:
@@ -310,124 +293,55 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                     raise Exception(f"Epic API returned status {resp.status}")
                 payload = await resp.json()
 
-                modules = (
+                # 提取游戏列表：data.Catalog.searchStore.elements[]
+                elements = (
                     payload.get("data", {})
-                    .get("Storefront", {})
-                    .get("storefrontModulesPaginated", {})
-                    .get("modules")
+                    .get("Catalog", {})
+                    .get("searchStore", {})
+                    .get("elements")
                 )
-                if not isinstance(modules, list):
-                    raise Exception("Unexpected Epic API response format: missing modules list")
+                if not isinstance(elements, list):
+                    raise Exception("Unexpected Epic API response format: missing elements")
 
-                offer_blocks = _iter_epic_offer_blocks(modules)
-                if not offer_blocks:
-                    return {"now": [], "upcoming": []}
-
-                now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
                 now_list: List[Dict[str, Any]] = []
                 upcoming_list: List[Dict[str, Any]] = []
 
-                seen: set[str] = set()
-
-                for block in offer_blocks:
-                    offer = block.get("offer")
-                    if not isinstance(offer, dict):
+                for game in elements:
+                    if not isinstance(game, dict):
                         continue
 
-                    # 过滤：仅保留"限时免费"的条目（原价>0 且折扣价=0）
-                    price_obj = offer.get("price")
-                    if not isinstance(price_obj, dict):
-                        continue
-                    total_price = price_obj.get("totalPrice")
-                    if not isinstance(total_price, dict):
-                        continue
-                    discount_price = total_price.get("discountPrice")
-                    original_price = total_price.get("originalPrice")
-                    
-                    # 核心筛选：折扣价为0 且 原价>0（排除永久免费的DLC/Add-on）
-                    if discount_price != 0:
-                        continue
-                    if not isinstance(original_price, (int, float)) or original_price <= 0:
+                    promotions = game.get("promotions")
+                    if not isinstance(promotions, dict):
                         continue
 
-                    offer_id = str(offer.get("id") or block.get("id") or "")
-                    namespace = str(offer.get("namespace") or block.get("namespace") or "")
-                    dedupe_key = f"{namespace}:{offer_id}" if namespace or offer_id else offer.get("title")
-                    if not dedupe_key or dedupe_key in seen:
-                        continue
-                    seen.add(dedupe_key)
+                    # 当前免费：promotions.promotionalOffers[0].promotionalOffers[]
+                    current_promos = promotions.get("promotionalOffers")
+                    if isinstance(current_promos, list) and len(current_promos) > 0:
+                        promo_offers = current_promos[0].get("promotionalOffers") if isinstance(current_promos[0], dict) else None
+                        if isinstance(promo_offers, list) and len(promo_offers) > 0:
+                            promo = promo_offers[0] if isinstance(promo_offers[0], dict) else None
+                            if promo:
+                                start_ms = _parse_iso_datetime_ms(promo.get("startDate"))
+                                end_ms = _parse_iso_datetime_ms(promo.get("endDate"))
+                                mapped = _map_epic_game(game, start_ms, end_ms, is_current=True)
+                                if mapped:
+                                    now_list.append(mapped)
+                                    continue
 
-                    title = str(offer.get("title") or "未知作品")
-                    description = str(offer.get("description") or "")
-                    seller_obj = offer.get("seller")
-                    seller_name = seller_obj.get("name") if isinstance(seller_obj, dict) else None
+                    # 即将免费：promotions.upcomingPromotionalOffers[0].promotionalOffers[]
+                    upcoming_promos = promotions.get("upcomingPromotionalOffers")
+                    if isinstance(upcoming_promos, list) and len(upcoming_promos) > 0:
+                        promo_offers = upcoming_promos[0].get("promotionalOffers") if isinstance(upcoming_promos[0], dict) else None
+                        if isinstance(promo_offers, list) and len(promo_offers) > 0:
+                            promo = promo_offers[0] if isinstance(promo_offers[0], dict) else None
+                            if promo:
+                                start_ms = _parse_iso_datetime_ms(promo.get("startDate"))
+                                end_ms = _parse_iso_datetime_ms(promo.get("endDate"))
+                                mapped = _map_epic_game(game, start_ms, end_ms, is_current=False)
+                                if mapped:
+                                    upcoming_list.append(mapped)
 
-                    # 时间窗口：优先从 lineOffers[].appliedRules[].endDate 提取限免结束时间
-                    line_offers = price_obj.get("lineOffers")
-                    promo_end_ms = None
-                    if isinstance(line_offers, list) and len(line_offers) > 0:
-                        applied_rules = line_offers[0].get("appliedRules") if isinstance(line_offers[0], dict) else None
-                        if isinstance(applied_rules, list) and len(applied_rules) > 0:
-                            rule_end = applied_rules[0].get("endDate") if isinstance(applied_rules[0], dict) else None
-                            promo_end_ms = _parse_iso_datetime_ms(rule_end)
-                    
-                    # 回退：若 lineOffers 无数据，使用 effectiveDate/expiryDate
-                    start_ms = _parse_iso_datetime_ms(offer.get("effectiveDate") or offer.get("viewableDate"))
-                    end_ms = promo_end_ms or _parse_iso_datetime_ms(offer.get("expiryDate"))
-
-                    # 过滤：已过期则跳过
-                    if end_ms is not None and now_ms >= end_ms:
-                        continue
-
-                    # 判断是否"正在免费"还是"即将免费"
-                    is_free_now = False
-                    if start_ms is not None and end_ms is not None:
-                        # 有明确时间窗：在窗口内=正在，窗口前=即将，窗口后=已过期（上面已过滤）
-                        is_free_now = start_ms <= now_ms < end_ms
-                    elif start_ms is not None:
-                        # 只有开始时间：已开始=正在，未开始=即将
-                        is_free_now = start_ms <= now_ms
-                    elif end_ms is not None:
-                        # 只有结束时间：默认认为正在进行（还没到结束）
-                        is_free_now = now_ms < end_ms
-                    else:
-                        # 无时间信息：默认当作"正在"
-                        is_free_now = True
-
-                    cover = _pick_epic_cover(offer)
-                    link = _build_epic_link(offer)
-
-                    fmt_price = total_price.get("fmtPrice") if isinstance(total_price.get("fmtPrice"), dict) else None
-                    original_price_desc = None
-                    if isinstance(fmt_price, dict) and fmt_price.get("originalPrice") not in (None, ""):
-                        original_price_desc = str(fmt_price.get("originalPrice"))
-
-                    mapped = {
-                        "id": offer_id or title,
-                        "title": title,
-                        "description": description,
-                        "cover": cover,
-                        "link": link,
-                        "isFreeNow": is_free_now,
-                        "freeStartAt": start_ms,
-                        "freeEndAt": end_ms,
-                        # 原价信息（若接口提供 fmtPrice，则保留字符串）
-                        "originalPrice": str(original_price) if original_price not in (None, "") else None,
-                        "originalPriceDesc": original_price_desc,
-                        "isBundle": offer.get("offerType") == "BUNDLE",
-                        "platforms": None,
-                        "platform": None,
-                        "seller": seller_name,
-                        "developer": offer.get("developerDisplayName"),
-                        "publisher": offer.get("publisherDisplayName") or seller_name,
-                        "genres": None,
-                    }
-
-                    if start_ms is not None and start_ms > now_ms:
-                        upcoming_list.append(mapped)
-                    else:
-                        now_list.append(mapped)
-
+                # 排序：当前免费按结束时间，即将免费按开始时间
                 now_list.sort(key=lambda x: (x.get("freeEndAt") or 2**63 - 1, x.get("title") or ""))
                 upcoming_list.sort(key=lambda x: (x.get("freeStartAt") or 2**63 - 1, x.get("title") or ""))
                 return {"now": now_list, "upcoming": upcoming_list}
@@ -436,6 +350,55 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
             import traceback
             traceback.print_exc()
             return {"now": [], "upcoming": []}
+
+
+def _map_epic_game(
+    game: Dict[str, Any], 
+    start_ms: Optional[int], 
+    end_ms: Optional[int], 
+    is_current: bool
+) -> Optional[Dict[str, Any]]:
+    """将 Epic API 游戏数据映射为统一格式"""
+    title = game.get("title")
+    if not title or not isinstance(title, str):
+        return None
+    
+    title = title.strip()
+    if not title:
+        return None
+
+    # 提取价格信息（用于显示原价）
+    price_obj = game.get("price")
+    original_price_desc = None
+    if isinstance(price_obj, dict):
+        total_price = price_obj.get("totalPrice")
+        if isinstance(total_price, dict):
+            fmt_price = total_price.get("fmtPrice")
+            if isinstance(fmt_price, dict):
+                original_price_desc = fmt_price.get("originalPrice")
+
+    seller_obj = game.get("seller")
+    seller_name = seller_obj.get("name") if isinstance(seller_obj, dict) else None
+
+    return {
+        "id": str(game.get("id") or game.get("namespace") or title),
+        "title": title,
+        "description": str(game.get("description") or ""),
+        "cover": _pick_epic_cover(game),
+        "link": _build_epic_link(game),
+        "isFreeNow": is_current,
+        "freeStartAt": start_ms,
+        "freeEndAt": end_ms,
+        "originalPrice": None,
+        "originalPriceDesc": original_price_desc,
+        "isBundle": False,
+        "platforms": None,
+        "platform": None,
+        "seller": seller_name,
+        "developer": game.get("developerDisplayName"),
+        "publisher": game.get("publisherDisplayName"),
+        "genres": None,
+    }
 
 
 def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
