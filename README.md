@@ -6,9 +6,24 @@ Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静�
 
 ## 在线站点
 
-**https://nodesire7.github.io/FreeGame-info/**
+**主页**: https://nodesire7.github.io/FreeGame-info/
 
 每 3 小时自动更新一次限免数据。
+
+### 历史数据访问
+
+每次更新都会自动保存历史数据到 `archive/` 文件夹，可通过以下方式访问：
+
+- **历史 JSON 数据**: `https://nodesire7.github.io/FreeGame-info/archive/{时间戳}白嫖信息.json`
+- **历史图片**: `https://nodesire7.github.io/FreeGame-info/archive/{时间戳}白嫖信息.webp`
+
+时间戳格式：`YYYYMMDDHHmmss`（例如：`20251214202455`）
+
+**示例**：
+- JSON: https://nodesire7.github.io/FreeGame-info/archive/20251214202455白嫖信息.json
+- 图片: https://nodesire7.github.io/FreeGame-info/archive/20251214202455白嫖信息.webp
+
+> 💡 提示：在主页底部可以找到最新一次更新的历史数据链接。
 
 ## 功能特性
 
@@ -17,6 +32,7 @@ Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静�
 - 🎮 **PlayStation Plus**：抓取会员免费游戏
 - 📄 **静态 HTML 页面**：美观的单页应用
 - 🖼️ **分享拼图生成**：使用 Canvas API 生成长图（支持 PNG/WebP）
+- 📦 **历史数据归档**：每次更新自动保存 JSON 和图片到 `archive/` 文件夹
 - 🤖 **GitHub Actions**：自动定时更新并部署到 GitHub Pages
 
 ## 本地使用
@@ -36,14 +52,28 @@ python -m playwright install chromium
 ### 生成静态页面
 
 ```bash
+# 一键生成（推荐）
+python main.py site
+
+# 这会自动：
+# 1. 抓取所有平台数据（Epic、Steam、PSN）
+# 2. 生成 HTML 页面
+# 3. 生成历史 JSON 和图片到 site/archive/ 文件夹
+```
+
+**手动步骤**（已废弃，建议使用 `main.py`）：
+
+```bash
 # 1) 抓取数据
-python fetch_freebies.py snapshot.json
+python epic_fetch.py site/EPIC.json
+python psn_fetch.py site/PSN.json
+python steam_fetch.py site/STEAM.json
 
 # 2) 生成 HTML
-python render_html.py snapshot.json epic-freebies.html.template index.html
+python render_html.py site/snapshot.json epic-freebies.html.template site/index.html
 
-# 3) （可选）生成分享拼图
-python generate_image.py index.html gameinfo.webp
+# 3) 生成分享拼图
+python generate_image.py site/index.html site/archive/时间戳白嫖信息.webp
 ```
 
 ### 一键脚本
@@ -65,7 +95,8 @@ chmod +x update.sh
 
 - **定时运行**：每 3 小时抓取一次（UTC 时间：0:00、3:00、6:00...）
 - **手动触发**：在 Actions 页面点击 "Run workflow"
-- **自动部署**：生成 `site/index.html` + `site/gameinfo.webp` 并发布到 GitHub Pages
+- **自动部署**：生成 `site/index.html`、历史 JSON 和图片，并发布到 GitHub Pages
+- **历史归档**：每次更新都会在 `site/archive/` 文件夹中保存带时间戳的 JSON 和图片文件
 
 ### 如何启用
 
@@ -112,13 +143,30 @@ https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/
 
 | 文件 | 说明 |
 |------|------|
-| `fetch_freebies.py` | 抓取数据主脚本 |
+| `main.py` | 主脚本，一键生成所有内容 |
+| `epic_fetch.py` | Epic Games 数据抓取脚本 |
+| `psn_fetch.py` | PlayStation Plus 数据抓取脚本 |
+| `steam_fetch.py` | Steam 数据抓取脚本 |
 | `render_html.py` | 渲染 HTML 页面 |
 | `generate_image.py` | 生成分享拼图（使用 Playwright + Canvas API） |
-| `psn_api.py` | FastAPI 服务（可选，提供 PSN/Steam API 接口） |
 | `epic-freebies.html.template` | HTML 模板 |
+| `logo.png` | 网站图标 |
 | `requirements.txt` | Python 依赖 |
-| `update.sh` / `update.ps1` | 一键更新脚本 |
+
+### 生成的文件结构
+
+```
+site/
+├── index.html              # 主页
+├── logo.png                # 网站图标
+├── snapshot.json           # 当前数据快照
+├── EPIC.json               # Epic 数据
+├── PSN.json                # PSN 数据
+├── STEAM.json              # Steam 数据
+└── archive/                # 历史数据归档
+    ├── {时间戳}白嫖信息.json
+    └── {时间戳}白嫖信息.webp
+```
 
 ## 自定义配置
 

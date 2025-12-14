@@ -148,7 +148,7 @@ def main():
         generate_webp_from_html(html_output_path, archive_image_path, 1200)
         print(f"\n历史图片已生成到 {archive_image_path}")
     except Exception as e:
-        print(f"\n[FAIL] 生成历史图片失败: {e}")
+        print(f"\n生成历史图片失败: {e}")
         import traceback
         traceback.print_exc()
     
