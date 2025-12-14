@@ -320,7 +320,7 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                     continue
                 seen.add(dedupe_key)
 
-                # 价格过滤：必须存在 totalPrice.originalPrice > 0 且 discountPrice == 0
+                # 价格过滤：折扣为 0，且 (原价>0 或 isCodeRedemptionOnly=True)
                 price_obj = game.get("price")
                 if not isinstance(price_obj, dict):
                     continue
@@ -329,9 +329,10 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                     continue
                 discount_price = total_price.get("discountPrice")
                 original_price = total_price.get("originalPrice")
+                is_code_only = bool(game.get("isCodeRedemptionOnly"))
                 if discount_price != 0:
                     continue
-                if not isinstance(original_price, (int, float)) or original_price <= 0:
+                if not is_code_only and (not isinstance(original_price, (int, float)) or original_price <= 0):
                     continue
 
                 promotions = game.get("promotions") if isinstance(game.get("promotions"), dict) else None
@@ -441,6 +442,7 @@ def _map_epic_game(
         "originalPrice": str(original_price) if original_price not in (None, "") else None,
         "originalPriceDesc": original_price_desc,
         "isBundle": game.get("offerType") == "BUNDLE",
+        "isCodeRedemptionOnly": bool(game.get("isCodeRedemptionOnly")),
         "platforms": None,
         "platform": None,
         "seller": seller_name,
@@ -462,6 +464,14 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
     monthly_sections = soup.select("section#monthly-games")
     section_candidates.extend(monthly_sections)
     print(f"找到 {len(monthly_sections)} 个 #monthly-games 区块")
+
+    # 用户提供的 DOM 路径位置（疑似包含免费游戏列表）
+    specific = soup.select_one(
+        "#gdk__content > div > div.root > div > div > div:nth-child(6) > div > div > div > div > div:nth-child(2)"
+    )
+    if specific:
+        section_candidates.append(specific)
+        print("找到用户指定的免费游戏区块")
 
     legacy_section = soup.select_one(
         "#gdk__content > div > div.root > div > div > div:nth-child(4) > section.gpdc-section.theme--light"
@@ -524,7 +534,7 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
                 ".btn--cta__btn-container a, .button a, .buttonblock a, a.cta__primary"
             )
             if not link_el:
-                link_el = box.select_one("a[href*='playstation'], a[href*='store']")
+                link_el = box.select_one("a[href*='playstation'], a[href*='store'], a[href*='ps-plus']")
             link = link_el.get("href").strip() if link_el and link_el.get("href") else ""
             if link:
                 link = urljoin(base_url, link)
