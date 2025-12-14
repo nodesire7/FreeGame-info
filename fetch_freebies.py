@@ -379,13 +379,20 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                     if end_ms is not None and now_ms >= end_ms:
                         continue
 
-                    is_free_now = True
+                    # 判断是否"正在免费"还是"即将免费"
+                    is_free_now = False
                     if start_ms is not None and end_ms is not None:
+                        # 有明确时间窗：在窗口内=正在，窗口前=即将，窗口后=已过期（上面已过滤）
                         is_free_now = start_ms <= now_ms < end_ms
-                    elif start_ms is not None and end_ms is None:
+                    elif start_ms is not None:
+                        # 只有开始时间：已开始=正在，未开始=即将
                         is_free_now = start_ms <= now_ms
-                    elif start_ms is None and end_ms is not None:
+                    elif end_ms is not None:
+                        # 只有结束时间：默认认为正在进行（还没到结束）
                         is_free_now = now_ms < end_ms
+                    else:
+                        # 无时间信息：默认当作"正在"
+                        is_free_now = True
 
                     cover = _pick_epic_cover(offer)
                     link = _build_epic_link(offer)
@@ -582,31 +589,36 @@ def parse_steam_freebies(html_content: str) -> List[Dict[str, Any]]:
 
 
 async def fetch_psn(psn_html_path: Optional[str] = None) -> List[Dict[str, Any]]:
-    """抓取 PlayStation Plus 限免游戏（使用 Playwright 渲染 JavaScript）"""
+    """抓取 PlayStation Plus 限免游戏"""
     try:
-        print(f"正在抓取 PSN 页面: {PSN_SOURCE_URL}")
-        # 使用 Playwright 抓取（PlayStation 页面需要 JS 渲染）
-        html_content = await fetch_page_html(
-            PSN_SOURCE_URL, wait_for_selector="section#monthly-games"
-        )
+        # 使用 aiohttp 直接下载页面HTML
+        print(f"正在下载PSN页面: {PSN_SOURCE_URL}")
+        async with aiohttp.ClientSession() as session:
+            headers = {
+                "User-Agent": USER_AGENT,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                "Upgrade-Insecure-Requests": "1",
+            }
+            async with session.get(PSN_SOURCE_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                response.raise_for_status()
+                html_content = await response.text()
         
-        # 保存HTML到临时文件（调试用）
+        # 保存HTML到临时文件
         if psn_html_path:
             with open(psn_html_path, "w", encoding="utf-8") as f:
                 f.write(html_content)
-            print(f"PSN 页面已保存到: {psn_html_path}")
+            print(f"PSN页面已临时保存到: {psn_html_path}")
         
         # 解析HTML内容
-        items = parse_psplus_html(html_content)
-        print(f"PSN: 解析到 {len(items)} 条游戏")
-        return items
-    except PlaywrightTimeoutError as e:
-        print(f"Timeout fetching PlayStation page: {e}")
+        return parse_psplus_html(html_content)
+    except aiohttp.ClientError as e:
+        print(f"Network error fetching PlayStation page: {e}")
         return []
     except Exception as e:
         print(f"Failed to fetch PlayStation page: {e}")
-        import traceback
-        traceback.print_exc()
         return []
 
 

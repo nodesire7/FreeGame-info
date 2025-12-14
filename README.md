@@ -1,177 +1,165 @@
-# 限免游戏信息抓取工具（Python 独立版）
+# FreeGame-info
 
-这是一个 **Python 3** 项目，用于抓取并聚合以下平台的限免/免费内容，并生成静态页面：
+Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静态页面
 
-- Epic Games Store（使用官方 `storefrontLayout` JSON）
-- Steam（Playwright 抓取网页）
-- PlayStation Plus（抓取网页解析）
+[![Build & Deploy](https://github.com/nodesire7/FreeGame-info/actions/workflows/pages.yml/badge.svg)](https://github.com/nodesire7/FreeGame-info/actions/workflows/pages.yml)
 
-输出：
-- `snapshot.json`：数据快照
-- `index.html`：静态页面
-- （可选）`gameinfo.webp` / PNG：分享拼图图片
+## 在线站点
 
-更详细的使用说明见 `README_FREEBIES.md`。
+**https://nodesire7.github.io/FreeGame-info/**
 
-## 快速使用（手动）
+每 3 小时自动更新一次限免数据。
 
-1) 安装依赖：
+## 功能特性
+
+- 🎮 **Epic Games Store**：抓取官方 `storefrontLayout` API，获取每周限免游戏
+- 🎮 **Steam**：使用 Playwright 抓取限时免费游戏
+- 🎮 **PlayStation Plus**：抓取会员免费游戏
+- 📄 **静态 HTML 页面**：美观的单页应用
+- 🖼️ **分享拼图生成**：使用 Canvas API 生成长图（支持 PNG/WebP）
+- 🤖 **GitHub Actions**：自动定时更新并部署到 GitHub Pages
+
+## 本地使用
+
+### 环境要求
+
+- Python 3.11+
+- pip
+
+### 安装依赖
 
 ```bash
 pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-2) 抓取数据并生成静态页：
+### 生成静态页面
 
 ```bash
+# 1) 抓取数据
 python fetch_freebies.py snapshot.json
+
+# 2) 生成 HTML
 python render_html.py snapshot.json epic-freebies.html.template index.html
-```
 
-3) （可选）生成拼图：
-
-```bash
+# 3) （可选）生成分享拼图
 python generate_image.py index.html gameinfo.webp
 ```
 
-## Epic 数据源
+### 一键脚本
 
-默认使用 Epic 官方接口（可通过环境变量 `EPIC_API_URL` 覆盖）：
-
-`https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=6&count=6`
-
-## GitHub Actions（自动更新/发布）
-
-仓库包含一个定时任务工作流：`.github/workflows/pages.yml`
-
-- 每 6 小时运行一次（GitHub cron 使用 UTC）
-- 自动抓取数据 → 生成 `index.html` / `snapshot.json` / `gameinfo.webp`
-- 使用 GitHub Pages（GitHub Actions 部署）发布静态站点
-
-2. 编辑配置文件，设置邮箱：
+**Linux / macOS**:
 ```bash
-ALERT_EMAIL="admin@yourcompany.com"
-ENABLE_EMAIL_ALERT=true
+chmod +x update.sh
+./update.sh
 ```
 
-#### Webhook告警设置（钉钉/企业微信）
-1. 在钉钉群或企业微信群中创建机器人
-2. 获取Webhook URL
-3. 编辑配置文件：
-```bash
-WEBHOOK_URL="https://oapi.dingtalk.com/robot/send?access_token=xxx"
-ENABLE_WEBHOOK_ALERT=true
+**Windows**:
+```powershell
+.\update.ps1
 ```
 
-## 宝塔面板集成
+## GitHub Actions 自动化
 
-### 方法1：通过计划任务
-1. 登录宝塔面板
-2. 进入 "计划任务"
-3. 添加Shell脚本任务：
-   - 任务类型：Shell脚本
-   - 任务名称：硬盘监控
-   - 执行周期：N分钟（建议5-10分钟）
-   - 脚本内容：
-   ```bash
-   /root/disk_monitor.sh --once
-   ```
+仓库包含定时任务工作流（`.github/workflows/pages.yml`）：
 
-### 方法2：通过网站监控
-1. 进入 "监控" → "网站监控"
-2. 添加监控项：
-   - 监控类型：自定义
-   - 监控脚本：`/root/disk_monitor.sh --once`
-   - 告警阈值：自定义
+- **定时运行**：每 3 小时抓取一次（UTC 时间：0:00、3:00、6:00...）
+- **手动触发**：在 Actions 页面点击 "Run workflow"
+- **自动部署**：生成 `site/index.html` + `site/gameinfo.webp` 并发布到 GitHub Pages
 
-### 方法3：通过系统监控
-1. 启用宝塔系统监控
-2. 在监控设置中添加自定义监控脚本
-3. 设置告警规则
+### 如何启用
 
-## 监控指标说明
+1. Fork 本仓库
+2. 在仓库 Settings → Pages：
+   - Source 选择：**GitHub Actions**
+3. 在 Actions 页面手动触发一次运行
+4. 访问 `https://你的用户名.github.io/FreeGame-info/`
 
-### 磁盘IO指标
-- **IO使用率**: 磁盘繁忙程度百分比
-- **读IOPS**: 每秒读操作次数
-- **写IOPS**: 每秒写操作次数
-- **读MB/s**: 每秒读取数据量
-- **写MB/s**: 每秒写入数据量
-- **平均等待**: IO操作平均等待时间
+## 数据源说明
 
-### 磁盘空间指标
-- **总大小**: 磁盘总容量
-- **已使用**: 已使用空间
-- **可用**: 剩余可用空间
-- **使用率**: 空间使用百分比
+### Epic Games
 
-### 系统负载
-- 系统1分钟平均负载
+默认使用官方 GraphQL 接口：
 
-## 告警阈值建议
-
-### 生产环境
-- IO使用率: 80%
-- 磁盘空间: 90%
-- 系统负载: 5.0
-
-### 测试环境
-- IO使用率: 90%
-- 磁盘空间: 95%
-- 系统负载: 8.0
-
-## 故障排除
-
-### 常见问题
-
-1. **脚本无执行权限**
-   ```bash
-   chmod +x disk_monitor.sh
-   ```
-
-2. **缺少sysstat包**
-   ```bash
-   yum install -y sysstat
-   ```
-
-3. **iostat命令不可用**
-   ```bash
-   which iostat
-   # 如果不存在，重新安装sysstat
-   ```
-
-4. **日志文件过大**
-   - 脚本会自动轮转日志
-   - 可在配置文件中调整 `LOG_RETENTION_DAYS`
-
-### 日志查看
-```bash
-# 查看实时日志
-tail -f /root/logs/disk_monitor.log
-
-# 查看历史日志
-ls -la /root/logs/
+```
+https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=0&count=30
 ```
 
-## 性能优化建议
+筛选条件：
+- `price.totalPrice.discountPrice == 0`（现价为 0）
+- `price.totalPrice.originalPrice > 0`（原价大于 0）
+- 从 `price.lineOffers[0].appliedRules[0].endDate` 提取限免结束时间
 
-1. **调整检查间隔**: 根据服务器负载调整 `CHECK_INTERVAL`
-2. **选择性监控**: 在 `DEVICES` 中指定特定设备
-3. **日志清理**: 定期清理旧日志文件
-4. **告警优化**: 避免频繁告警，设置合理的阈值
+**注意**：官方 API 可能不包含"即将开始"的限免游戏（只有已开始的），具体取决于 Epic 的发布策略。
 
-## 安全注意事项
+### Steam
 
-1. 脚本需要root权限运行
-2. 定期更新系统和依赖包
-3. 保护配置文件中的敏感信息
-4. 限制日志文件访问权限
+抓取 Steam 商店的"限时特惠 + 免费"搜索结果页：
 
-## 技术支持
+```
+https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese
+```
 
-如遇问题，请检查：
-1. 系统日志: `/var/log/messages`
-2. 脚本日志: `/root/logs/disk_monitor.log`
-3. 配置文件: `/root/disk_monitor.conf`
-4. 运行状态: `./disk_monitor.sh -s`
+### PlayStation Plus
+
+抓取 PlayStation 官方会员页面：
+
+```
+https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/
+```
+
+## 文件说明
+
+| 文件 | 说明 |
+|------|------|
+| `fetch_freebies.py` | 抓取数据主脚本 |
+| `render_html.py` | 渲染 HTML 页面 |
+| `generate_image.py` | 生成分享拼图（使用 Playwright + Canvas API） |
+| `psn_api.py` | FastAPI 服务（可选，提供 PSN/Steam API 接口） |
+| `epic-freebies.html.template` | HTML 模板 |
+| `requirements.txt` | Python 依赖 |
+| `update.sh` / `update.ps1` | 一键更新脚本 |
+
+## 自定义配置
+
+### Epic API URL
+
+通过环境变量覆盖：
+
+```bash
+export EPIC_API_URL="https://..."
+python fetch_freebies.py snapshot.json
+```
+
+### Python 版本
+
+`update.sh` 默认使用 `python3.11`，可通过环境变量 `PYTHON_CMD` 指定：
+
+```bash
+PYTHON_CMD=python3.12 ./update.sh
+```
+
+## 常见问题
+
+### Playwright 浏览器安装失败
+
+```bash
+python -m playwright install --with-deps chromium
+```
+
+### WebP 转换失败
+
+安装 Pillow 库：
+
+```bash
+pip install Pillow
+```
+
+## 许可证
+
+MIT License
+
+---
+
+**在线站点**: https://nodesire7.github.io/FreeGame-info/  
+**仓库地址**: https://github.com/nodesire7/FreeGame-info
