@@ -41,6 +41,14 @@ python generate_image.py index.html gameinfo.webp
 
 `https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=6&count=6`
 
+## GitHub Actions（自动更新/发布）
+
+仓库包含一个定时任务工作流：`.github/workflows/pages.yml`
+
+- 每 6 小时运行一次（GitHub cron 使用 UTC）
+- 自动抓取数据 → 生成 `index.html` / `snapshot.json` / `gameinfo.webp`
+- 使用 GitHub Pages（GitHub Actions 部署）发布静态站点
+
 2. 编辑配置文件，设置邮箱：
 ```bash
 ALERT_EMAIL="admin@yourcompany.com"
