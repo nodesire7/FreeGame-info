@@ -4,6 +4,7 @@
 """
 import asyncio
 import json
+import re
 import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
@@ -426,6 +427,8 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                         mapped["description"] = page_detail.get("description") or mapped.get("description")
                         mapped["platforms"] = page_detail.get("platforms") or mapped.get("platforms")
                         mapped["genres"] = page_detail.get("genres") or mapped.get("genres")
+                        mapped["publisher"] = page_detail.get("publisher") or mapped.get("publisher")
+                        mapped["developer"] = page_detail.get("developer") or mapped.get("developer")
 
                     has_window = True
                     if is_free_now:
@@ -502,7 +505,7 @@ async def _fetch_epic_offer_detail(session: aiohttp.ClientSession, offer_id: str
 
 
 async def _fetch_epic_page_detail(session: aiohttp.ClientSession, slug: str) -> Optional[Dict[str, Any]]:
-    """抓取 Epic 商品页 HTML，解析 __NEXT_DATA__ 提取原价/描述/平台/类型"""
+    """抓取 Epic 商品页 HTML，解析 __NEXT_DATA__ + DOM 提取原价/描述/平台/类型/发行商"""
     url = f"https://store.epicgames.com/zh-CN/p/{slug}"
     try:
         async with session.get(url, timeout=aiohttp.ClientTimeout(total=20)) as resp:
@@ -517,9 +520,7 @@ async def _fetch_epic_page_detail(session: aiohttp.ClientSession, slug: str) -> 
     if not next_data_json:
         return None
 
-    product_info = _extract_product_info(next_data_json)
-    if not product_info:
-        return None
+    product_info = _extract_product_info(next_data_json) or {}
 
     price = (product_info.get("price") or {}).get("totalPrice") or {}
     original_price = price.get("originalPrice")
@@ -540,12 +541,26 @@ async def _fetch_epic_page_detail(session: aiohttp.ClientSession, slug: str) -> 
     if isinstance(tags, list):
         genres = [t.get("id") or t.get("name") for t in tags if isinstance(t, dict) and (t.get("id") or t.get("name"))]
 
+    # DOM 解析补全价格/描述/发行商/开发商
+    dom_detail = _parse_epic_page_dom(html)
+    if dom_detail:
+        original_price_desc = dom_detail.get("originalPriceDesc") or original_price_desc
+        description = dom_detail.get("description") or description
+        platforms = dom_detail.get("platforms") or platforms
+        genres = dom_detail.get("genres") or genres
+        if dom_detail.get("publisher"):
+            product_info["publisherDisplayName"] = dom_detail["publisher"]
+        if dom_detail.get("developer"):
+            product_info["developerDisplayName"] = dom_detail["developer"]
+
     return {
         "originalPrice": str(original_price) if original_price not in (None, "") else None,
         "originalPriceDesc": original_price_desc,
         "description": description,
         "platforms": platforms,
         "genres": genres,
+        "publisher": product_info.get("publisherDisplayName"),
+        "developer": product_info.get("developerDisplayName"),
     }
 
 
@@ -585,6 +600,87 @@ def _extract_product_info(next_data: Dict[str, Any]) -> Optional[Dict[str, Any]]
     except Exception:
         return None
     return None
+
+
+def _parse_epic_page_dom(html: str) -> Optional[Dict[str, Any]]:
+    """从商品页 DOM 解析原价文本、描述、平台、发行商/开发商等信息"""
+    try:
+        soup = BeautifulSoup(html, "html.parser")
+
+        # 原价文本（包含货币符号），选择价格段的货币文本
+        original_price_desc = None
+        price_spans = soup.select("span")
+        for sp in price_spans:
+            text = sp.get_text(strip=True)
+            if re.match(r"^[¥$€£]\s*\d", text):
+                original_price_desc = text
+                break
+        if not original_price_desc:
+            txt = soup.find(string=re.compile(r"¥\s*\d"))
+            if txt:
+                original_price_desc = txt.strip()
+
+        # 描述：优先 head meta，再次从页面主要描述块尝试
+        description = None
+        meta_desc = soup.find("meta", attrs={"property": "og:description"})
+        if meta_desc and meta_desc.get("content"):
+            description = meta_desc["content"].strip()
+        if not description:
+            desc_node = soup.select_one("#app-main-content [data-testid='product-description'], #app-main-content div.css-j7qwjs p")
+            if desc_node:
+                description = desc_node.get_text(strip=True) or None
+
+        # 平台列表
+        platforms = None
+        plat_ul = soup.select_one("ul[class*=css-e6kwg0]")
+        if plat_ul:
+            plats: List[str] = []
+            for li in plat_ul.select("li"):
+                text = li.get_text(strip=True)
+                if text:
+                    plats.append(text)
+            if plats:
+                platforms = plats
+
+        # 标签/类型
+        genres = None
+        genre_nodes = soup.select("a[href*='category'], a[href*='genre']")
+        if genre_nodes:
+            genres = []
+            for node in genre_nodes:
+                text = node.get_text(strip=True)
+                if text:
+                    genres.append(text)
+            if not genres:
+                genres = None
+
+        # 发行商/开发商
+        def _find_label_value(label: str) -> Optional[str]:
+            lbl = soup.find(string=re.compile(label))
+            if not lbl:
+                return None
+            parent = lbl.find_parent()
+            if not parent:
+                return None
+            for candidate in parent.find_all_next(["span", "time"], limit=5):
+                val = candidate.get_text(strip=True)
+                if val and val != label:
+                    return val
+            return None
+
+        developer = _find_label_value("开发商")
+        publisher = _find_label_value("发行商")
+
+        return {
+            "originalPriceDesc": original_price_desc,
+            "description": description,
+            "platforms": platforms,
+            "developer": developer,
+            "publisher": publisher,
+            "genres": genres,
+        }
+    except Exception:
+        return None
 
 
 def _map_epic_game(
