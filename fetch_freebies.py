@@ -542,99 +542,48 @@ def _map_epic_game(
 
 
 def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
-    """解析 PlayStation Plus HTML"""
+    """解析 PlayStation Plus HTML（适配 gdk/gpdc-section 结构）"""
     soup = BeautifulSoup(html_content, "html.parser")
     base_url = "https://www.playstation.com"
 
     items: List[Dict[str, Any]] = []
     seen_links: set[str] = set()
 
-    section_candidates: List[Tag] = []
-    monthly_sections = soup.select("section#monthly-games")
-    section_candidates.extend(monthly_sections)
-    print(f"找到 {len(monthly_sections)} 个 #monthly-games 区块")
+    # 优先：页面主容器内的 gpdc-section
+    sections = soup.select(".gdk.root.container section.gpdc-section")
+    if not sections:
+        sections = soup.select("section.gpdc-section")
 
-    # 用户提供的 DOM 路径位置（疑似包含免费游戏列表）
-    specific = soup.select_one(
-        "#gdk__content > div > div.root > div > div > div:nth-child(6) > div > div > div > div > div:nth-child(2)"
-    )
-    if specific:
-        section_candidates.append(specific)
-        print("找到用户指定的免费游戏区块")
-
-    legacy_section = soup.select_one(
-        "#gdk__content > div > div.root > div > div > div:nth-child(4) > section.gpdc-section.theme--light"
-    )
-    if legacy_section:
-        section_candidates.append(legacy_section)
-        print("找到 legacy section")
-
-    if not section_candidates:
-        all_sections = soup.select("section.gpdc-section")
-        section_candidates.extend(all_sections)
-        print(f"未找到特定区块，使用所有 gpdc-section: {len(all_sections)} 个")
-
-    # 尝试更多选择器
-    if not section_candidates:
-        # 尝试查找包含游戏信息的其他区块
-        alt_sections = soup.select("section[class*='game'], section[class*='plus'], section[class*='monthly']")
-        section_candidates.extend(alt_sections)
-        print(f"尝试备用选择器，找到 {len(alt_sections)} 个区块")
-
-    for section in section_candidates:
-        boxes = section.select(".box--light, .box")
-        if not boxes:
-            # 尝试其他可能的容器选择器
-            boxes = section.select(".card, .game-card, .item, [class*='game']")
-        print(f"区块中找到 {len(boxes)} 个游戏卡片")
-
+    for section in sections:
+        # 每个 section 内的 box
+        boxes = section.select(".box")
         for box in boxes:
             text_block = box.select_one(".txt-block__paragraph") or box
-            # 尝试更多标题选择器
-            title_el = text_block.find(["h1", "h2", "h3", "h4", "strong", "b"])
-            if not title_el:
-                title_el = box.find(["h1", "h2", "h3", "h4", "strong", "b"])
+
+            title_el = text_block.find(["h1", "h2", "h3", "h4", "strong", "b"]) or box.find(
+                ["h1", "h2", "h3", "h4", "strong", "b"]
+            )
             title = title_el.get_text(strip=True) if title_el else ""
 
-            paragraph = text_block.find("p")
-            if not paragraph:
-                paragraph = box.find("p")
+            paragraph = text_block.find("p") or box.find("p")
             lines = _collect_text_lines(paragraph)
-            highlight_lines = [
-                line for line in lines if line.startswith(("·", "•", "-", "—"))
-            ]
+            highlight_lines = [line for line in lines if line.startswith(("·", "•", "-", "—"))]
             description_lines = [line for line in lines if line not in highlight_lines]
-
-            highlight = (
-                " / ".join(line.lstrip("·•-— ").strip() for line in highlight_lines)
-                or None
-            )
+            highlight = " / ".join(line.lstrip("·•-— ").strip() for line in highlight_lines) or None
             description = " ".join(description_lines).strip() or None
 
-            media_block = box.select_one(".media-block")
-            if not media_block:
-                # 尝试直接查找图片标签
-                img_tag = box.select_one("img")
-                if img_tag:
-                    media_block = img_tag
+            media_block = box.select_one(".media-block") or box.select_one(".imageblock") or box.select_one("img")
             image = _extract_image_url(media_block, base_url)
 
-            link_el = box.select_one(
-                ".btn--cta__btn-container a, .button a, .buttonblock a, a.cta__primary"
+            link_el = box.select_one(".btn--cta__btn-container a") or box.select_one(
+                "a[href*='playstation'], a[href*='store'], a[href*='games']"
             )
-            if not link_el:
-                link_el = box.select_one("a[href*='playstation'], a[href*='store'], a[href*='ps-plus']")
             link = link_el.get("href").strip() if link_el and link_el.get("href") else ""
             if link:
                 link = urljoin(base_url, link)
 
             if not title or not link or link in seen_links:
                 continue
-
-            platform_el = text_block.select_one(".eyebrow, .eyebrow__text")
-            if not platform_el:
-                platform_el = box.select_one(".eyebrow, .eyebrow__text")
-            platforms = platform_el.get_text(strip=True) if platform_el else None
 
             items.append(
                 {
@@ -644,13 +593,10 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
                     "image": image,
                     "description": description or highlight or "PlayStation 官方暂未提供详细描述。",
                     "highlight": highlight,
-                    "platforms": platforms,
+                    "platforms": None,
                 }
             )
             seen_links.add(link)
-
-        if items:
-            break
 
     return items
 
