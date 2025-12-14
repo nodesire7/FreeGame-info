@@ -21,6 +21,7 @@ index.html
 public/
 *.webp
 *.png
+!logo.png
 
 # Allow the HTML template to be tracked
 !epic-freebies.html.template
