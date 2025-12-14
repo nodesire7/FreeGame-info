@@ -416,6 +416,17 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                             mapped["originalPrice"] = detail_price.get("originalPrice") or mapped["originalPrice"]
                             mapped["originalPriceDesc"] = detail_price.get("originalPriceDesc") or mapped["originalPriceDesc"]
 
+                # 追加：从商品页抓取详情（原价/描述/平台/类型），优先使用页面数据
+                slug = _extract_epic_slug(game)
+                if slug:
+                    page_detail = await _fetch_epic_page_detail(session, slug)
+                    if page_detail:
+                        mapped["originalPrice"] = page_detail.get("originalPrice") or mapped.get("originalPrice")
+                        mapped["originalPriceDesc"] = page_detail.get("originalPriceDesc") or mapped.get("originalPriceDesc")
+                        mapped["description"] = page_detail.get("description") or mapped.get("description")
+                        mapped["platforms"] = page_detail.get("platforms") or mapped.get("platforms")
+                        mapped["genres"] = page_detail.get("genres") or mapped.get("genres")
+
                     has_window = True
                     if is_free_now:
                         now_list.append(mapped)
@@ -490,6 +501,92 @@ async def _fetch_epic_offer_detail(session: aiohttp.ClientSession, offer_id: str
         return None
 
 
+async def _fetch_epic_page_detail(session: aiohttp.ClientSession, slug: str) -> Optional[Dict[str, Any]]:
+    """抓取 Epic 商品页 HTML，解析 __NEXT_DATA__ 提取原价/描述/平台/类型"""
+    url = f"https://store.epicgames.com/zh-CN/p/{slug}"
+    try:
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=20)) as resp:
+            if resp.status != 200:
+                return None
+            html = await resp.text()
+    except Exception:
+        return None
+
+    # 解析 __NEXT_DATA__
+    next_data_json = _extract_next_data(html)
+    if not next_data_json:
+        return None
+
+    product_info = _extract_product_info(next_data_json)
+    if not product_info:
+        return None
+
+    price = (product_info.get("price") or {}).get("totalPrice") or {}
+    original_price = price.get("originalPrice")
+    fmt_price = price.get("fmtPrice") if isinstance(price.get("fmtPrice"), dict) else None
+    original_price_desc = fmt_price.get("originalPrice") if isinstance(fmt_price, dict) else None
+
+    description = product_info.get("description")
+
+    # 平台
+    platforms: Optional[List[str]] = None
+    plat_list = product_info.get("platforms")
+    if isinstance(plat_list, list):
+        platforms = [str(p) for p in plat_list if p]
+
+    # 类型/标签
+    genres: Optional[List[str]] = None
+    tags = product_info.get("tags")
+    if isinstance(tags, list):
+        genres = [t.get("id") or t.get("name") for t in tags if isinstance(t, dict) and (t.get("id") or t.get("name"))]
+
+    return {
+        "originalPrice": str(original_price) if original_price not in (None, "") else None,
+        "originalPriceDesc": original_price_desc,
+        "description": description,
+        "platforms": platforms,
+        "genres": genres,
+    }
+
+
+def _extract_next_data(html: str) -> Optional[Dict[str, Any]]:
+    """从 HTML 中提取 __NEXT_DATA__ JSON"""
+    marker = '<script id="__NEXT_DATA__" type="application/json">'
+    start = html.find(marker)
+    if start == -1:
+        return None
+    start += len(marker)
+    end = html.find("</script>", start)
+    if end == -1:
+        return None
+    try:
+        return json.loads(html[start:end])
+    except Exception:
+        return None
+
+
+def _extract_product_info(next_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    从 __NEXT_DATA__ 结构中提取 productInfo（兼容常见结构）
+    典型路径：props.pageProps.product.productBaseInfo.productInfo[0]
+    """
+    try:
+        props = next_data.get("props") or next_data.get("pageProps") or {}
+        page_props = props.get("pageProps") if isinstance(props, dict) else {}
+        product = page_props.get("product") if isinstance(page_props, dict) else props.get("product")
+        if not isinstance(product, dict):
+            return None
+        base = product.get("productBaseInfo") or {}
+        infos = base.get("productInfo")
+        if isinstance(infos, list) and infos:
+            info = infos[0]
+            if isinstance(info, dict):
+                return info
+    except Exception:
+        return None
+    return None
+
+
 def _map_epic_game(
     game: Dict[str, Any],
     price_obj: Dict[str, Any],
@@ -549,17 +646,20 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
     items: List[Dict[str, Any]] = []
     seen_links: set[str] = set()
 
-    # 优先：页面主容器内的 gpdc-section
-    sections = soup.select(".gdk.root.container section.gpdc-section")
+    # 优先 gdk root 容器下的 gpdc-section（实测实例.html）
+    sections = soup.select("div.gdk.root.container section.gpdc-section")
     if not sections:
-        sections = soup.select("section.gpdc-section")
+        sections = soup.select("section#monthly-games, section.gpdc-section")
 
     for section in sections:
-        # 每个 section 内的 box
-        boxes = section.select(".box")
-        for box in boxes:
-            text_block = box.select_one(".txt-block__paragraph") or box
+        boxes = section.select(".content-grid .box")
+        if not boxes:
+            boxes = section.select(".box")
 
+        # box 可能成对出现（图+文），逐个收集
+        for box in boxes:
+            # 标题/描述
+            text_block = box.select_one(".txt-block__paragraph") or box
             title_el = text_block.find(["h1", "h2", "h3", "h4", "strong", "b"]) or box.find(
                 ["h1", "h2", "h3", "h4", "strong", "b"]
             )
@@ -572,11 +672,18 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
             highlight = " / ".join(line.lstrip("·•-— ").strip() for line in highlight_lines) or None
             description = " ".join(description_lines).strip() or None
 
-            media_block = box.select_one(".media-block") or box.select_one(".imageblock") or box.select_one("img")
+            # 图片
+            media_block = (
+                box.select_one(".media-block")
+                or box.select_one(".imageblock")
+                or box.select_one("img")
+            )
             image = _extract_image_url(media_block, base_url)
 
-            link_el = box.select_one(".btn--cta__btn-container a") or box.select_one(
-                "a[href*='playstation'], a[href*='store'], a[href*='games']"
+            # 链接
+            link_el = (
+                box.select_one(".btn--cta__btn-container a")
+                or box.select_one("a[href*='playstation'], a[href*='store'], a[href*='games']")
             )
             link = link_el.get("href").strip() if link_el and link_el.get("href") else ""
             if link:
@@ -597,6 +704,9 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
                 }
             )
             seen_links.add(link)
+
+        if items:
+            break
 
     return items
 
