@@ -359,7 +359,7 @@ def get_share_client_script() -> str:
   }
 
   if (sharePayload && shareButton) {
-    shareButton.setAttribute('download', sharePayload.suggestedFileName || '乐赏限免拼图.png');
+    shareButton.setAttribute('download', sharePayload.suggestedFileName || 'GBTGame限免拼图.png');
   }
 
   if (shareButton) {
@@ -989,7 +989,7 @@ def serialize_for_client(payload: Optional[Dict[str, Any]]) -> str:
     return json_str
 
 
-def render_html(snapshot: Dict[str, Any], template_path: str) -> str:
+def render_html(snapshot: Dict[str, Any], template_path: str, timestamp: str = None) -> str:
     """渲染 HTML"""
     with open(template_path, "r", encoding="utf-8") as f:
         template = f.read()
@@ -1003,6 +1003,13 @@ def render_html(snapshot: Dict[str, Any], template_path: str) -> str:
             fetched_at_display = "等待同步"
     else:
         fetched_at_display = "等待同步"
+    
+    # 生成 archive 文件的 URL
+    archive_json_url = ""
+    archive_image_url = ""
+    if timestamp:
+        archive_json_url = f"archive/{timestamp}白嫖信息.json"
+        archive_image_url = f"archive/{timestamp}白嫖信息.webp"
 
     epic_now = snapshot["epic"]["now"]
     epic_upcoming = snapshot["epic"]["upcoming"]
@@ -1020,6 +1027,11 @@ def render_html(snapshot: Dict[str, Any], template_path: str) -> str:
     share_ready = share_payload is not None
     share_data_json = serialize_for_client(share_payload)
     share_script = get_share_client_script()
+    
+    # 生成 archive 链接
+    archive_links = ""
+    if timestamp and archive_json_url and archive_image_url:
+        archive_links = f'<span>历史数据：<a href="{escape_attribute(archive_json_url)}" target="_blank" rel="noopener noreferrer">JSON</a> | <a href="{escape_attribute(archive_image_url)}" target="_blank" rel="noopener noreferrer">图片</a></span>'
 
     replacements = {
         "FETCHED_AT": escape_html(fetched_at_display),
@@ -1054,6 +1066,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str) -> str:
         "SHARE_BUTTON_URL": escape_attribute("#"),
         "SHARE_DATA_JSON": share_data_json,
         "CLIENT_SCRIPT": share_script,
+        "ARCHIVE_LINKS": archive_links,
     }
 
     html_content = template

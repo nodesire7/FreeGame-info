@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>白嫖游戏速报 | GBTGAME官方网站</title>
-    <link rel="icon" type="image/png" href="data:image/png;base64,">
+    <link rel="icon" type="image/png" href="logo.png">
     <style>
         :root {
             --steam-body-bg: #0a151f;
@@ -725,6 +725,7 @@
                     <span>作者：AFEI</span>
                     <span>邮箱：<a href="mailto:amocnfk@gmail.com">amocnfk@gmail.com</a></span>
                     <span>GitHub：<a href="https://github.com/nodesire7/" target="_blank" rel="noopener noreferrer">nodesire7</a></span>
+                    {{ARCHIVE_LINKS}}
                 </div>
             </footer>
         </div>

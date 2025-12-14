@@ -44,7 +44,6 @@ jobs:
         run: |
           mkdir -p site
           python main.py site
-          python generate_image.py site/index.html site/gameinfo.webp 1200
           touch site/.nojekyll
 
       - name: Configure Pages
