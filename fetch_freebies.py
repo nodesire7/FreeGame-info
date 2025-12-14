@@ -15,7 +15,7 @@ from playwright.async_api import Page, TimeoutError as PlaywrightTimeoutError
 from playwright.async_api import async_playwright
 
 # 配置
-# Epic 官方免费游戏促销接口（单一数据源）
+# Epic 官方免费游戏促销接口（唯一使用的接口）
 EPIC_PROMOTIONS_API_URL = os.getenv(
     "EPIC_PROMOTIONS_API_URL",
     "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?locale=zh-CN&country=CN&allowCountries=CN",
@@ -285,10 +285,12 @@ def _build_epic_link(game: Dict[str, Any]) -> str:
 
 
 async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
-    """抓取 Epic 限免游戏（单一 freeGamesPromotions 数据源）"""
+    """抓取 Epic 限免游戏（仅使用 freeGamesPromotions 接口）"""
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(EPIC_PROMOTIONS_API_URL, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+            async with session.get(
+                EPIC_PROMOTIONS_API_URL, timeout=aiohttp.ClientTimeout(total=30)
+            ) as resp:
                 if resp.status != 200:
                     raise Exception(f"Epic Promotions API returned status {resp.status}")
                 payload = await resp.json()
@@ -302,6 +304,7 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
             if not isinstance(elements, list):
                 raise Exception("Unexpected Epic Promotions API response format: missing elements")
 
+            now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
             now_list: List[Dict[str, Any]] = []
             upcoming_list: List[Dict[str, Any]] = []
             seen: set[str] = set()
@@ -309,64 +312,65 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
             for game in elements:
                 if not isinstance(game, dict):
                     continue
-                namespace = str(game.get("namespace") or "")
-                game_id = str(game.get("id") or "")
-                if not namespace or not game_id:
+
+                namespace = str(game.get("namespace") or "").strip()
+                game_id = str(game.get("id") or "").strip()
+                dedupe_key = f"{namespace}:{game_id}" if namespace or game_id else game.get("title")
+                if not dedupe_key or dedupe_key in seen:
                     continue
-                dedupe_key = f"{namespace}:{game_id}"
-                if dedupe_key in seen:
-                    continue
-                promotions = game.get("promotions")
-                if not isinstance(promotions, dict):
-                    continue
-
-                def _first_promo(block_name: str) -> Optional[Dict[str, Any]]:
-                    block = promotions.get(block_name)
-                    if isinstance(block, list) and block:
-                        inner = block[0].get("promotionalOffers") if isinstance(block[0], dict) else None
-                        if isinstance(inner, list) and inner:
-                            promo = inner[0]
-                            return promo if isinstance(promo, dict) else None
-                    return None
-
-                current_promo = _first_promo("promotionalOffers")
-                upcoming_promo = _first_promo("upcomingPromotionalOffers")
-
-                if current_promo is None and upcoming_promo is None:
-                    continue
-
-                promo = current_promo or upcoming_promo
-                start_ms = _parse_iso_datetime_ms(promo.get("startDate")) if promo else None
-                end_ms = _parse_iso_datetime_ms(promo.get("endDate")) if promo else None
-                is_current = current_promo is not None
-
-                price_obj = game.get("price")
-                # 过滤逻辑：如果价格字段存在且明确不是免费，则跳过
-                if isinstance(price_obj, dict):
-                    total_price = price_obj.get("totalPrice")
-                    if isinstance(total_price, dict):
-                        discount_price = total_price.get("discountPrice")
-                        original_price = total_price.get("originalPrice")
-                        if discount_price not in (None, 0):
-                            continue
-                        if original_price not in (None, "") and isinstance(original_price, (int, float)) and original_price <= 0:
-                            continue
-
-                mapped = _map_epic_game_with_price(
-                    game,
-                    start_ms,
-                    end_ms,
-                    is_current,
-                    price_obj if isinstance(price_obj, dict) else {},
-                )
-                if not mapped:
-                    continue
-
                 seen.add(dedupe_key)
-                if is_current:
-                    now_list.append(mapped)
-                else:
-                    upcoming_list.append(mapped)
+
+                # 价格过滤：必须存在 totalPrice.originalPrice > 0 且 discountPrice == 0
+                price_obj = game.get("price")
+                if not isinstance(price_obj, dict):
+                    continue
+                total_price = price_obj.get("totalPrice")
+                if not isinstance(total_price, dict):
+                    continue
+                discount_price = total_price.get("discountPrice")
+                original_price = total_price.get("originalPrice")
+                if discount_price != 0:
+                    continue
+                if not isinstance(original_price, (int, float)) or original_price <= 0:
+                    continue
+
+                promotions = game.get("promotions") if isinstance(game.get("promotions"), dict) else None
+                if not promotions:
+                    continue
+
+                has_window = False
+                for is_current, start_ms, end_ms in _iter_promo_windows(promotions):
+                    # 跳过已结束的促销
+                    if end_ms is not None and now_ms >= end_ms:
+                        continue
+
+                    is_free_now = is_current
+                    if start_ms is not None and end_ms is not None:
+                        is_free_now = start_ms <= now_ms < end_ms
+                    elif start_ms is not None:
+                        is_free_now = start_ms <= now_ms
+                    elif end_ms is not None:
+                        is_free_now = now_ms < end_ms
+
+                    mapped = _map_epic_game(
+                        game=game,
+                        price_obj=price_obj,
+                        start_ms=start_ms,
+                        end_ms=end_ms,
+                        is_free_now=is_free_now,
+                    )
+                    if not mapped:
+                        continue
+
+                    has_window = True
+                    if is_free_now:
+                        now_list.append(mapped)
+                    else:
+                        upcoming_list.append(mapped)
+
+                # 如果没有任何促销窗口，跳过
+                if not has_window:
+                    continue
 
             now_list.sort(key=lambda x: (x.get("freeEndAt") or 2**63 - 1, x.get("title") or ""))
             upcoming_list.sort(key=lambda x: (x.get("freeStartAt") or 2**63 - 1, x.get("title") or ""))
@@ -378,14 +382,32 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
             return {"now": [], "upcoming": []}
 
 
-def _map_epic_game_with_price(
-    game: Dict[str, Any], 
-    start_ms: Optional[int], 
-    end_ms: Optional[int], 
-    is_current: bool,
-    price_obj: Dict[str, Any]
+def _iter_promo_windows(promotions: Dict[str, Any]):
+    """迭代促销窗口，返回 (is_current, start_ms, end_ms)"""
+    for is_current, key in ((True, "promotionalOffers"), (False, "upcomingPromotionalOffers")):
+        groups = promotions.get(key)
+        if not (isinstance(groups, list) and groups):
+            continue
+        group = groups[0]
+        offers = group.get("promotionalOffers") if isinstance(group, dict) else None
+        if not (isinstance(offers, list) and offers):
+            continue
+        for promo in offers:
+            if not isinstance(promo, dict):
+                continue
+            start_ms = _parse_iso_datetime_ms(promo.get("startDate"))
+            end_ms = _parse_iso_datetime_ms(promo.get("endDate"))
+            yield is_current, start_ms, end_ms
+
+
+def _map_epic_game(
+    game: Dict[str, Any],
+    price_obj: Dict[str, Any],
+    start_ms: Optional[int],
+    end_ms: Optional[int],
+    is_free_now: bool,
 ) -> Optional[Dict[str, Any]]:
-    """将 Epic API 游戏数据映射为统一格式（包含价格信息）"""
+    """将 Epic API 游戏数据映射为统一格式"""
     title = game.get("title")
     if not title or not isinstance(title, str):
         return None
@@ -394,7 +416,6 @@ def _map_epic_game_with_price(
     if not title:
         return None
 
-    # 提取价格信息：从 price.totalPrice.originalPrice 和 price.totalPrice.fmtPrice.originalPrice
     original_price = None
     original_price_desc = None
     if isinstance(price_obj, dict):
@@ -414,7 +435,7 @@ def _map_epic_game_with_price(
         "description": str(game.get("description") or ""),
         "cover": _pick_epic_cover(game),
         "link": _build_epic_link(game),
-        "isFreeNow": is_current,
+        "isFreeNow": is_free_now,
         "freeStartAt": start_ms,
         "freeEndAt": end_ms,
         "originalPrice": str(original_price) if original_price not in (None, "") else None,
@@ -529,6 +550,9 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
             )
             seen_links.add(link)
 
+        if items:
+            break
+
     return items
 
 
@@ -606,29 +630,41 @@ def parse_steam_freebies(html_content: str) -> List[Dict[str, Any]]:
 async def fetch_psn(psn_html_path: Optional[str] = None) -> List[Dict[str, Any]]:
     """抓取 PlayStation Plus 限免游戏"""
     try:
-        # 使用 aiohttp 直接下载页面HTML
-        print(f"正在下载PSN页面: {PSN_SOURCE_URL}")
-        async with aiohttp.ClientSession() as session:
-            headers = {
-                "User-Agent": USER_AGENT,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Connection": "keep-alive",
-                "Upgrade-Insecure-Requests": "1",
-            }
-            async with session.get(PSN_SOURCE_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as response:
-                response.raise_for_status()
-                html_content = await response.text()
+        html_content: Optional[str] = None
+
+        # 优先使用 Playwright，结构稳定且可处理弹窗
+        try:
+            print(f"使用 Playwright 抓取 PSN 页面: {PSN_SOURCE_URL}")
+            html_content = await fetch_page_html(
+                PSN_SOURCE_URL, wait_for_selector="section#monthly-games"
+            )
+        except Exception as e:
+            print(f"Playwright 抓取失败，回退到 aiohttp: {e}")
+
+        # 回退：aiohttp 直接抓取
+        if html_content is None:
+            print(f"正在下载PSN页面: {PSN_SOURCE_URL}")
+            async with aiohttp.ClientSession() as session:
+                headers = {
+                    "User-Agent": USER_AGENT,
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Connection": "keep-alive",
+                    "Upgrade-Insecure-Requests": "1",
+                }
+                async with session.get(PSN_SOURCE_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                    response.raise_for_status()
+                    html_content = await response.text()
         
         # 保存HTML到临时文件
-        if psn_html_path:
+        if psn_html_path and html_content is not None:
             with open(psn_html_path, "w", encoding="utf-8") as f:
                 f.write(html_content)
             print(f"PSN页面已临时保存到: {psn_html_path}")
         
         # 解析HTML内容
-        items = parse_psplus_html(html_content)
+        items = parse_psplus_html(html_content or "")
         print(f"PSN解析完成，找到 {len(items)} 个游戏")
         if len(items) == 0:
             print("警告: PSN解析未找到任何游戏，可能需要检查页面结构")
