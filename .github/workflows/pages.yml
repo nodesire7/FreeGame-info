@@ -1,0 +1,60 @@
+name: Build & Deploy (FreeGame-info)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every 6 hours. GitHub cron uses UTC.
+    - cron: "0 */6 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Playwright (Chromium)
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Generate site
+        run: |
+          mkdir -p site
+          python fetch_freebies.py site/snapshot.json
+          python render_html.py site/snapshot.json epic-freebies.html.template site/index.html
+          python generate_image.py site/index.html site/gameinfo.webp 1200
+          touch site/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+
