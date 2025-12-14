@@ -1,0 +1,30 @@
+[
+  {
+    "id": "https://store.steampowered.com/app/582660/Black_Desert/?snr=1_7_7_2300_150_1",
+    "title": "Black Desert",
+    "link": "https://store.steampowered.com/app/582660/Black_Desert/?snr=1_7_7_2300_150_1",
+    "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/582660/8bc9b1c77608e30042d876da0cfb9f838ac535c9/capsule_231x87_alt_assets_27.jpg?t=1765621416",
+    "releaseDate": "2021 年 7 月 20 日",
+    "platforms": [
+      "Windows"
+    ],
+    "discountText": "-100%",
+    "originalPrice": "¥900",
+    "finalPrice": "¥0",
+    "reviewSummary": "褒贬不一 此游戏的 978 篇用户评测中有 62% 为好评。 此产品的总体评价是基于您的偏好用以您语言撰写的评测计算得出的。"
+  },
+  {
+    "id": "https://store.steampowered.com/app/561770/Just_Ignore_Them/?snr=1_7_7_2300_150_1",
+    "title": "Just Ignore Them",
+    "link": "https://store.steampowered.com/app/561770/Just_Ignore_Them/?snr=1_7_7_2300_150_1",
+    "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/561770/capsule_231x87.jpg?t=1765702177",
+    "releaseDate": "2017 年 4 月 28 日",
+    "platforms": [
+      "Windows"
+    ],
+    "discountText": "-100%",
+    "originalPrice": "¥470",
+    "finalPrice": "¥0",
+    "reviewSummary": "多半好评 此游戏的 637 篇用户评测中有 79% 为好评。"
+  }
+]
