@@ -1,6 +1,9 @@
 name: Build & Deploy (FreeGame-info)
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
   schedule:
     # Every 3 hours. GitHub cron uses UTC.

@@ -310,6 +310,22 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
                     if not isinstance(game, dict):
                         continue
 
+                    # 验证价格：确保是真正免费的游戏（discountPrice=0 且 originalPrice>0）
+                    price_obj = game.get("price")
+                    if isinstance(price_obj, dict):
+                        total_price = price_obj.get("totalPrice")
+                        if isinstance(total_price, dict):
+                            discount_price = total_price.get("discountPrice")
+                            original_price = total_price.get("originalPrice")
+                            # 核心筛选：折扣价为0 且 原价>0（排除永久免费的DLC/Add-on）
+                            if discount_price != 0:
+                                continue
+                            if not isinstance(original_price, (int, float)) or original_price <= 0:
+                                continue
+                    else:
+                        # 如果没有价格信息，跳过（可能是DLC或其他非游戏内容）
+                        continue
+
                     promotions = game.get("promotions")
                     if not isinstance(promotions, dict):
                         continue
@@ -423,16 +439,33 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
         section_candidates.extend(soup.select("section.gpdc-section"))
 
     for section in section_candidates:
-        boxes = section.select(".box--light, .box")
+        # 尝试多种选择器来查找游戏卡片
+        boxes = section.select(".box--light, .box, .psw-product-tile, .product-tile, [data-qa='product-tile']")
+        if not boxes:
+            # 尝试更通用的选择器
+            boxes = section.select("article, .card, .tile")
+        
         if not boxes:
             continue
 
         for box in boxes:
-            text_block = box.select_one(".txt-block__paragraph") or box
-            title_el = text_block.find(["h1", "h2", "h3", "strong"])
+            # 尝试多种方式提取文本块
+            text_block = (
+                box.select_one(".txt-block__paragraph") or
+                box.select_one(".text-block") or
+                box.select_one(".product-tile__details") or
+                box.select_one(".psw-product-tile__details") or
+                box
+            )
+            
+            # 尝试多种方式提取标题
+            title_el = (
+                text_block.select_one("h1, h2, h3, h4, .title, .product-title, [data-qa='product-title']") or
+                text_block.find(["h1", "h2", "h3", "h4", "strong"])
+            )
             title = title_el.get_text(strip=True) if title_el else ""
 
-            paragraph = text_block.find("p")
+            paragraph = text_block.find("p") or text_block.select_one(".description, .product-description")
             lines = _collect_text_lines(paragraph)
             highlight_lines = [
                 line for line in lines if line.startswith(("·", "•", "-", "—"))
@@ -445,11 +478,19 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
             )
             description = " ".join(description_lines).strip() or None
 
-            media_block = box.select_one(".media-block")
+            # 尝试多种方式提取图片
+            media_block = (
+                box.select_one(".media-block") or
+                box.select_one(".image-block") or
+                box.select_one("img")
+            )
             image = _extract_image_url(media_block, base_url)
 
-            link_el = box.select_one(
-                ".btn--cta__btn-container a, .button a, .buttonblock a, a.cta__primary"
+            # 尝试多种方式提取链接
+            link_el = (
+                box.select_one(".btn--cta__btn-container a, .button a, .buttonblock a, a.cta__primary") or
+                box.select_one("a[href*='/games/'], a[href*='/product/']") or
+                box.select_one("a")
             )
             link = link_el.get("href").strip() if link_el and link_el.get("href") else ""
             if link:
@@ -458,7 +499,7 @@ def parse_psplus_html(html_content: str) -> List[Dict[str, Any]]:
             if not title or not link or link in seen_links:
                 continue
 
-            platform_el = text_block.select_one(".eyebrow, .eyebrow__text")
+            platform_el = text_block.select_one(".eyebrow, .eyebrow__text, .platform")
             platforms = platform_el.get_text(strip=True) if platform_el else None
 
             items.append(
@@ -569,19 +610,27 @@ async def fetch_psn(psn_html_path: Optional[str] = None) -> List[Dict[str, Any]]
                 response.raise_for_status()
                 html_content = await response.text()
         
-        # 保存HTML到临时文件
+        # 保存HTML到临时文件（用于调试）
         if psn_html_path:
             with open(psn_html_path, "w", encoding="utf-8") as f:
                 f.write(html_content)
             print(f"PSN页面已临时保存到: {psn_html_path}")
         
         # 解析HTML内容
-        return parse_psplus_html(html_content)
+        items = parse_psplus_html(html_content)
+        print(f"PSN解析结果: 找到 {len(items)} 个游戏")
+        if len(items) == 0:
+            print("警告: PSN解析未找到任何游戏，可能需要检查页面结构或选择器")
+        return items
     except aiohttp.ClientError as e:
         print(f"Network error fetching PlayStation page: {e}")
+        import traceback
+        traceback.print_exc()
         return []
     except Exception as e:
         print(f"Failed to fetch PlayStation page: {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 
