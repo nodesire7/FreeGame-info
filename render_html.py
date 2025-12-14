@@ -757,7 +757,7 @@ def get_share_client_script() -> str:
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = fileName || '乐赏限免拼图.png';
+      anchor.download = fileName || 'GBTGame限免拼图.png';
       anchor.rel = 'noopener';
       anchor.style.display = 'none';
       document.body.appendChild(anchor);
@@ -859,7 +859,7 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
     total_items = sum(len(section["items"]) for section in sections)
 
-    suggested_file_name = f"乐赏限免拼图-{datetime.now().strftime('%Y%m%d-%H%M')}.png"
+    suggested_file_name = f"GBTGame限免拼图-{datetime.now().strftime('%Y%m%d-%H%M')}.png"
 
     return {
         "generatedAtDisplay": format_full_datetime(generated_at_timestamp),
@@ -1061,7 +1061,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, timestamp: str = N
         "SHARE_BUTTON_LABEL": "生成分享拼图" if share_ready else "分享数据未就绪",
         "SHARE_BUTTON_FILENAME": escape_attribute(
             (share_payload.get("suggestedFileName") if share_payload else None)
-            or "乐赏限免拼图.png"
+            or "GBTGame限免拼图.png"
         ),
         "SHARE_BUTTON_URL": escape_attribute("#"),
         "SHARE_DATA_JSON": share_data_json,
