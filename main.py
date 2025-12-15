@@ -6,7 +6,7 @@ import asyncio
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List
 
 # 导入各个独立的 fetcher
@@ -69,8 +69,10 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     # PSN 已经在 fetch_psn 中保存了
     
     # 合并为 snapshot.json
+    # 使用中国时区（UTC+8）
+    china_tz = timezone(timedelta(hours=8))
     snapshot = {
-        "fetchedAt": datetime.now(timezone.utc).isoformat(),
+        "fetchedAt": datetime.now(china_tz).isoformat(),
         "epic": epic_data,
         "steam": steam_data,
         "psn": results.get("psn", []),
@@ -96,8 +98,9 @@ def main():
     archive_dir = os.path.join(output_dir, "archive")
     os.makedirs(archive_dir, exist_ok=True)
     
-    # 生成时间戳（格式：YYYYMMDDHHmmss）
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    # 生成时间戳（格式：YYYYMMDDHHmmss）- 使用中国时区
+    china_tz = timezone(timedelta(hours=8))
+    timestamp = datetime.now(china_tz).strftime("%Y%m%d%H%M%S")
     
     snapshot = asyncio.run(fetch_all(output_dir))
     

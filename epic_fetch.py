@@ -10,7 +10,7 @@ import asyncio
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
@@ -491,7 +491,9 @@ async def fetch_epic() -> Dict[str, List[Dict[str, Any]]]:
         if not isinstance(elements, list):
             raise RuntimeError("Unexpected Epic API format")
 
-        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+        # 使用中国时区（UTC+8）
+        china_tz = timezone(timedelta(hours=8))
+        now_ms = int(datetime.now(china_tz).timestamp() * 1000)
         now_list: List[Dict[str, Any]] = []
         upcoming_list: List[Dict[str, Any]] = []
         seen: set[str] = set()

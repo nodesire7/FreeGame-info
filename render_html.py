@@ -6,7 +6,7 @@ import html
 import json
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -38,29 +38,34 @@ def escape_attribute(text: str) -> str:
 
 
 def format_full_datetime(timestamp: Optional[int] = None) -> str:
-    """格式化完整日期时间"""
+    """格式化完整日期时间（中国时区）"""
     if not timestamp:
         return "待定"
-    dt = datetime.fromtimestamp(timestamp / 1000)
+    # 将 UTC 时间戳转换为中国时区
+    china_tz = timezone(timedelta(hours=8))
+    dt = datetime.fromtimestamp(timestamp / 1000, tz=timezone.utc).astimezone(china_tz)
     return dt.strftime("%Y-%m-%d %H:%M")
 
 
 def format_datetime(timestamp: Optional[int] = None) -> str:
-    """格式化日期时间"""
+    """格式化日期时间（中国时区）"""
     if not timestamp:
         return "待定"
-    dt = datetime.fromtimestamp(timestamp / 1000)
+    # 将 UTC 时间戳转换为中国时区
+    china_tz = timezone(timedelta(hours=8))
+    dt = datetime.fromtimestamp(timestamp / 1000, tz=timezone.utc).astimezone(china_tz)
     return dt.strftime("%m月%d日 %H:%M")
 
 
 def format_date_range(start_at: Optional[int] = None, end_at: Optional[int] = None) -> str:
-    """格式化日期范围"""
+    """格式化日期范围（中国时区）"""
+    china_tz = timezone(timedelta(hours=8))
     if start_at and end_at:
-        start = datetime.fromtimestamp(start_at / 1000).strftime("%m月%d日 %H:%M")
-        end = datetime.fromtimestamp(end_at / 1000).strftime("%m月%d日 %H:%M")
+        start = datetime.fromtimestamp(start_at / 1000, tz=timezone.utc).astimezone(china_tz).strftime("%m月%d日 %H:%M")
+        end = datetime.fromtimestamp(end_at / 1000, tz=timezone.utc).astimezone(china_tz).strftime("%m月%d日 %H:%M")
         return f"{start} 至 {end}"
     if end_at:
-        end = datetime.fromtimestamp(end_at / 1000).strftime("%m月%d日 %H:%M")
+        end = datetime.fromtimestamp(end_at / 1000, tz=timezone.utc).astimezone(china_tz).strftime("%m月%d日 %H:%M")
         return f"截至 {end}"
     return "时间待定"
 
@@ -74,7 +79,10 @@ def format_remaining(
     """格式化剩余时间"""
     if not target_timestamp:
         return f"{prefix} {fallback}"
-    diff_ms = target_timestamp - int(datetime.now().timestamp() * 1000)
+    # 使用中国时区计算当前时间
+    china_tz = timezone(timedelta(hours=8))
+    now_ms = int(datetime.now(china_tz).timestamp() * 1000)
+    diff_ms = target_timestamp - now_ms
     if diff_ms <= 0:
         return finished_text
     minutes = diff_ms // 60000
@@ -127,13 +135,17 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
     is_free_now = game.get("isFreeNow", False)
     free_end_at = game.get("freeEndAt")
     free_start_at = game.get("freeStartAt")
+    
+    # 使用中国时区计算当前时间
+    china_tz = timezone(timedelta(hours=8))
+    now_ms = int(datetime.now(china_tz).timestamp() * 1000)
 
     if is_free_now and free_end_at:
         primary_timer = format_remaining(
             free_end_at, prefix="剩余", finished_text="已结束"
         )
         secondary_timer = f"截止：{format_datetime(free_end_at)}"
-    elif free_start_at and free_start_at > int(datetime.now().timestamp() * 1000):
+    elif free_start_at and free_start_at > now_ms:
         primary_timer = format_remaining(
             free_start_at, prefix="距离开放还剩", finished_text="已开放"
         )
@@ -855,11 +867,15 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         dt = datetime.fromisoformat(fetched_at.replace("Z", "+00:00"))
         generated_at_timestamp = int(dt.timestamp() * 1000)
     else:
-        generated_at_timestamp = int(datetime.now().timestamp() * 1000)
+        # 使用中国时区
+        china_tz = timezone(timedelta(hours=8))
+        generated_at_timestamp = int(datetime.now(china_tz).timestamp() * 1000)
 
     total_items = sum(len(section["items"]) for section in sections)
 
-    suggested_file_name = f"GBTGame限免拼图-{datetime.now().strftime('%Y%m%d-%H%M')}.png"
+    # 使用中国时区生成文件名
+    china_tz = timezone(timedelta(hours=8))
+    suggested_file_name = f"GBTGame限免拼图-{datetime.now(china_tz).strftime('%Y%m%d-%H%M')}.png"
 
     return {
         "generatedAtDisplay": format_full_datetime(generated_at_timestamp),
