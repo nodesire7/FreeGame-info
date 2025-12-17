@@ -30,13 +30,33 @@ Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静�
 
 ### Releases（版本包）
 
+- **定位**：Releases 用于“快速部署”（提供 Docker Compose 等配置），**不是最终生成的页面**
 - **触发时机**：仅在 **合并/推送到 `main`** 时自动创建 Release（`schedule` 自动更新页面 **不会** 生成 Release）
 - **版本号规则**：按顺序自动递增，起始为 **`v1.0`**（后续 `v1.1`、`v1.2`...）
-- **内容**：Release 附带“全平台通用”的构建产物（静态站点）
-  - `site.zip`
-  - `site.tar.gz`
+- **内容**：Release 附带“全平台通用”的快速部署包
+  - `deploy.zip`（Windows 推荐）
+  - `deploy.tar.gz`（Linux/macOS 推荐）
 
 下载入口：仓库的 Releases 页面（`https://github.com/nodesire7/FreeGame-info/releases`）
+
+#### 如何正确使用 Releases
+
+1. 下载并解压 `deploy.zip` / `deploy.tar.gz`
+2. 进入 `deploy/` 目录
+3. 复制 `env.example` 为 `env`（可选）
+4. 执行一次生成：
+
+```bash
+docker compose --env-file env run --rm generator
+```
+
+5. 启动静态服务：
+
+```bash
+docker compose --env-file env up -d web
+```
+
+> Releases 中已将 `IMAGE_TAG` 写成当前版本号，开箱即用。页面仍由容器运行时生成（不是 Release 里预置的）。
 
 ## 功能特性
 
@@ -97,7 +117,7 @@ python generate_image.py site/index.html site/history/records/时间戳白嫖信
 - **手动触发**：在 Actions 页面点击 "Run workflow"
 - **自动部署**：生成 `site/index.html`、历史 JSON 和图片，并发布到 GitHub Pages
 - **历史归档**：仅在数据变化时写入 SQLite，并生成历史列表页与图片
-- **Release**：仅 `push(main)` 触发，自动创建版本号 Release 并上传 `site.zip` / `site.tar.gz`
+- **Release**：仅 `push(main)` 触发，自动创建版本号 Release 并上传 `deploy.zip` / `deploy.tar.gz`
 - **Docker**：仅 `push(main)` 触发，推送镜像到 Docker Hub：`nodesire77/game_info`
 
 ## Docker（自动推送）

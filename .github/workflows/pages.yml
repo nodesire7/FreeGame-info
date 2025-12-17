@@ -114,8 +114,14 @@ jobs:
         if: github.event_name == 'push'
         shell: bash
         run: |
-          zip -r site.zip site
-          tar -czf site.tar.gz -C site .
+          # Releases 用于“快速部署”，不打包最终生成页面
+          rm -f deploy.zip deploy.tar.gz || true
+          rm -f deploy/env || true
+          cp deploy/env.example deploy/env
+          # 写入本次版本号，用户开箱即用
+          sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=${{ steps.version.outputs.tag }}/" deploy/env
+          zip -r deploy.zip deploy
+          tar -czf deploy.tar.gz deploy
 
       - name: Create GitHub Release (merge builds only)
         if: github.event_name == 'push'
@@ -126,8 +132,8 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
-            site.zip
-            site.tar.gz
+            deploy.zip
+            deploy.tar.gz
 
       # Docker: only on merge/push to main
       - name: Set up Docker Buildx
