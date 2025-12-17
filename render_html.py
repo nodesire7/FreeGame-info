@@ -182,6 +182,24 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
     if summary:
         summary_html = f'<div class="epic-freebies__card-summary">{"".join(f"<span>{escape_html(text)}</span>" for text in summary)}</div>'
 
+    # 倒计时：默认使用截止时间（freeEndAt），没有则退化为 freeStartAt（仅用于展示）
+    countdown_target_ms: Optional[int] = None
+    if isinstance(free_end_at, (int, float)):
+        countdown_target_ms = int(free_end_at)
+    elif isinstance(free_start_at, (int, float)):
+        countdown_target_ms = int(free_start_at)
+
+    countdown_attrs = ""
+    if countdown_target_ms:
+        # 统一以“截止时间”倒计时
+        countdown_prefix = "剩余"
+        countdown_finished = "已结束"
+        countdown_attrs = (
+            f' data-countdown-target="{countdown_target_ms}"'
+            f' data-countdown-prefix="{escape_attribute(countdown_prefix)}"'
+            f' data-countdown-finished="{escape_attribute(countdown_finished)}"'
+        )
+
     return f"""<article class="epic-freebies__card">
   <div class="epic-freebies__card-cover">
     {cover_html}
@@ -197,7 +215,7 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
     {summary_html}
     <div class="epic-freebies__card-footer">
       <div class="epic-freebies__card-timing">
-        <span class="epic-freebies__meta-primary">{escape_html(primary_timer)}</span>
+        <span class="epic-freebies__meta-primary"{countdown_attrs}>{escape_html(primary_timer)}</span>
         <span class="epic-freebies__meta-secondary">{escape_html(deadline_text)}</span>
       </div>
       <a class="epic-freebies__card-link" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">{link_text}</a>
@@ -352,6 +370,48 @@ def get_share_client_script() -> str:
   if (!root) {
     return;
   }
+
+  // =========================
+  // 倒计时（以截止时间计算）
+  // =========================
+  const countdownNodes = Array.from(document.querySelectorAll('[data-countdown-target]'));
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const formatCountdown = (diffMs) => {
+    if (diffMs <= 0) return '';
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    if (days > 0) {
+      return `${days}天 ${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+    }
+    return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+  };
+
+  const updateCountdowns = () => {
+    if (!countdownNodes.length) return;
+    const now = Date.now();
+    countdownNodes.forEach((node) => {
+      const targetRaw = node.getAttribute('data-countdown-target');
+      if (!targetRaw) return;
+      const target = Number(targetRaw);
+      if (!Number.isFinite(target)) return;
+      const prefix = node.getAttribute('data-countdown-prefix') || '剩余';
+      const finished = node.getAttribute('data-countdown-finished') || '已结束';
+      const diff = target - now;
+      if (diff <= 0) {
+        node.textContent = finished;
+        return;
+      }
+      const body = formatCountdown(diff);
+      node.textContent = body ? `${prefix} ${body}` : finished;
+    });
+  };
+
+  updateCountdowns();
+  // 每秒刷新一次
+  setInterval(updateCountdowns, 1000);
 
   const shareButton = root.querySelector('[data-share-button]');
   const tabs = Array.from(root.querySelectorAll('.epic-freebies__tab'));
