@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>白嫖游戏速报 | GBTGAME官方网站</title>
+    <title>白嫖游戏信息 | FreeGame-info</title>
     <link rel="icon" type="image/png" href="logo.png">
     <style>
         :root {
@@ -720,11 +720,11 @@
                 </section>
             </section>
             <footer class="epic-footer">
-                <img class="epic-footer__avatar" src="https://avatars.githubusercontent.com/u/63827263?v=4" alt="AFEI 头像" width="32" height="32">
+                <img class="epic-footer__avatar" src="https://avatars.githubusercontent.com/u/63827263?v=4" alt="Nodesire7 头像" width="32" height="32">
                 <div class="epic-footer__details">
-                    <span>作者：AFEI</span>
+                    <span>作者：<a href="https://github.com/nodesire7/" target="_blank" rel="noopener noreferrer">Nodesire7</a></span>
                     <span>邮箱：<a href="mailto:amocnfk@gmail.com">amocnfk@gmail.com</a></span>
-                    <span>GitHub：<a href="https://github.com/nodesire7/" target="_blank" rel="noopener noreferrer">nodesire7</a></span>
+                    <span>仓库：<a href="https://github.com/nodesire7/FreeGame-info" target="_blank" rel="noopener noreferrer">FreeGame-info</a></span>
                     {{ARCHIVE_LINKS}}
                 </div>
             </footer>

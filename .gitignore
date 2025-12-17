@@ -21,12 +21,12 @@ index.html
 public/
 site/
 .tmp_history/
+.tmp_sqlite_history/
+history/
 *.webp
 *.png
 !logo.png
-!history/**/*.webp
-!history/**/*.json
-!history/**/manifest.json
+*.db
 
 # Allow the HTML template to be tracked
 !epic-freebies.html.template

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-主调度：调用各独立 fetcher（epic_fetch / psn_fetch / steam），合并为 snapshot.json，并生成 HTML
+主调度：调用各独立 fetcher（epic_fetch / psn_fetch / steam），生成静态页面，并将历史写入 SQLite（date.db）。
 """
 import asyncio
 import hashlib
@@ -18,6 +18,7 @@ from epic_fetch import fetch_epic
 from psn_fetch import fetch_psn
 from steam_fetch import fetch_steam
 from render_html import render_html, render_history_page
+from history_db import open_db, get_latest_meta, insert_record, list_snapshots
 
 
 async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
@@ -25,12 +26,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     print("开始抓取限免数据...")
     
     os.makedirs(output_dir, exist_ok=True)
-    
-    # 定义各平台的输出路径
-    epic_path = os.path.join(output_dir, "EPIC.json")
-    psn_path = os.path.join(output_dir, "PSN.json")
-    steam_path = os.path.join(output_dir, "STEAM.json")
-    
+
     # 并行抓取各平台数据
     results = {}
     
@@ -45,7 +41,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     
     # PSN
     try:
-        psn_data = await fetch_psn(psn_path)
+        psn_data = await fetch_psn(None)
         results["psn"] = psn_data
         print("[OK] PSN 抓取完成")
     except Exception as e:
@@ -54,25 +50,17 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     
     # Steam
     try:
-        steam_data = await fetch_steam(steam_path)
+        steam_data = await fetch_steam(None)
         results["steam"] = steam_data
         print("[OK] STEAM 抓取完成")
     except Exception as e:
         print(f"[FAIL] STEAM 抓取失败: {e}")
         results["steam"] = []
-    
-    # 保存各平台的独立 JSON
+
     epic_data = results.get("epic", {"now": [], "upcoming": []})
-    with open(epic_path, "w", encoding="utf-8") as f:
-        json.dump(epic_data, f, ensure_ascii=False, indent=2)
-    
     steam_data = results.get("steam", [])
-    with open(steam_path, "w", encoding="utf-8") as f:
-        json.dump(steam_data, f, ensure_ascii=False, indent=2)
-    
-    # PSN 已经在 fetch_psn 中保存了
-    
-    # 合并为 snapshot.json
+
+    # 合并为 snapshot（不落地 JSON 文件；历史数据写入 SQLite）
     # 使用中国时区（UTC+8）
     china_tz = timezone(timedelta(hours=8))
     snapshot = {
@@ -86,11 +74,6 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
             "psn": "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/",
         },
     }
-    
-    snapshot_path = os.path.join(output_dir, "snapshot.json")
-    with open(snapshot_path, "w", encoding="utf-8") as f:
-        json.dump(snapshot, f, ensure_ascii=False, indent=2)
-    
     return snapshot
 
 
@@ -145,23 +128,6 @@ def _snapshot_hash(snapshot: Dict[str, Any]) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def _load_manifest(history_dir: Path) -> Dict[str, Any]:
-    manifest_path = history_dir / "manifest.json"
-    if manifest_path.exists():
-        try:
-            return json.loads(manifest_path.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return {"version": 1, "records": []}
-
-
-def _save_manifest(history_dir: Path, manifest: Dict[str, Any]) -> None:
-    history_dir.mkdir(parents=True, exist_ok=True)
-    (history_dir / "manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-
-
 def _ensure_dir(p: Path) -> None:
     p.mkdir(parents=True, exist_ok=True)
 
@@ -173,10 +139,10 @@ def _sync_history_to_site(history_dir: Path, site_dir: Path) -> None:
     src_records = history_dir / "records"
     _ensure_dir(dst_records)
 
-    # manifest
-    manifest_path = history_dir / "manifest.json"
-    if manifest_path.exists():
-        shutil.copy2(manifest_path, dst_root / "manifest.json")
+    # date.db
+    db_path = history_dir / "date.db"
+    if db_path.exists():
+        shutil.copy2(db_path, dst_root / "date.db")
 
     # records
     if src_records.exists():
@@ -199,7 +165,6 @@ def main() -> Tuple[Optional[str], Optional[str]]:
 
     snapshot = asyncio.run(fetch_all(output_dir))
 
-    print(f"\n数据已保存到 {output_dir}/snapshot.json")
     print(f"Epic: {len(snapshot['epic'].get('now', []))} 正在免费, {len(snapshot['epic'].get('upcoming', []))} 即将免费")
     print(f"Steam: {len(snapshot['steam'])} 条")
     print(f"PSN: {len(snapshot['psn'])} 条")
@@ -210,26 +175,21 @@ def main() -> Tuple[Optional[str], Optional[str]]:
         shutil.copy2("logo.png", logo_dest)
         print(f"\nLogo 已复制到 {logo_dest}")
 
-    # === 历史去重：仅当内容发生变化才新增记录 ===
-    manifest = _load_manifest(history_dir)
-    records: List[Dict[str, Any]] = manifest.get("records") if isinstance(manifest.get("records"), list) else []
+    # === 历史去重（SQLite）：仅当本次与上次不同才新增记录 ===
+    conn = open_db(history_dir)
     current_hash = _snapshot_hash(snapshot)
-    last_hash = records[-1].get("hash") if records else None
+    last_hash, latest_ts = get_latest_meta(conn)
+
+    template_path = "epic-freebies.html.template"
+    html_output_path = os.path.join(output_dir, "index.html")
 
     created = False
-    latest_ts: Optional[str] = records[-1].get("timestamp") if records else None
     if current_hash != last_hash:
         latest_ts = _timestamp_cn()
-        json_name = f"{latest_ts}白嫖信息.json"
         webp_name = f"{latest_ts}白嫖信息.webp"
+        image_rel = f"records/{webp_name}"
 
-        json_path = records_dir / json_name
-        json_path.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"\n[HISTORY] 新增历史 JSON: {json_path.as_posix()}")
-
-        # 生成 HTML（先生成 index，再生成图片）
-        template_path = "epic-freebies.html.template"
-        html_output_path = os.path.join(output_dir, "index.html")
+        # 先生成主页 HTML（页脚包含历史入口/最新图片）
         if os.path.exists(template_path):
             html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts)
             Path(html_output_path).write_text(html_content, encoding="utf-8")
@@ -246,29 +206,20 @@ def main() -> Tuple[Optional[str], Optional[str]]:
             print(f"\n[HISTORY] 新增历史图片: {webp_path.as_posix()}")
         except Exception as e:
             print(f"\n生成历史图片失败: {e}")
+            image_rel = None
 
-        # 更新 manifest
-        rec = {
-            "timestamp": latest_ts,
-            "fetchedAt": snapshot.get("fetchedAt"),
-            "hash": current_hash,
-            "json": f"records/{json_name}",
-            "webp": f"records/{webp_name}",
-            "counts": {
-                "epicNow": len(snapshot.get("epic", {}).get("now", []) or []),
-                "epicUpcoming": len(snapshot.get("epic", {}).get("upcoming", []) or []),
-                "steam": len(snapshot.get("steam") or []),
-                "psn": len(snapshot.get("psn") or []),
-            },
-        }
-        records.append(rec)
-        manifest["records"] = records
-        _save_manifest(history_dir, manifest)
+        # 写入 SQLite
+        insert_record(
+            conn,
+            ts=latest_ts,
+            fetched_at=snapshot.get("fetchedAt"),
+            hash_value=current_hash,
+            snapshot=snapshot,
+            image_rel=image_rel,
+        )
         created = True
     else:
         # 未变化：仍生成主页 HTML，但 latest_ts 指向上一次记录
-        template_path = "epic-freebies.html.template"
-        html_output_path = os.path.join(output_dir, "index.html")
         if os.path.exists(template_path):
             html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts)
             Path(html_output_path).write_text(html_content, encoding="utf-8")
@@ -278,18 +229,7 @@ def main() -> Tuple[Optional[str], Optional[str]]:
         print("\n[HISTORY] 本次抓取结果与上次一致，不新增历史记录。")
 
     # === 生成历史页面（渲染为卡片样式）===
-    # 读取所有历史 snapshot（最新在前）
-    snapshots: List[Dict[str, Any]] = []
-    for rec in reversed(records):
-        rel = rec.get("json")
-        if not isinstance(rel, str):
-            continue
-        p = history_dir / rel
-        if p.exists():
-            try:
-                snapshots.append(json.loads(p.read_text(encoding="utf-8")))
-            except Exception:
-                continue
+    snapshots: List[Dict[str, Any]] = list_snapshots(conn, limit=60)
 
     site_dir = Path(output_dir)
     history_page_dir = site_dir / "history"

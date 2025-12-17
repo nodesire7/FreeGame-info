@@ -10,18 +10,18 @@ Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静�
 
 每 3 小时自动更新一次限免数据。
 
-### 历史数据访问
+### 历史数据访问（SQLite）
 
-只有当本次抓取结果与上次不同，才会新增一条历史记录，并保存到 `history/records/`，可通过以下方式访问：
+只有当本次抓取结果与上次不同，才会新增一条历史记录。
 
 - **历史列表页面**: `https://nodesire7.github.io/FreeGame-info/history/`
-- **历史 JSON 数据**: `https://nodesire7.github.io/FreeGame-info/history/records/{时间戳}白嫖信息.json`
+- **历史数据库（SQLite）**: `https://nodesire7.github.io/FreeGame-info/history/date.db`
 - **历史图片**: `https://nodesire7.github.io/FreeGame-info/history/records/{时间戳}白嫖信息.webp`
 
 时间戳格式：`YYYYMMDDHHmmss`（例如：`20251214202455`）
 
 **示例**：
-- JSON: https://nodesire7.github.io/FreeGame-info/history/records/20251214202455白嫖信息.json
+- 数据库: https://nodesire7.github.io/FreeGame-info/history/date.db
 - 图片: https://nodesire7.github.io/FreeGame-info/history/records/20251214202455白嫖信息.webp
 
 > 💡 提示：在主页底部可以找到“历史记录”入口与“最新归档”链接。
@@ -43,7 +43,7 @@ Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静�
 - 🎮 **PlayStation Plus**：抓取会员免费游戏
 - 📄 **静态 HTML 页面**：美观的单页应用
 - 🖼️ **分享拼图生成**：使用 Canvas API 生成长图（支持 PNG/WebP）
-- 📦 **历史数据归档**：仅在数据变化时保存 JSON 和图片到 `history/records/`
+- 🗃️ **历史数据归档（SQLite）**：仅在数据变化时写入 `history/date.db`，图片保存到 `history/records/`
 - 🤖 **GitHub Actions**：自动定时更新并部署到 GitHub Pages
 
 ## 本地使用
@@ -69,19 +69,19 @@ python main.py site
 # 这会自动：
 # 1. 抓取所有平台数据（Epic、Steam、PSN）
 # 2. 生成 HTML 页面
-# 3. 如数据有变化，生成历史 JSON / 图片到 site/history/records/，并生成历史列表页
+# 3. 如数据有变化，写入历史数据库 SQLite（date.db），并生成历史图片与历史列表页
 ```
 
 **手动步骤**（已废弃，建议使用 `main.py`）：
 
 ```bash
 # 1) 抓取数据
-python epic_fetch.py site/EPIC.json
-python psn_fetch.py site/PSN.json
-python steam_fetch.py site/STEAM.json
+python epic_fetch.py
+python psn_fetch.py
+python steam_fetch.py
 
 # 2) 生成 HTML
-python render_html.py site/snapshot.json epic-freebies.html.template site/index.html
+python render_html.py
 
 # 3) 生成分享拼图
 python generate_image.py site/index.html site/history/records/时间戳白嫖信息.webp
@@ -94,8 +94,33 @@ python generate_image.py site/index.html site/history/records/时间戳白嫖信
 - **定时运行**：每 3 小时抓取一次（UTC 时间：0:00、3:00、6:00...）
 - **手动触发**：在 Actions 页面点击 "Run workflow"
 - **自动部署**：生成 `site/index.html`、历史 JSON 和图片，并发布到 GitHub Pages
-- **历史归档**：仅在数据变化时保存带时间戳的 JSON 和图片文件，并生成历史列表页
+- **历史归档**：仅在数据变化时写入 SQLite，并生成历史列表页与图片
 - **Release**：仅 `push(main)` 触发，自动创建版本号 Release 并上传 `site.zip` / `site.tar.gz`
+- **Docker**：仅 `push(main)` 触发，推送镜像到 Docker Hub：`nodesire77/game_info`
+
+## Docker（自动推送）
+
+镜像地址：`nodesire77/game_info`
+
+- `latest`
+- `vX.Y`（与 Release 版本号一致，例如 `v1.0`）
+
+示例（建议挂载数据卷持久化历史数据库与图片）：
+
+```bash
+docker run --rm -v "$(pwd)/data:/data" nodesire77/game_info:latest
+```
+
+运行后输出：
+- `/data/site/`：静态站点（可自行用 Nginx/静态服务托管）
+- `/data/history/date.db`：历史数据库
+- `/data/history/records/`：历史图片
+
+## 数据存储（SQLite / 可扩展）
+
+当前：所有历史快照存储在 SQLite：`history/date.db`（Pages 展示为 `history/date.db`）。
+
+后续可扩展接入（规划）：Redis / MySQL / PostgreSQL（作为历史存储后端）。
 
 ### 如何启用
 
@@ -155,15 +180,10 @@ https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/
 site/
 ├── index.html              # 主页
 ├── logo.png                # 网站图标
-├── snapshot.json           # 当前数据快照
-├── EPIC.json               # Epic 数据
-├── PSN.json                # PSN 数据
-├── STEAM.json              # Steam 数据
-└── history/                 # 历史记录页面与资源（用于 Pages 展示）
+└── history/                # 历史记录页面与资源（用于 Pages 展示）
     ├── index.html
-    ├── manifest.json
+    ├── date.db             # 历史数据库（SQLite）
     └── records/
-        ├── {时间戳}白嫖信息.json
         └── {时间戳}白嫖信息.webp
 ```
 

@@ -1081,10 +1081,8 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         fetched_at_display = "等待同步"
     
     # 历史记录 URL（Pages）
-    latest_json_url = ""
     latest_image_url = ""
     if latest_history_ts:
-        latest_json_url = f"history/records/{latest_history_ts}白嫖信息.json"
         latest_image_url = f"history/records/{latest_history_ts}白嫖信息.webp"
 
     epic_now = snapshot["epic"]["now"]
@@ -1107,11 +1105,10 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
     # 页脚链接：历史页 + 最新归档（如有）
     links: list[str] = []
     links.append('<span>历史记录：<a href="history/" target="_blank" rel="noopener noreferrer">查看</a></span>')
-    if latest_json_url and latest_image_url:
+    links.append('<span>数据库：<a href="history/date.db" target="_blank" rel="noopener noreferrer">date.db</a></span>')
+    if latest_image_url:
         links.append(
             '<span>最新归档：'
-            f'<a href="{escape_attribute(latest_json_url)}" target="_blank" rel="noopener noreferrer">JSON</a>'
-            ' | '
             f'<a href="{escape_attribute(latest_image_url)}" target="_blank" rel="noopener noreferrer">图片</a>'
             "</span>"
         )

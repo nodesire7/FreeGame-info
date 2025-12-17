@@ -69,7 +69,7 @@ jobs:
           if [ -n "$(git status --porcelain history)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add history
+            git add -f history
             git commit -m "Update history store"
             git push origin HEAD:history
           else
@@ -128,5 +128,27 @@ jobs:
           files: |
             site.zip
             site.tar.gz
+
+      # Docker: only on merge/push to main
+      - name: Set up Docker Buildx
+        if: github.event_name == 'push'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Docker image
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            nodesire77/game_info:latest
+            nodesire77/game_info:${{ steps.version.outputs.tag }}
 
 
