@@ -25,9 +25,19 @@ Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静�
 
 > 💡 提示：在主页底部可以找到最新一次更新的历史数据链接。
 
+### Releases（版本包）
+
+- **触发时机**：仅在 **合并/推送到 `main`** 时自动创建 Release（`schedule` 自动更新页面 **不会** 生成 Release）
+- **版本号规则**：按顺序自动递增，起始为 **`v1.0`**（后续 `v1.1`、`v1.2`...）
+- **内容**：Release 附带“全平台通用”的构建产物（静态站点）
+  - `site.zip`
+  - `site.tar.gz`
+
+下载入口：仓库的 Releases 页面（`https://github.com/nodesire7/FreeGame-info/releases`）
+
 ## 功能特性
 
-- 🎮 **Epic Games Store**：抓取官方 `storefrontLayout` API，获取每周限免游戏
+- 🎮 **Epic Games Store**：抓取官方 `freeGamesPromotions` 接口并解析限免窗口
 - 🎮 **Steam**：使用 Playwright 抓取限时免费游戏
 - 🎮 **PlayStation Plus**：抓取会员免费游戏
 - 📄 **静态 HTML 页面**：美观的单页应用
@@ -76,19 +86,6 @@ python render_html.py site/snapshot.json epic-freebies.html.template site/index.
 python generate_image.py site/index.html site/archive/时间戳白嫖信息.webp
 ```
 
-### 一键脚本
-
-**Linux / macOS**:
-```bash
-chmod +x update.sh
-./update.sh
-```
-
-**Windows**:
-```powershell
-.\update.ps1
-```
-
 ## GitHub Actions 自动化
 
 仓库包含定时任务工作流（`.github/workflows/pages.yml`）：
@@ -97,6 +94,7 @@ chmod +x update.sh
 - **手动触发**：在 Actions 页面点击 "Run workflow"
 - **自动部署**：生成 `site/index.html`、历史 JSON 和图片，并发布到 GitHub Pages
 - **历史归档**：每次更新都会在 `site/archive/` 文件夹中保存带时间戳的 JSON 和图片文件
+- **Release**：仅 `push(main)` 触发，自动创建版本号 Release 并上传 `site.zip` / `site.tar.gz`
 
 ### 如何启用
 
@@ -110,18 +108,15 @@ chmod +x update.sh
 
 ### Epic Games
 
-默认使用官方 GraphQL 接口：
+默认使用官方接口：
 
 ```
-https://store-site-backend-static-ipv4.ak.epicgames.com/storefrontLayout?locale=zh-CN&country=CN&start=0&count=30
+https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?locale=zh-CN&country=CN&allowCountries=CN
 ```
 
-筛选条件：
-- `price.totalPrice.discountPrice == 0`（现价为 0）
-- `price.totalPrice.originalPrice > 0`（原价大于 0）
-- 从 `price.lineOffers[0].appliedRules[0].endDate` 提取限免结束时间
-
-**注意**：官方 API 可能不包含"即将开始"的限免游戏（只有已开始的），具体取决于 Epic 的发布策略。
+说明：
+- 从 promotions 窗口判定 **正在免费** / **即将免费**
+- 商品页详细信息（价格/开发商/发行商等）使用浏览器渲染后提取
 
 ### Steam
 
@@ -175,16 +170,8 @@ site/
 通过环境变量覆盖：
 
 ```bash
-export EPIC_API_URL="https://..."
-python fetch_freebies.py snapshot.json
-```
-
-### Python 版本
-
-`update.sh` 默认使用 `python3.11`，可通过环境变量 `PYTHON_CMD` 指定：
-
-```bash
-PYTHON_CMD=python3.12 ./update.sh
+export EPIC_PROMOTIONS_API_URL="https://..."
+python main.py site
 ```
 
 ## 常见问题

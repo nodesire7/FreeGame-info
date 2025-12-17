@@ -10,7 +10,7 @@ on:
     - cron: "0 */3 * * *"
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -57,5 +59,46 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # Releases: only on manual merge/push to main (NOT on schedule)
+      - name: Compute next version tag
+        if: github.event_name == 'push'
+        id: version
+        shell: bash
+        run: |
+          git fetch --tags --force
+          latest="$(git tag -l 'v[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)"
+          if [ -z "$latest" ]; then
+            next="v1.0"
+          else
+            if [[ "$latest" =~ ^v([0-9]+)\.([0-9]+)$ ]]; then
+              major="${BASH_REMATCH[1]}"
+              minor="${BASH_REMATCH[2]}"
+              next="v${major}.$((minor+1))"
+            else
+              next="v1.0"
+            fi
+          fi
+          echo "tag=$next" >> "$GITHUB_OUTPUT"
+          echo "Next release tag: $next"
+
+      - name: Package site for Release assets
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          zip -r site.zip site
+          tar -czf site.tar.gz -C site .
+
+      - name: Create GitHub Release (merge builds only)
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            site.zip
+            site.tar.gz
 
 
