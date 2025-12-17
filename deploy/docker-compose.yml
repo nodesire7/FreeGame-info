@@ -1,21 +1,16 @@
 services:
-  generator:
+  app:
     image: "nodesire77/game_info:${IMAGE_TAG}"
-    container_name: game_info_generator
+    container_name: game_info
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      - PORT=8080
+      - INTERVAL_SECONDS=${INTERVAL_SECONDS:-10800}
+      - SERVE=1
+      - ONE_SHOT=0
     volumes:
       - ./data:/data
-    # one-shot 生成（不会常驻），建议配合定时任务或手动执行
-    command: ["python", "main.py", "/data/site", "--history-dir", "/data/history"]
-
-  web:
-    image: nginx:alpine
-    container_name: game_info_web
-    depends_on:
-      - generator
-    ports:
-      - "${PORT:-8080}:80"
-    volumes:
-      - ./data/site:/usr/share/nginx/html:ro
     restart: unless-stopped
 
 

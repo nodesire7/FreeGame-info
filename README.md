@@ -127,14 +127,22 @@ python generate_image.py site/index.html site/history/records/时间戳白嫖信
 - `latest`
 - `vX.Y`（与 Release 版本号一致，例如 `v1.0`）
 
-示例（建议挂载数据卷持久化历史数据库与图片）：
+示例（拉取后直接常驻运行，自动生成页面，并默认每 3 小时更新一次；可修改间隔）：
 
 ```bash
-docker run --rm -v "$(pwd)/data:/data" nodesire77/game_info:latest
+docker run -d --name game_info -p 8080:8080 -v "$(pwd)/data:/data" nodesire77/game_info:latest
 ```
 
-运行后输出：
-- `/data/site/`：静态站点（可自行用 Nginx/静态服务托管）
+访问：`http://localhost:8080/`
+
+可选：修改生成间隔（例如 1 小时一次）：
+
+```bash
+docker run -d --name game_info -p 8080:8080 -v "$(pwd)/data:/data" -e INTERVAL_SECONDS=3600 nodesire77/game_info:latest
+```
+
+容器会输出到：
+- `/data/site/`：静态站点（包含 history 页）
 - `/data/history/date.db`：历史数据库
 - `/data/history/records/`：历史图片
 

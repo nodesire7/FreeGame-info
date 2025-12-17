@@ -20,7 +20,14 @@ VOLUME ["/data"]
 
 ENV OUTPUT_DIR=/data/site
 ENV HISTORY_DIR=/data/history
+ENV PORT=8080
+ENV INTERVAL_SECONDS=10800
+ENV SERVE=1
+ENV ONE_SHOT=0
 
-CMD ["python", "main.py", "/data/site", "--history-dir", "/data/history"]
+EXPOSE 8080
+
+RUN chmod +x /app/docker/entrypoint.sh
+ENTRYPOINT ["/app/docker/entrypoint.sh"]
 
 

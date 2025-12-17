@@ -27,16 +27,10 @@ cp env.example env
 docker compose --env-file env pull
 ```
 
-5. 生成一次站点（写入到 `./data/`）
+5. 启动（会自动生成页面，并每隔一段时间自动更新）
 
 ```bash
-docker compose --env-file env run --rm generator
-```
-
-6. 启动静态站点服务
-
-```bash
-docker compose --env-file env up -d web
+docker compose --env-file env up -d
 ```
 
 访问：`http://localhost:8080/`（端口可通过 `PORT` 修改）
@@ -50,10 +44,11 @@ docker compose --env-file env up -d web
 
 ## 定时更新
 
-本镜像默认是“一次性生成后退出”。建议用系统定时任务定期执行：
+本镜像默认会 **常驻运行**，并按 `INTERVAL_SECONDS` 周期自动执行抓取与页面生成。
 
-```bash
-docker compose --env-file env run --rm generator
-```
+默认：3 小时一次（10800 秒）。你可以在 `env` 里修改：
+
+- `INTERVAL_SECONDS=3600`（1 小时一次）
+- `INTERVAL_SECONDS=600`（10 分钟一次）
 
 
