@@ -1065,7 +1065,7 @@ def serialize_for_client(payload: Optional[Dict[str, Any]]) -> str:
     return json_str
 
 
-def render_html(snapshot: Dict[str, Any], template_path: str, timestamp: str = None) -> str:
+def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts: str | None = None) -> str:
     """渲染 HTML"""
     with open(template_path, "r", encoding="utf-8") as f:
         template = f.read()
@@ -1080,12 +1080,12 @@ def render_html(snapshot: Dict[str, Any], template_path: str, timestamp: str = N
     else:
         fetched_at_display = "等待同步"
     
-    # 生成 archive 文件的 URL
-    archive_json_url = ""
-    archive_image_url = ""
-    if timestamp:
-        archive_json_url = f"archive/{timestamp}白嫖信息.json"
-        archive_image_url = f"archive/{timestamp}白嫖信息.webp"
+    # 历史记录 URL（Pages）
+    latest_json_url = ""
+    latest_image_url = ""
+    if latest_history_ts:
+        latest_json_url = f"history/records/{latest_history_ts}白嫖信息.json"
+        latest_image_url = f"history/records/{latest_history_ts}白嫖信息.webp"
 
     epic_now = snapshot["epic"]["now"]
     epic_upcoming = snapshot["epic"]["upcoming"]
@@ -1104,10 +1104,18 @@ def render_html(snapshot: Dict[str, Any], template_path: str, timestamp: str = N
     share_data_json = serialize_for_client(share_payload)
     share_script = get_share_client_script()
     
-    # 生成 archive 链接
-    archive_links = ""
-    if timestamp and archive_json_url and archive_image_url:
-        archive_links = f'<span>历史数据：<a href="{escape_attribute(archive_json_url)}" target="_blank" rel="noopener noreferrer">JSON</a> | <a href="{escape_attribute(archive_image_url)}" target="_blank" rel="noopener noreferrer">图片</a></span>'
+    # 页脚链接：历史页 + 最新归档（如有）
+    links: list[str] = []
+    links.append('<span>历史记录：<a href="history/" target="_blank" rel="noopener noreferrer">查看</a></span>')
+    if latest_json_url and latest_image_url:
+        links.append(
+            '<span>最新归档：'
+            f'<a href="{escape_attribute(latest_json_url)}" target="_blank" rel="noopener noreferrer">JSON</a>'
+            ' | '
+            f'<a href="{escape_attribute(latest_image_url)}" target="_blank" rel="noopener noreferrer">图片</a>'
+            "</span>"
+        )
+    archive_links = "".join(links)
 
     replacements = {
         "FETCHED_AT": escape_html(fetched_at_display),
@@ -1150,6 +1158,131 @@ def render_html(snapshot: Dict[str, Any], template_path: str, timestamp: str = N
         html_content = html_content.replace(f"{{{{{key}}}}}", value)
 
     return html_content
+
+
+def _extract_style_block(template: str) -> str:
+    m = re.search(r"<style>[\s\S]*?</style>", template)
+    return m.group(0) if m else "<style></style>"
+
+
+def render_history_page(
+    records: list[dict[str, Any]],
+    *,
+    template_path: str,
+    base_title: str = "历史记录 | 白嫖游戏信息",
+) -> str:
+    """
+    渲染历史记录页（渲染为卡片样式）。
+    records: 每条为完整 snapshot（包含 fetchedAt / epic / steam / psn）
+    """
+    with open(template_path, "r", encoding="utf-8") as f:
+        template = f.read()
+    style_block = _extract_style_block(template)
+
+    # 组装记录内容（最新在前）
+    blocks: list[str] = []
+    for snap in records:
+        fetched_at = snap.get("fetchedAt")
+        fetched_at_display = "等待同步"
+        if fetched_at:
+            try:
+                dt = datetime.fromisoformat(str(fetched_at).replace("Z", "+00:00"))
+                fetched_at_display = format_full_datetime(int(dt.timestamp() * 1000))
+            except Exception:
+                fetched_at_display = str(fetched_at)
+
+        epic_now = (snap.get("epic") or {}).get("now") or []
+        epic_upcoming = (snap.get("epic") or {}).get("upcoming") or []
+        steam = snap.get("steam") or []
+        psn = snap.get("psn") or []
+
+        total = len(epic_now) + len(epic_upcoming) + len(steam) + len(psn)
+
+        def _subsection(title: str, count: int, body_html: str) -> str:
+            return (
+                '<div class="epic-freebies__section" style="padding: 18px 20px;">'
+                '<header class="epic-freebies__section-header">'
+                f'<h4 class="epic-freebies__section-title">{escape_html(title)}</h4>'
+                f'<span class="epic-freebies__section-count">{count}</span>'
+                "</header>"
+                f'<div class="epic-freebies__section-body">{body_html}</div>'
+                "</div>"
+            )
+
+        body_parts: list[str] = []
+        body_parts.append(
+            _subsection(
+                "EPIC 正在免费",
+                len(epic_now),
+                render_epic_section_content(epic_now, "当前暂无正在进行的限免活动。", "now"),
+            )
+        )
+        body_parts.append(
+            _subsection(
+                "EPIC 即将免费",
+                len(epic_upcoming),
+                render_epic_section_content(epic_upcoming, "暂无即将开始的官方限免活动。", "upcoming"),
+            )
+        )
+        body_parts.append(
+            _subsection(
+                "Steam 限免",
+                len(steam),
+                render_steam_section_content(steam, "暂未检测到 Steam 官方限免活动，请稍后再试。"),
+            )
+        )
+        body_parts.append(
+            _subsection(
+                "PlayStation 本月会员免费",
+                len(psn),
+                render_psn_section_content(psn, "暂未检测到 PlayStation 公布的会员免费游戏。"),
+            )
+        )
+
+        blocks.append(
+            '<div class="epic-freebies__section">'
+            '<header class="epic-freebies__section-header">'
+            f'<h3 class="epic-freebies__section-title">{escape_html(fetched_at_display)}</h3>'
+            f'<span class="epic-freebies__section-count">{total}</span>'
+            "</header>"
+            f'<div class="epic-freebies__section-body">{"".join(body_parts)}</div>'
+            "</div>"
+        )
+
+    content_html = "".join(blocks) if blocks else '<div class="epic-freebies__panel-empty">暂无历史记录</div>'
+
+    # history 页 favicon 相对路径不同
+    favicon_href = "../logo.png"
+
+    return f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{escape_html(base_title)}</title>
+  <link rel="icon" type="image/png" href="{favicon_href}">
+  {style_block}
+</head>
+<body>
+  <div class="steam-page">
+    <div class="steam-shell">
+      <header class="epic-hero" role="banner">
+        <div class="epic-hero__content">
+          <span class="epic-hero__eyebrow">Game Freebie Radar</span>
+          <h1 class="epic-hero__title">历史记录</h1>
+          <p class="epic-hero__desc">仅当抓取结果与上次不同才会新增一条历史记录。</p>
+          <div class="epic-hero__callout">
+            <span class="epic-hero__pill"><a href="../" style="color: inherit; text-decoration: none;">返回主页</a></span>
+          </div>
+        </div>
+      </header>
+      <section class="epic-freebies" role="main">
+        {content_html}
+      </section>
+    </div>
+  </div>
+</body>
+</html>"""
 
 
 def main():

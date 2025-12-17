@@ -19,9 +19,14 @@ snapshot.json
 psn.html
 index.html
 public/
+site/
+.tmp_history/
 *.webp
 *.png
 !logo.png
+!history/**/*.webp
+!history/**/*.json
+!history/**/manifest.json
 
 # Allow the HTML template to be tracked
 !epic-freebies.html.template

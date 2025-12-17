@@ -12,18 +12,19 @@ Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静�
 
 ### 历史数据访问
 
-每次更新都会自动保存历史数据到 `archive/` 文件夹，可通过以下方式访问：
+只有当本次抓取结果与上次不同，才会新增一条历史记录，并保存到 `history/records/`，可通过以下方式访问：
 
-- **历史 JSON 数据**: `https://nodesire7.github.io/FreeGame-info/archive/{时间戳}白嫖信息.json`
-- **历史图片**: `https://nodesire7.github.io/FreeGame-info/archive/{时间戳}白嫖信息.webp`
+- **历史列表页面**: `https://nodesire7.github.io/FreeGame-info/history/`
+- **历史 JSON 数据**: `https://nodesire7.github.io/FreeGame-info/history/records/{时间戳}白嫖信息.json`
+- **历史图片**: `https://nodesire7.github.io/FreeGame-info/history/records/{时间戳}白嫖信息.webp`
 
 时间戳格式：`YYYYMMDDHHmmss`（例如：`20251214202455`）
 
 **示例**：
-- JSON: https://nodesire7.github.io/FreeGame-info/archive/20251214202455白嫖信息.json
-- 图片: https://nodesire7.github.io/FreeGame-info/archive/20251214202455白嫖信息.webp
+- JSON: https://nodesire7.github.io/FreeGame-info/history/records/20251214202455白嫖信息.json
+- 图片: https://nodesire7.github.io/FreeGame-info/history/records/20251214202455白嫖信息.webp
 
-> 💡 提示：在主页底部可以找到最新一次更新的历史数据链接。
+> 💡 提示：在主页底部可以找到“历史记录”入口与“最新归档”链接。
 
 ### Releases（版本包）
 
@@ -42,7 +43,7 @@ Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静�
 - 🎮 **PlayStation Plus**：抓取会员免费游戏
 - 📄 **静态 HTML 页面**：美观的单页应用
 - 🖼️ **分享拼图生成**：使用 Canvas API 生成长图（支持 PNG/WebP）
-- 📦 **历史数据归档**：每次更新自动保存 JSON 和图片到 `archive/` 文件夹
+- 📦 **历史数据归档**：仅在数据变化时保存 JSON 和图片到 `history/records/`
 - 🤖 **GitHub Actions**：自动定时更新并部署到 GitHub Pages
 
 ## 本地使用
@@ -68,7 +69,7 @@ python main.py site
 # 这会自动：
 # 1. 抓取所有平台数据（Epic、Steam、PSN）
 # 2. 生成 HTML 页面
-# 3. 生成历史 JSON 和图片到 site/archive/ 文件夹
+# 3. 如数据有变化，生成历史 JSON / 图片到 site/history/records/，并生成历史列表页
 ```
 
 **手动步骤**（已废弃，建议使用 `main.py`）：
@@ -83,7 +84,7 @@ python steam_fetch.py site/STEAM.json
 python render_html.py site/snapshot.json epic-freebies.html.template site/index.html
 
 # 3) 生成分享拼图
-python generate_image.py site/index.html site/archive/时间戳白嫖信息.webp
+python generate_image.py site/index.html site/history/records/时间戳白嫖信息.webp
 ```
 
 ## GitHub Actions 自动化
@@ -93,7 +94,7 @@ python generate_image.py site/index.html site/archive/时间戳白嫖信息.webp
 - **定时运行**：每 3 小时抓取一次（UTC 时间：0:00、3:00、6:00...）
 - **手动触发**：在 Actions 页面点击 "Run workflow"
 - **自动部署**：生成 `site/index.html`、历史 JSON 和图片，并发布到 GitHub Pages
-- **历史归档**：每次更新都会在 `site/archive/` 文件夹中保存带时间戳的 JSON 和图片文件
+- **历史归档**：仅在数据变化时保存带时间戳的 JSON 和图片文件，并生成历史列表页
 - **Release**：仅 `push(main)` 触发，自动创建版本号 Release 并上传 `site.zip` / `site.tar.gz`
 
 ### 如何启用
@@ -158,9 +159,12 @@ site/
 ├── EPIC.json               # Epic 数据
 ├── PSN.json                # PSN 数据
 ├── STEAM.json              # Steam 数据
-└── archive/                # 历史数据归档
-    ├── {时间戳}白嫖信息.json
-    └── {时间戳}白嫖信息.webp
+└── history/                 # 历史记录页面与资源（用于 Pages 展示）
+    ├── index.html
+    ├── manifest.json
+    └── records/
+        ├── {时间戳}白嫖信息.json
+        └── {时间戳}白嫖信息.webp
 ```
 
 ## 自定义配置

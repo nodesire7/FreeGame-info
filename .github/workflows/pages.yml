@@ -27,6 +27,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Prepare history store (branch: history)
+        shell: bash
+        run: |
+          set -e
+          if git ls-remote --exit-code origin history >/dev/null 2>&1; then
+            git fetch origin history:history
+          else
+            # first run: create local history branch from current HEAD
+            git branch history
+          fi
+          git worktree add history-wt history
+          mkdir -p history-wt/history/records
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -45,8 +58,23 @@ jobs:
       - name: Generate site
         run: |
           mkdir -p site
-          python main.py site
+          python main.py site --history-dir history-wt/history
           touch site/.nojekyll
+
+      - name: Persist history store (only when changed)
+        shell: bash
+        run: |
+          set -e
+          cd history-wt
+          if [ -n "$(git status --porcelain history)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add history
+            git commit -m "Update history store"
+            git push origin HEAD:history
+          else
+            echo "No history changes."
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
