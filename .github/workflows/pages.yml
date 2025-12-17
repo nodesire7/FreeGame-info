@@ -27,7 +27,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare history store (branch: history)
+      - name: "Prepare history store (branch: history)"
         shell: bash
         run: |
           set -e

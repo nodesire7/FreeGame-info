@@ -1106,6 +1106,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
     links: list[str] = []
     links.append('<span>历史记录：<a href="history/" target="_blank" rel="noopener noreferrer">查看</a></span>')
     links.append('<span>数据库：<a href="history/date.db" target="_blank" rel="noopener noreferrer">date.db</a></span>')
+    links.append('<span>本次记录：<a href="白嫖信息.json" target="_blank" rel="noopener noreferrer">JSON</a></span>')
     if latest_image_url:
         links.append(
             '<span>最新归档：'

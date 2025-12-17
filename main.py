@@ -169,6 +169,11 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     print(f"Steam: {len(snapshot['steam'])} 条")
     print(f"PSN: {len(snapshot['psn'])} 条")
 
+    # 输出“本次记录”的 JSON（用于 Pages 直接访问），始终覆盖为当前快照
+    site_dir = Path(output_dir)
+    current_json_path = site_dir / "白嫖信息.json"
+    current_json_path.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+
     # 复制 logo.png 到 site 目录
     if os.path.exists("logo.png"):
         logo_dest = os.path.join(output_dir, "logo.png")
@@ -231,7 +236,6 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     # === 生成历史页面（渲染为卡片样式）===
     snapshots: List[Dict[str, Any]] = list_snapshots(conn, limit=60)
 
-    site_dir = Path(output_dir)
     history_page_dir = site_dir / "history"
     _ensure_dir(history_page_dir)
     history_index = history_page_dir / "index.html"
