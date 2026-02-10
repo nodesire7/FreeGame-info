@@ -122,7 +122,30 @@ def _extract_description(game: Dict[str, Any]) -> str:
     if key_text:
         return key_text.replace("\n", " ").strip()
     
-    return "暂无游戏简介。"
+        return "暂无游戏简介。"
+
+
+def _extract_publisher(game: Dict[str, Any]) -> str:
+    """
+    提取发行商 (Seller)
+    """
+    return game.get("seller", {}).get("name", "未知发行商")
+
+
+def _extract_creator(game: Dict[str, Any]) -> str:
+    """
+    提取开发商 (Developer)
+    从 customAttributes 中查找 developerName，如果没有则使用发行商
+    """
+    # 从 customAttributes 中查找 developerName
+    custom_attrs = game.get("customAttributes", [])
+    if isinstance(custom_attrs, list):
+        for attr in custom_attrs:
+            if isinstance(attr, dict) and attr.get("key") == "developerName":
+                return attr.get("value", "")
+    
+    # 如果没找到，返回发行商
+    return _extract_publisher(game)
 
 
 async def fetch_epic() -> List[Dict[str, Any]]:
@@ -235,10 +258,16 @@ async def fetch_epic() -> List[Dict[str, Any]]:
 
         # 提取游戏简介
         description = _extract_description(game)
+        
+        # 提取发行商和开发商
+        publisher = _extract_publisher(game)
+        creator = _extract_creator(game)
 
         game_info = {
             "title": game.get("title", ""),
             "status": status,
+            "publisher": publisher,
+            "creator": creator,
             "description": description,
             "originalPrice": original_price,
             "date": _parse_iso_to_beijing(target_date),

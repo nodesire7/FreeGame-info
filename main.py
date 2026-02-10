@@ -68,6 +68,8 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
                     "link": game.get("link", ""),
                     "cover": game.get("cover", ""),
                     "originalPriceDesc": game.get("originalPrice", ""),
+                    "publisher": game.get("publisher", ""),
+                    "creator": game.get("creator", ""),
                     "description": game.get("description", ""),
                     "isFreeNow": game.get("status") == "ACTIVE",
                     "freeStartAt": free_start_at_ms,

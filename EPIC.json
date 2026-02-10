@@ -2,45 +2,55 @@
   {
     "title": "暗面侦探：黑暗中的摸索",
     "status": "UPCOMING",
+    "publisher": "Akupara Games",
+    "creator": "Akupara Games",
     "description": "用鼠尾草净化房间，带上旅行装通灵板，再次进入双湖城吧。这是美国排名34位的闹鬼名城。在像素化的世界中，与麦奎因侦探一起探索六个令人毛骨悚然的案件，冒着生命危险闯过重重迷雾，破解笼罩在这座城市上方的可怕谜团。",
     "originalPrice": "¥47.00",
-    "date": "2026/02/13 00:00",
+    "date": "2026/02/13 00:00:00",
     "link": "https://store.epicgames.com/zh-CN/p/the-darkside-detective-a-fumble-in-the-dark-174fcf",
     "cover": "https://cdn1.epicgames.com/spt-assets/0638bcc62d9f4ba2a53eb9093c54be31/the-darkside-detective-a-fumble-in-the-dark-offer-501mw.jpg"
   },
   {
     "title": "纪念碑谷（Monument Valley）",
     "status": "UPCOMING",
+    "publisher": "ustwo games",
+    "creator": "ustwo games",
     "description": "踏上宽恕之旅，穿越几乎不可能破解的环境和幻想谜题。操纵纪念碑、创建不断发展的道路，探索全新超现实且神秘的世界，体验这款冥想且平静的解谜游戏。",
     "originalPrice": "¥33.00",
-    "date": "2026/03/30 23:00",
+    "date": "2026/03/30 23:00:00",
     "link": "https://store.epicgames.com/zh-CN/p/monument-valley-1d99d3",
     "cover": "https://cdn1.epicgames.com/spt-assets/e56a7411805046d3b5b7253a6e4e0faa/monument-valley-1gys5.jpg"
   },
   {
     "title": "《波坦尼庄园》",
     "status": "ACTIVE",
+    "publisher": "White Thorn Digital",
+    "creator": "White Thorn Digital",
     "description": "欢迎来到19世纪的英格兰，来到广阔的植物庄园。你将扮演庄园的退休植物学家阿拉贝拉·格林，探索庄园内外，研究那些被遗忘的植物，并帮助它们找到理想的生长环境。",
     "originalPrice": "¥78.00",
-    "date": "2026/02/13 00:00",
+    "date": "2026/02/13 00:00:00",
     "link": "https://store.epicgames.com/zh-CN/p/botany-manor-e7c456",
     "cover": "https://cdn1.epicgames.com/spt-assets/42d56a88c22d4eaa8977bf5528a2396b/botany-manor-1f7uq.jpg"
   },
   {
     "title": "剧毒复古套装",
     "status": "ACTIVE",
+    "publisher": "Cubic Games Studio Ltd",
+    "creator": "Cubic Games Studio Ltd",
     "description": "携带剧毒复古套装，穿越时光投入战斗——灵感源自刺激的街机赛季。",
     "originalPrice": "¥92.00",
-    "date": "2026/02/13 00:00",
+    "date": "2026/02/13 00:00:00",
     "link": "https://store.epicgames.com/zh-CN/p/pixel-gun-3d-812855",
     "cover": "https://cdn1.epicgames.com/spt-assets/65338dc60d204dcb98752745bab52374/pixel-gun-3d-1pp3a.jpg"
   },
   {
     "title": "Nobody Wants to Die",
     "status": "UPCOMING",
+    "publisher": "Plaion",
+    "creator": "Plaion",
     "description": "纽约，2329 年，反乌托邦的世界。走进这个黑色电影风格的互动故事，扮演侦探詹姆斯·卡拉，使用先进技术，对一系列针对纽约上层精英的谋杀展开调查，孤注一掷追捕幕后的连环杀手。",
     "originalPrice": "¥106.80",
-    "date": "2026/02/13 00:00",
+    "date": "2026/02/13 00:00:00",
     "link": "https://store.epicgames.com/zh-CN/p/nobody-wants-to-die-fe21cd",
     "cover": "https://cdn1.epicgames.com/spt-assets/dece0016082647a6af5759dbbedfc8eb/nobody-wants-to-die-13stz.jpg"
   }

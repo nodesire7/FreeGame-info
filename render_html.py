@@ -42,7 +42,7 @@ def escape_attribute(text: str) -> str:
 def convert_epic_new_format(epic_list: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
     """
     将 EPIC 新格式转换为渲染所需格式
-    新格式: [{"title", "status", "description", "originalPrice", "date", "link", "cover"}]
+    新格式: [{"title", "status", "publisher", "creator", "description", "originalPrice", "date", "link", "cover"}]
     旧格式: {"now": [...], "upcoming": [...]}
     """
     now_list = []
@@ -50,6 +50,10 @@ def convert_epic_new_format(epic_list: List[Dict[str, Any]]) -> Dict[str, List[D
     
     for game in epic_list:
         status = game.get("status", "")
+        
+        # 提取发行商和开发商
+        publisher = game.get("publisher", "未知发行商")
+        creator = game.get("creator", "")
         
         # 使用游戏实际的 description，如果没有则用默认值
         description = game.get("description", "") or "Epic 官方暂未提供详细介绍。"
@@ -85,6 +89,8 @@ def convert_epic_new_format(epic_list: List[Dict[str, Any]]) -> Dict[str, List[D
             "link": game.get("link", ""),
             "cover": game.get("cover", ""),
             "originalPriceDesc": game.get("originalPrice", ""),
+            "publisher": publisher,
+            "creator": creator,
             "description": description,
             "isFreeNow": status == "ACTIVE",
             "freeStartAt": free_start_at_ms,
@@ -221,12 +227,17 @@ def sanitize_text(value: Optional[str]) -> str:
 def render_epic_card(game: Dict[str, Any], variant: str) -> str:
     """渲染 Epic 游戏卡片"""
     summary = []
-    publisher = game.get("publisher") or game.get("seller")
+    
+    # 发行商 (publisher)
+    publisher = game.get("publisher", "")
     if publisher:
         summary.append(f"发行：{publisher}")
-    developer = game.get("developer")
-    if developer and developer != publisher:
-        summary.append(f"开发：{developer}")
+    
+    # 开发商 (creator)
+    creator = game.get("creator", "")
+    if creator and creator != publisher:
+        summary.append(f"开发：{creator}")
+    
     genres = game.get("genres")
     if genres:
         summary.append(f"类型：{' / '.join(genres)}")
@@ -1119,10 +1130,18 @@ def map_epic_share_item(game: Dict[str, Any], variant: str) -> Dict[str, Any]:
     price = game.get("originalPriceDesc") or game.get("originalPrice") or ""
     platforms = game.get("platforms", [])
     platform_text = " / ".join(filter(None, platforms)) if platforms else ""
+    
+    # 获取发行商和开发商
+    publisher = game.get("publisher", "")
+    creator = game.get("creator", "")
 
     tertiary_parts = []
     if price:
         tertiary_parts.append(f"原价 {price}")
+    if publisher:
+        tertiary_parts.append(f"发行 {publisher}")
+    if creator and creator != publisher:
+        tertiary_parts.append(f"开发 {creator}")
     if platform_text:
         tertiary_parts.append(f"平台 {platform_text}")
 
