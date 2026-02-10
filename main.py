@@ -33,7 +33,53 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     # Epic
     try:
         epic_data = await fetch_epic()
-        results["epic"] = epic_data
+        # 新格式返回扁平数组，转换为旧格式用于兼容
+        if isinstance(epic_data, list):
+            results["epic"] = {"now": [], "upcoming": []}
+            for game in epic_data:
+                # 解析日期字符串为时间戳
+                from datetime import datetime, timezone, timedelta
+                date_str = game.get("date", "")
+                free_start_at_ms = None
+                free_end_at_ms = None
+                
+                if date_str:
+                    try:
+                        # 解析日期
+                        if len(date_str.split(":")) == 2:
+                            dt = datetime.strptime(date_str, "%Y/%m/%d %H:%M")
+                            dt = dt.replace(hour=23, minute=59, second=0)
+                        else:
+                            dt = datetime.strptime(date_str, "%Y/%m/%d %H:%M:%S")
+                            dt = dt.replace(second=0)
+                        # 转换为 UTC 时间戳（毫秒）
+                        timestamp_ms = int(dt.timestamp() * 1000)
+                        
+                        if game.get("status") == "ACTIVE":
+                            free_end_at_ms = timestamp_ms
+                        else:
+                            free_start_at_ms = timestamp_ms
+                    except Exception:
+                        pass
+                
+                # 构建转换后的游戏对象
+                converted_game = {
+                    "title": game.get("title", ""),
+                    "link": game.get("link", ""),
+                    "cover": game.get("cover", ""),
+                    "originalPriceDesc": game.get("originalPrice", ""),
+                    "description": game.get("description", ""),
+                    "isFreeNow": game.get("status") == "ACTIVE",
+                    "freeStartAt": free_start_at_ms,
+                    "freeEndAt": free_end_at_ms,
+                }
+                
+                if game.get("status") == "ACTIVE":
+                    results["epic"]["now"].append(converted_game)
+                else:
+                    results["epic"]["upcoming"].append(converted_game)
+        else:
+            results["epic"] = epic_data
         print("[OK] EPIC 抓取完成")
     except Exception as e:
         print(f"[FAIL] EPIC 抓取失败: {e}")
@@ -41,7 +87,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     
     # PSN
     try:
-        psn_data = await fetch_psn(None)
+        psn_data = await fetch_psn()
         results["psn"] = psn_data
         print("[OK] PSN 抓取完成")
     except Exception as e:

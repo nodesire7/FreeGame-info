@@ -1,0 +1,42 @@
+[
+  {
+    "platform": "PSN",
+    "title": "Undisputed",
+    "description": "与拳击史上过去与现今的传奇拳击手正面交锋，包括Muhammad Ali、Canelo Álvarez，以及Tyson Fury。",
+    "originalPrice": "会员免费",
+    "date": "本月有效",
+    "link": "https://www.playstation.com/zh-hans-hk/games/undisputed/",
+    "cover": "https://gmedia.playstation.com/is/image/SIEPDC/undisputed-screenshot-01-en-26july24",
+    "status": "ACTIVE"
+  },
+  {
+    "platform": "PSN",
+    "title": "Subnautica: Below Zero",
+    "description": "在4546B行星的冰冷水域中生存、研究和探索，揭开您妹妹神秘失踪背后的真相。",
+    "originalPrice": "会员免费",
+    "date": "本月有效",
+    "link": "https://www.playstation.com/zh-hans-hk/games/subnautica-below-zero/",
+    "cover": "https://gmedia.playstation.com/is/image/SIEPDC/subnautica-screenshot-03-en-23feb22",
+    "status": "ACTIVE"
+  },
+  {
+    "platform": "PSN",
+    "title": "奥特罗斯 Ultros",
+    "description": "在这场迷幻冒险中，使用致命连击与宇宙敌人战斗，并逃脱黑洞的时间循环。",
+    "originalPrice": "会员免费",
+    "date": "本月有效",
+    "link": "https://www.playstation.com/zh-hans-hk/games/ultros/",
+    "cover": "https://gmedia.playstation.com/is/image/SIEPDC/Ultros-screenshot-04-en-24nov23",
+    "status": "ACTIVE"
+  },
+  {
+    "platform": "PSN",
+    "title": "ACE COMBAT 7: SKIES UNKNOWN",
+    "description": "从一系列真实存在和未来感十足的战斗机中选择座机，升空展开令人心惊胆颤的空中缠斗。",
+    "originalPrice": "会员免费",
+    "date": "本月有效",
+    "link": "https://www.playstation.com/zh-hans-hk/games/ace-combat-7-skies-unknown/",
+    "cover": "https://gmedia.playstation.com/is/image/SIEPDC/ace-combat-7-20-ps4-eu-03jan17",
+    "status": "ACTIVE"
+  }
+]

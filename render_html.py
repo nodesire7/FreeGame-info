@@ -37,6 +37,113 @@ def escape_attribute(text: str) -> str:
     return escape_html(text)
 
 
+# ============== EPIC 新格式转换函数 ==============
+
+def convert_epic_new_format(epic_list: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    将 EPIC 新格式转换为渲染所需格式
+    新格式: [{"title", "status", "description", "originalPrice", "date", "link", "cover"}]
+    旧格式: {"now": [...], "upcoming": [...]}
+    """
+    now_list = []
+    upcoming_list = []
+    
+    for game in epic_list:
+        status = game.get("status", "")
+        
+        # 使用游戏实际的 description，如果没有则用默认值
+        description = game.get("description", "") or "Epic 官方暂未提供详细介绍。"
+        
+        # 解析日期字符串为时间戳（毫秒）
+        date_str = game.get("date", "")
+        free_start_at_ms = None
+        free_end_at_ms = None
+        
+        if date_str:
+            try:
+                # 解析日期
+                if len(date_str.split(":")) == 2:
+                    dt = datetime.strptime(date_str, "%Y/%m/%d %H:%M")
+                    # 如果没有秒，设置为当天的 23:59
+                    dt = dt.replace(hour=23, minute=59, second=0)
+                else:
+                    dt = datetime.strptime(date_str, "%Y/%m/%d %H:%M:%S")
+                    dt = dt.replace(second=0)
+                
+                # 转换为 UTC 时间戳（毫秒）
+                timestamp_ms = int(dt.timestamp() * 1000)
+                
+                if status == "ACTIVE":
+                    free_end_at_ms = timestamp_ms
+                else:  # UPCOMING
+                    free_start_at_ms = timestamp_ms
+            except Exception:
+                pass
+        
+        converted = {
+            "title": game.get("title", ""),
+            "link": game.get("link", ""),
+            "cover": game.get("cover", ""),
+            "originalPriceDesc": game.get("originalPrice", ""),
+            "description": description,
+            "isFreeNow": status == "ACTIVE",
+            "freeStartAt": free_start_at_ms,
+            "freeEndAt": free_end_at_ms,
+        }
+        
+        if status == "ACTIVE":
+            now_list.append(converted)
+        else:  # UPCOMING
+            upcoming_list.append(converted)
+    
+    return {"now": now_list, "upcoming": upcoming_list}
+
+
+# ============== PSN 新格式转换函数 ==============
+
+def convert_psn_new_format(psn_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    将 PSN 新格式转换为渲染所需格式
+    新格式: [{"platform", "title", "description", "originalPrice", "date", "link", "cover", "status"}]
+    旧格式: [{"id", "title", "link", "image", "description", "platforms"}]
+    """
+    result = []
+    
+    for game in psn_list:
+        # 新格式的字段映射
+        platform = game.get("platform", "PSN")
+        title = game.get("title", "")
+        description = game.get("description", "")
+        original_price = game.get("originalPrice", "会员免费")
+        date = game.get("date", "本月有效")
+        link = game.get("link", "")
+        cover = game.get("cover", "")
+        status = game.get("status", "ACTIVE")
+        
+        # 构建 highlight 文本
+        if "PS Plus" in status or "Monthly" in status:
+            highlight = "PS Plus 月度会员免费"
+        elif status == "ACTIVE":
+            highlight = "会员免费"
+        else:
+            highlight = status
+        
+        converted = {
+            "id": link,
+            "title": title,
+            "link": link,
+            "image": cover,
+            "description": description,
+            "highlight": highlight,
+            "platforms": [platform] if platform else ["PSN"],
+            "period": date,
+            "originalPrice": original_price,
+        }
+        result.append(converted)
+    
+    return result
+
+
 def format_full_datetime(timestamp: Optional[int] = None) -> str:
     """格式化完整日期时间（中国时区）"""
     if not timestamp:
@@ -290,7 +397,8 @@ def render_steam_card(game: Dict[str, Any]) -> str:
 
 def render_psn_card(game: Dict[str, Any]) -> str:
     """渲染 PlayStation 游戏卡片"""
-    cover = game.get("image", "")
+    # 兼容新旧格式（新格式用 cover，旧格式用 image）
+    cover = game.get("cover") or game.get("image", "")
     cover_html = (
         f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"])}" loading="lazy">'
         if cover
@@ -303,8 +411,12 @@ def render_psn_card(game: Dict[str, Any]) -> str:
             f'<span class="epic-freebies__meta-primary">{escape_html(game["highlight"])}</span>'
         )
     if game.get("platforms"):
+        # platforms 可能是列表或字符串
+        platforms = game["platforms"]
+        if isinstance(platforms, list):
+            platforms = " / ".join(platforms)
         timing_parts.append(
-            f'<span class="epic-freebies__meta-secondary">{escape_html(game["platforms"])}</span>'
+            f'<span class="epic-freebies__meta-secondary">{escape_html(str(platforms))}</span>'
         )
     if game.get("period"):
         timing_parts.append(
@@ -875,10 +987,31 @@ def get_share_client_script() -> str:
 def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """构建分享数据"""
     sections = []
-    epic_now = snapshot["epic"]["now"]
-    epic_upcoming = snapshot["epic"]["upcoming"]
-    steam = snapshot["steam"]
-    psn = snapshot["psn"]
+    
+    # 处理 EPIC 数据（兼容新旧格式）
+    epic_data = snapshot.get("epic", {})
+    if isinstance(epic_data, list):
+        # 新格式：扁平数组，需要转换
+        epic_converted = convert_epic_new_format(epic_data)
+        epic_now = epic_converted["now"]
+        epic_upcoming = epic_converted["upcoming"]
+    else:
+        # 旧格式：字典包含 now/upcoming
+        epic_now = epic_data.get("now", [])
+        epic_upcoming = epic_data.get("upcoming", [])
+    
+    steam = snapshot.get("steam", [])
+    
+    # 处理 PSN 数据（兼容新旧格式）
+    psn_data = snapshot.get("psn", [])
+    if psn_data and isinstance(psn_data, list) and len(psn_data) > 0:
+        first_psn = psn_data[0] if psn_data else {}
+        if "cover" in first_psn or "status" in first_psn:
+            psn = convert_psn_new_format(psn_data)
+        else:
+            psn = psn_data
+    else:
+        psn = []
 
     if epic_now:
         sections.append(
@@ -1041,6 +1174,9 @@ def map_psn_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
     if game.get("platforms"):
         tertiary_parts.append(f"平台 {sanitize_text(game['platforms'])}")
 
+    # 兼容新旧格式（新格式用 cover，旧格式用 image）
+    cover_url = game.get("cover") or game.get("image", "")
+
     return {
         "title": sanitize_text(game.get("title", "")),
         "primary": sanitize_text(game.get("highlight", "PS Plus 会员福利")),
@@ -1049,7 +1185,7 @@ def map_psn_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
         ),
         "tertiary": " · ".join(tertiary_parts),
         "description": sanitize_text(game.get("description", "")),
-        "coverUrl": game.get("image"),
+        "coverUrl": cover_url,
     }
 
 
@@ -1085,10 +1221,33 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
     if latest_history_ts:
         latest_image_url = f"history/records/{latest_history_ts}白嫖信息.webp"
 
-    epic_now = snapshot["epic"]["now"]
-    epic_upcoming = snapshot["epic"]["upcoming"]
-    steam = snapshot["steam"]
-    psn = snapshot["psn"]
+    # 处理 EPIC 数据（兼容新旧格式）
+    epic_data = snapshot.get("epic", {})
+    if isinstance(epic_data, list):
+        # 新格式：扁平数组，需要转换
+        epic_converted = convert_epic_new_format(epic_data)
+        epic_now = epic_converted["now"]
+        epic_upcoming = epic_converted["upcoming"]
+    else:
+        # 旧格式：字典包含 now/upcoming
+        epic_now = epic_data.get("now", [])
+        epic_upcoming = epic_data.get("upcoming", [])
+    
+    # 处理 PSN 数据（兼容新旧格式）
+    psn_data = snapshot.get("psn", [])
+    if psn_data and isinstance(psn_data, list) and len(psn_data) > 0:
+        # 检查是否是新格式（新格式第一个元素通常有 status 字段）
+        first_psn = psn_data[0] if psn_data else {}
+        if "cover" in first_psn or "status" in first_psn:
+            # 新格式：扁平数组
+            psn = convert_psn_new_format(psn_data)
+        else:
+            # 旧格式
+            psn = psn_data
+    else:
+        psn = []
+
+    steam = snapshot.get("steam", [])
 
     epic_now_count = len(epic_now)
     epic_upcoming_count = len(epic_upcoming)
@@ -1189,10 +1348,30 @@ def render_history_page(
             except Exception:
                 fetched_at_display = str(fetched_at)
 
-        epic_now = (snap.get("epic") or {}).get("now") or []
-        epic_upcoming = (snap.get("epic") or {}).get("upcoming") or []
+        # 处理 EPIC 数据（兼容新旧格式）
+        epic_data = snap.get("epic", {})
+        if isinstance(epic_data, list):
+            # 新格式：扁平数组，需要转换
+            epic_converted = convert_epic_new_format(epic_data)
+            epic_now = epic_converted["now"]
+            epic_upcoming = epic_converted["upcoming"]
+        else:
+            # 旧格式：字典包含 now/upcoming
+            epic_now = (epic_data.get("now") or []) if isinstance(epic_data, dict) else []
+            epic_upcoming = (epic_data.get("upcoming") or []) if isinstance(epic_data, dict) else []
+        
         steam = snap.get("steam") or []
-        psn = snap.get("psn") or []
+        
+        # 处理 PSN 数据（兼容新旧格式）
+        psn_data = snap.get("psn") or []
+        if psn_data and isinstance(psn_data, list) and len(psn_data) > 0:
+            first_psn = psn_data[0] if psn_data else {}
+            if "cover" in first_psn or "status" in first_psn:
+                psn = convert_psn_new_format(psn_data)
+            else:
+                psn = psn_data
+        else:
+            psn = []
 
         total = len(epic_now) + len(epic_upcoming) + len(steam) + len(psn)
 
