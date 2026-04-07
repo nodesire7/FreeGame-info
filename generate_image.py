@@ -56,36 +56,54 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
             
             # 加载 HTML 文件
             page.goto(file_url, wait_until='domcontentloaded', timeout=60000)
-            
-            # 等待页面加载完成
-            page.wait_for_load_state('networkidle', timeout=30000)
-            
-            # 提取分享数据
-            share_payload = page.evaluate("""
+
+            # 等待页面加载完成（添加重试机制）
+            try:
+                page.wait_for_load_state('networkidle', timeout=30000)
+            except Exception as e:
+                print(f"⚠️  networkidle 等待超时: {e}，继续尝试...")
+
+            # 等待 share-payload 元素出现
+            try:
+                page.wait_for_selector('#share-payload', timeout=10000)
+            except Exception as e:
+                print(f"⚠️  未找到 #share-payload 元素: {e}")
+
+            # 提取分享数据（增加详细错误信息）
+            result = page.evaluate("""
                 () => {
-                    const payloadNode = document.getElementById('share-payload');
-                    if (!payloadNode) {
-                        return null;
-                    }
                     try {
-                        const raw = (payloadNode.textContent || payloadNode.innerText || '').trim();
-                        if (!raw || raw === 'null') {
-                            return null;
+                        const payloadNode = document.getElementById('share-payload');
+                        if (!payloadNode) {
+                            return { error: 'no-payload-node' };
                         }
-                        return JSON.parse(raw);
+                        const raw = (payloadNode.textContent || payloadNode.innerText || '').trim();
+                        if (!raw || raw === 'null' || raw === '') {
+                            return { error: 'empty-payload', raw: raw };
+                        }
+                        const parsed = JSON.parse(raw);
+                        return { success: true, data: parsed };
                     } catch (error) {
-                        console.error('Failed to parse share payload', error);
-                        return null;
+                        return { error: error.message, stack: error.stack };
                     }
                 }
             """)
-            
-            if not share_payload:
-                print("❌ 未找到分享数据，无法生成拼图")
-                print("提示: HTML 文件中需要包含 <script type='application/json' id='share-payload'> 元素")
+
+            # 解析结果
+            if not result or result.get('error'):
+                error_msg = result.get('error', 'unknown') if result else 'no-result'
+                print(f"❌ 获取分享数据失败: {error_msg}")
+                if result and result.get('stack'):
+                    print(f"   堆栈: {result['stack'][:200]}")
                 browser.close()
                 sys.exit(1)
-            
+
+            share_payload = result.get('data')
+            if not share_payload:
+                print("❌ 分享数据为空，无法生成拼图")
+                browser.close()
+                sys.exit(1)
+
             # 检查是否有有效的分享数据
             sections = share_payload.get('sections', [])
             if not sections or not any(section.get('items') for section in sections):

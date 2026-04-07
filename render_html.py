@@ -198,20 +198,18 @@ def format_remaining(
     diff_ms = target_timestamp - now_ms
     if diff_ms <= 0:
         return finished_text
-    minutes = diff_ms // 60000
-    days = minutes // (60 * 24)
-    hours = (minutes % (60 * 24)) // 60
-    mins = minutes % 60
-    parts = []
-    if days:
-        parts.append(f"{days} 天")
-    if hours:
-        parts.append(f"{hours} 小时")
-    if not days and mins:
-        parts.append(f"{mins} 分钟")
-    if not parts:
-        return f"{prefix} 不足 1 分钟"
-    return f"{prefix} {' '.join(parts)}"
+    total_seconds = diff_ms // 1000
+    days = total_seconds // 86400
+    hours = (total_seconds % 86400) // 3600
+    minutes = (total_seconds % 3600) // 60
+    seconds = total_seconds % 60
+    if days > 0:
+        return f"{prefix} {days}天 {hours:02d}:{minutes:02d}:{seconds:02d}"
+    if hours > 0:
+        return f"{prefix} {hours:02d}:{minutes:02d}:{seconds:02d}"
+    if minutes > 0:
+        return f"{prefix} {minutes:02d}:{seconds:02d}"
+    return f"{prefix} 00:{seconds:02d}"
 
 
 def sanitize_text(value: Optional[str]) -> str:
@@ -494,9 +492,17 @@ def render_itad_card(game: Dict[str, Any]) -> str:
     if expiry:
         diff = expiry - now_ts
         if diff > 0:
-            days = diff // 86400
-            hours = (diff % 86400) // 3600
-            remaining_text = f"剩余 {days} 天 {hours} 小时" if days else f"剩余 {hours} 小时"
+            total_seconds = diff
+            days = total_seconds // 86400
+            hours = (total_seconds % 86400) // 3600
+            minutes = (total_seconds % 3600) // 60
+            seconds = total_seconds % 60
+            if days > 0:
+                remaining_text = f"剩余 {days} 天 {hours:02d}:{minutes:02d}:{seconds:02d}"
+            elif hours > 0:
+                remaining_text = f"剩余 {hours:02d}:{minutes:02d}:{seconds:02d}"
+            else:
+                remaining_text = f"剩余 {minutes:02d}:{seconds:02d}"
             expiry_display = datetime.fromtimestamp(expiry, tz=china_tz).strftime("%m月%d日 %H:%M")
         else:
             remaining_text = "已过期"
@@ -1292,9 +1298,17 @@ def map_itad_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
     if expiry:
         diff = expiry - now_ts
         if diff > 0:
-            days = diff // 86400
-            hours = (diff % 86400) // 3600
-            primary = f"剩余 {days} 天 {hours} 小时" if days else f"剩余 {hours} 小时"
+            total_seconds = diff
+            days = total_seconds // 86400
+            hours = (total_seconds % 86400) // 3600
+            minutes = (total_seconds % 3600) // 60
+            seconds = total_seconds % 60
+            if days > 0:
+                primary = f"剩余 {days} 天 {hours:02d}:{minutes:02d}:{seconds:02d}"
+            elif hours > 0:
+                primary = f"剩余 {hours:02d}:{minutes:02d}:{seconds:02d}"
+            else:
+                primary = f"剩余 {minutes:02d}:{seconds:02d}"
         else:
             primary = "已过期"
     else:
