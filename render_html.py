@@ -298,7 +298,8 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
 
     summary_html = ""
     if summary:
-        summary_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 text-steam-text-muted text-xs tracking-wide mb-4"><span class="whitespace-nowrap">{escape_html("</span><span class=\"whitespace-nowrap\">".join(summary))}</span></div>'
+        summary_inner = escape_html("</span><span class=\"whitespace-nowrap\">".join(summary))
+        summary_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 text-steam-text-muted text-xs tracking-wide mb-4"><span class="whitespace-nowrap">{summary_inner}</span></div>'
 
     # 倒计时：默认使用截止时间（freeEndAt），没有则退化为 freeStartAt（仅用于展示）
     countdown_target_ms: Optional[int] = None
@@ -380,7 +381,8 @@ def render_steam_card(game: Dict[str, Any]) -> str:
 
     summary_html = ""
     if summary:
-        summary_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 text-steam-text-muted text-xs tracking-wide mb-4"><span class="whitespace-nowrap">{escape_html("</span><span class=\"whitespace-nowrap\">".join(summary))}</span></div>'
+        summary_inner = escape_html("</span><span class=\"whitespace-nowrap\">".join(summary))
+        summary_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 text-steam-text-muted text-xs tracking-wide mb-4"><span class="whitespace-nowrap">{summary_inner}</span></div>'
 
     return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
   <div class="epic-freebies__card-cover relative lg:flex-[0_0_320px] rounded-2xl overflow-hidden flex items-center justify-center bg-steam-bg/90 border border-steam-accent/20 aspect-video lg:aspect-auto min-h-[180px]">
