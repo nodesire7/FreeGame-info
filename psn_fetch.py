@@ -2,7 +2,7 @@
 """
 PSN 限免游戏抓取脚本：
 - 抓取 https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/ 页面
-- 使用 Playwright 获取完整渲染的页面
+- 优先使用 aiohttp，Playwright 作为备选
 - 返回简化的 JSON 格式（与用户提供的新 JS 逻辑一致）
 - 格式：title, description, link, cover, status
 """
@@ -12,6 +12,7 @@ import os
 from typing import Any, Dict, List, Optional
 from urllib.parse import urljoin
 
+import aiohttp
 from playwright.async_api import async_playwright
 
 PSN_SOURCE_URL = "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/"
@@ -21,43 +22,62 @@ USER_AGENT = (
 )
 
 
+async def _fetch_with_aiohttp() -> str:
+    """使用 aiohttp 获取页面 HTML（主要方法）"""
+    async with aiohttp.ClientSession() as session:
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Connection": "keep-alive",
+        }
+        async with session.get(PSN_SOURCE_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+            resp.raise_for_status()
+            return await resp.text()
+
+
+async def _fetch_with_playwright() -> str:
+    """使用 Playwright 获取页面 HTML（备选方法）"""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(
+            user_agent=USER_AGENT,
+            viewport={"width": 1920, "height": 1080},
+            locale="zh-CN",
+        )
+        page = await context.new_page()
+
+        # 设置页面导航超时
+        page.set_default_timeout(120_000)
+
+        # 使用更宽松的等待策略
+        await page.goto(PSN_SOURCE_URL, wait_until="domcontentloaded", timeout=120_000)
+        await page.wait_for_load_state("domcontentloaded")
+
+        # 等待页面内容加载
+        await page.wait_for_timeout(10_000)
+
+        # 尝试等待关键元素加载
+        try:
+            await page.wait_for_selector('.content-grid .box', timeout=30_000)
+        except Exception:
+            print("警告: 未找到 .content-grid .box 元素，继续尝试...")
+
+        html = await page.content()
+        await browser.close()
+        return html
+
+
 async def fetch_html() -> str:
     """
-    使用 Playwright 获取页面 HTML
+    使用 aiohttp 获取页面 HTML（主要方法，Playwright 作为备选）
     """
     try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            context = await browser.new_context(
-                user_agent=USER_AGENT,
-                viewport={"width": 1920, "height": 1080},
-                locale="zh-CN",
-            )
-            page = await context.new_page()
-            
-            # 设置页面导航超时
-            page.set_default_timeout(120_000)
-            
-            # 使用更宽松的等待策略
-            await page.goto(PSN_SOURCE_URL, wait_until="domcontentloaded", timeout=120_000)
-            await page.wait_for_load_state("domcontentloaded")
-            
-            # 等待页面内容加载
-            await page.wait_for_timeout(10_000)
-            
-            # 尝试等待关键元素加载
-            try:
-                await page.wait_for_selector('.content-grid .box', timeout=30_000)
-            except Exception:
-                print("警告: 未找到 .content-grid .box 元素，继续尝试...")
-            
-            html = await page.content()
-            await browser.close()
-            return html
-    
-    except Exception as e:
-        print(f"Playwright 获取失败: {str(e)}")
-        raise
+        return await _fetch_with_aiohttp()
+    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+        print(f"aiohttp 获取失败，尝试 Playwright: {e}")
+        return await _fetch_with_playwright()
 
 
 def parse_psn(html: str) -> List[Dict[str, Any]]:

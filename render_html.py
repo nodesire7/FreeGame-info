@@ -298,7 +298,7 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
 
     summary_html = ""
     if summary:
-        summary_html = f'<div class="epic-freebies__card-summary">{"".join(f"<span>{escape_html(text)}</span>" for text in summary)}</div>'
+        summary_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 text-steam-text-muted text-xs tracking-wide mb-4"><span class="whitespace-nowrap">{escape_html("</span><span class=\"whitespace-nowrap\">".join(summary))}</span></div>'
 
     # 倒计时：默认使用截止时间（freeEndAt），没有则退化为 freeStartAt（仅用于展示）
     countdown_target_ms: Optional[int] = None
@@ -309,7 +309,7 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
 
     countdown_attrs = ""
     if countdown_target_ms:
-        # 统一以“截止时间”倒计时
+        # 统一以"截止时间"倒计时
         countdown_prefix = "剩余"
         countdown_finished = "已结束"
         countdown_attrs = (
@@ -318,25 +318,25 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
             f' data-countdown-finished="{escape_attribute(countdown_finished)}"'
         )
 
-    return f"""<article class="epic-freebies__card">
-  <div class="epic-freebies__card-cover">
+    return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
+  <div class="epic-freebies__card-cover relative lg:flex-[0_0_320px] rounded-2xl overflow-hidden flex items-center justify-center bg-steam-bg/90 border border-steam-accent/20 aspect-video lg:aspect-auto min-h-[180px]">
     {cover_html}
   </div>
-  <div class="epic-freebies__card-body">
-    <header class="epic-freebies__card-header">
-      <div class="epic-freebies__card-title-row">
-        <h3 class="epic-freebies__card-title">{escape_html(game["title"])}</h3>
-        <span class="epic-freebies__badge">原价 {escape_html(price_label)}</span>
+  <div class="flex-1 flex flex-col gap-4 min-w-0">
+    <header class="epic-freebies__card-header flex flex-col gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
+        <h3 class="text-lg lg:text-xl font-bold tracking-wide m-0 text-steam-text">{escape_html(game["title"])}</h3>
+        <span class="epic-freebies__badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-steam-accent-strong/20 text-steam-accent text-xs tracking-wide">原价 {escape_html(price_label)}</span>
       </div>
-      <p class="epic-freebies__card-desc">{escape_html(description)}</p>
+      <p class="epic-freebies__card-desc text-steam-text-muted text-sm leading-relaxed line-clamp-3 m-0">{escape_html(description)}</p>
     </header>
     {summary_html}
-    <div class="epic-freebies__card-footer">
-      <div class="epic-freebies__card-timing">
-        <span class="epic-freebies__meta-primary"{countdown_attrs}>{escape_html(primary_timer)}</span>
-        <span class="epic-freebies__meta-secondary">{escape_html(deadline_text)}</span>
+    <div class="epic-freebies__card-footer mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-steam-accent/10">
+      <div class="epic-freebies__card-timing flex flex-col gap-1.5 text-xs">
+        <span class="epic-freebies__meta-primary text-base font-semibold text-steam-text" style="color: var(--steam-text, #f3f6fb);"{countdown_attrs}>{escape_html(primary_timer)}</span>
+        <span class="epic-freebies__meta-secondary text-steam-text-muted text-sm">{escape_html(deadline_text)}</span>
       </div>
-      <a class="epic-freebies__card-link" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">{link_text}</a>
+      <a class="epic-freebies__card-link w-full sm:w-auto text-center px-6 py-3 rounded-full bg-steam-accent-gradient to-steam-accent/65 text-steam-text text-sm tracking-widest uppercase font-bold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.35)] whitespace-nowrap" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">{link_text}</a>
     </div>
   </div>
 </article>"""
@@ -380,27 +380,27 @@ def render_steam_card(game: Dict[str, Any]) -> str:
 
     summary_html = ""
     if summary:
-        summary_html = f'<div class="epic-freebies__card-summary">{"".join(f"<span>{escape_html(text)}</span>" for text in summary)}</div>'
+        summary_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 text-steam-text-muted text-xs tracking-wide mb-4"><span class="whitespace-nowrap">{escape_html("</span><span class=\"whitespace-nowrap\">".join(summary))}</span></div>'
 
-    return f"""<article class="epic-freebies__card">
-  <div class="epic-freebies__card-cover">
+    return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
+  <div class="epic-freebies__card-cover relative lg:flex-[0_0_320px] rounded-2xl overflow-hidden flex items-center justify-center bg-steam-bg/90 border border-steam-accent/20 aspect-video lg:aspect-auto min-h-[180px]">
     {cover_html}
   </div>
-  <div class="epic-freebies__card-body">
-    <header class="epic-freebies__card-header">
-      <div class="epic-freebies__card-title-row">
-        <h3 class="epic-freebies__card-title">{escape_html(game["title"])}</h3>
-        <span class="epic-freebies__badge">Steam 限免</span>
+  <div class="flex-1 flex flex-col gap-4 min-w-0">
+    <header class="epic-freebies__card-header flex flex-col gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
+        <h3 class="text-lg lg:text-xl font-bold tracking-wide m-0 text-steam-text">{escape_html(game["title"])}</h3>
+        <span class="epic-freebies__badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-steam-accent-strong/20 text-steam-accent text-xs tracking-wide">Steam 限免</span>
       </div>
-      <p class="epic-freebies__card-desc">{escape_html(description)}</p>
+      <p class="epic-freebies__card-desc text-steam-text-muted text-sm leading-relaxed line-clamp-3 m-0">{escape_html(description)}</p>
     </header>
     {summary_html}
-    <div class="epic-freebies__card-footer">
-      <div class="epic-freebies__card-timing">
-        <span class="epic-freebies__meta-primary">{escape_html(price_text)}</span>
-        <span class="epic-freebies__meta-secondary">{escape_html(price_detail)}</span>
+    <div class="epic-freebies__card-footer mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-steam-accent/10">
+      <div class="epic-freebies__card-timing flex flex-col gap-1.5 text-xs">
+        <span class="epic-freebies__meta-primary text-base font-semibold text-steam-accent">{escape_html(price_text)}</span>
+        <span class="epic-freebies__meta-secondary text-steam-text-muted text-sm">{escape_html(price_detail)}</span>
       </div>
-      <a class="epic-freebies__card-link" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">前往 Steam 领取</a>
+      <a class="epic-freebies__card-link w-full sm:w-auto text-center px-6 py-3 rounded-full bg-steam-accent-gradient to-steam-accent/65 text-steam-text text-sm tracking-widest uppercase font-bold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.35)] whitespace-nowrap" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">前往 Steam 领取</a>
     </div>
   </div>
 </article>"""
@@ -436,23 +436,23 @@ def render_psn_card(game: Dict[str, Any]) -> str:
 
     description = (game.get("description") or "当前仍在同步 PlayStation 官方描述。").strip()
 
-    return f"""<article class="epic-freebies__card">
-  <div class="epic-freebies__card-cover">
+    return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
+  <div class="epic-freebies__card-cover relative lg:flex-[0_0_320px] rounded-2xl overflow-hidden flex items-center justify-center bg-steam-bg/90 border border-steam-accent/20 aspect-video lg:aspect-auto min-h-[180px]">
     {cover_html}
   </div>
-  <div class="epic-freebies__card-content">
-    <header class="epic-freebies__card-header">
-      <div class="epic-freebies__card-title-row">
-        <h3 class="epic-freebies__card-title">{escape_html(game["title"])}</h3>
-        <span class="epic-freebies__badge">PlayStation</span>
+  <div class="flex-1 flex flex-col gap-4 min-w-0">
+    <header class="epic-freebies__card-header flex flex-col gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
+        <h3 class="text-lg lg:text-xl font-bold tracking-wide m-0 text-steam-text">{escape_html(game["title"])}</h3>
+        <span class="epic-freebies__badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-steam-accent-strong/20 text-steam-accent text-xs tracking-wide">PlayStation</span>
       </div>
-      <p class="epic-freebies__card-desc">{escape_html(description)}</p>
+      <p class="epic-freebies__card-desc text-steam-text-muted text-sm leading-relaxed line-clamp-3 m-0">{escape_html(description)}</p>
     </header>
-    <div class="epic-freebies__card-footer">
-      <div class="epic-freebies__card-timing">
+    <div class="epic-freebies__card-footer mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-steam-accent/10">
+      <div class="epic-freebies__card-timing flex flex-col gap-1.5 text-xs">
         {"".join(timing_parts)}
       </div>
-      <a class="epic-freebies__card-link" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">前往 PS Store 查看</a>
+      <a class="epic-freebies__card-link w-full sm:w-auto text-center px-6 py-3 rounded-full bg-steam-accent-gradient to-steam-accent/65 text-steam-text text-sm tracking-widest uppercase font-bold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.35)] whitespace-nowrap" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">前往 PS Store 查看</a>
     </div>
   </div>
 </article>"""
@@ -461,25 +461,91 @@ def render_psn_card(game: Dict[str, Any]) -> str:
 def render_epic_section_content(items: List[Dict[str, Any]], empty_text: str, variant: str) -> str:
     """渲染 Epic 区块内容"""
     if not items:
-        return f'<div class="epic-freebies__panel-empty">{escape_html(empty_text)}</div>'
+        return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_epic_card(item, variant) for item in items)
-    return f'<div class="epic-freebies__grid">\n{cards}\n</div>'
+    return f'<div class="flex flex-col gap-5">\n{cards}\n</div>'
 
 
 def render_steam_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 Steam 区块内容"""
     if not items:
-        return f'<div class="epic-freebies__panel-empty">{escape_html(empty_text)}</div>'
+        return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_steam_card(item) for item in items)
-    return f'<div class="epic-freebies__grid">\n{cards}\n</div>'
+    return f'<div class="flex flex-col gap-5">\n{cards}\n</div>'
 
 
 def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 PlayStation 区块内容"""
     if not items:
-        return f'<div class="epic-freebies__panel-empty">{escape_html(empty_text)}</div>'
+        return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_psn_card(item) for item in items)
-    return f'<div class="epic-freebies__grid">\n{cards}\n</div>'
+    return f'<div class="flex flex-col gap-5">\n{cards}\n</div>'
+
+
+def render_itad_card(game: Dict[str, Any]) -> str:
+    """渲染 ITAD Giveaway 卡片"""
+    # 计算剩余时间
+    expiry = game.get("expiry")
+    china_tz = timezone(timedelta(hours=8))
+    now_ts = int(datetime.now(china_tz).timestamp())  # Unix seconds
+
+    if expiry:
+        diff = expiry - now_ts
+        if diff > 0:
+            days = diff // 86400
+            hours = (diff % 86400) // 3600
+            remaining_text = f"剩余 {days} 天 {hours} 小时" if days else f"剩余 {hours} 小时"
+            expiry_display = datetime.fromtimestamp(expiry, tz=china_tz).strftime("%m月%d日 %H:%M")
+        else:
+            remaining_text = "已过期"
+            expiry_display = datetime.fromtimestamp(expiry, tz=china_tz).strftime("%m月%d日 %H:%M") if expiry else "已过期"
+    else:
+        remaining_text = "时间待定"
+        expiry_display = "截止时间待定"
+
+    store = game.get("store", "ITAD")
+    game_count = game.get("gameCount", 0)
+    game_count_text = f"{game_count} 款游戏" if game_count else "游戏数量待定"
+
+    is_pending = game.get("isPending", False)
+    is_mature = game.get("isMature", False)
+
+    if is_pending:
+        badge_text = "待生效"
+    elif is_mature:
+        badge_text = "MATURE"
+    else:
+        badge_text = "ITAD Giveaway"
+
+    return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
+  <div class="epic-freebies__card-cover--itad flex flex-col items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-[rgba(26,40,60,0.95)] to-[rgba(16,28,44,0.9)] min-h-[180px] lg:min-h-auto lg:w-[320px]">
+    <span class="itad-store-badge px-4 py-2 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-sm font-semibold tracking-wide">{escape_html(store)}</span>
+    <span class="itad-game-count text-steam-text-muted text-xs">{escape_html(game_count_text)}</span>
+  </div>
+  <div class="flex-1 flex flex-col gap-4 min-w-0">
+    <header class="epic-freebies__card-header flex flex-col gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
+        <h3 class="text-lg lg:text-xl font-bold tracking-wide m-0 text-steam-text">{escape_html(game["title"])}</h3>
+        <span class="epic-freebies__badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-steam-accent-strong/20 text-steam-accent text-xs tracking-wide">{escape_html(badge_text)}</span>
+      </div>
+    </header>
+    <div class="epic-freebies__card-footer mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-steam-accent/10">
+      <div class="epic-freebies__card-timing flex flex-col gap-1.5 text-xs">
+        <span class="epic-freebies__meta-primary text-base font-semibold text-steam-text">{escape_html(remaining_text)}</span>
+        <span class="epic-freebies__meta-secondary text-steam-text-muted text-sm">{escape_html(expiry_display)}</span>
+      </div>
+      <a class="epic-freebies__card-link w-full sm:w-auto text-center px-6 py-3 rounded-full bg-steam-accent-gradient to-steam-accent/65 text-steam-text text-sm tracking-widest uppercase font-bold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.35)] whitespace-nowrap" href="{escape_attribute(game["url"])}" target="_blank" rel="noopener noreferrer">前往 ITAD 查看</a>
+    </div>
+  </div>
+</article>"""
+
+
+def render_itad_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
+    """渲染 ITAD Giveaways 区块内容"""
+    if not items:
+        return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
+    cards = "\n".join(render_itad_card(item) for item in items)
+    return f'<div class="flex flex-col gap-5">\n{cards}\n</div>'
 
 
 def get_share_client_script() -> str:
@@ -1063,6 +1129,17 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             }
         )
 
+    itad = snapshot.get("itad", [])
+    if itad:
+        sections.append(
+            {
+                "title": "ITAD Bundle Giveaways",
+                "items": [
+                    map_itad_share_item(item) for item in itad[:MAX_SHARE_ITEMS]
+                ],
+            }
+        )
+
     if not sections:
         return None
 
@@ -1208,6 +1285,33 @@ def map_psn_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def map_itad_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
+    """映射 ITAD 分享项"""
+    expiry = game.get("expiry")
+    china_tz = timezone(timedelta(hours=8))
+    now_ts = int(datetime.now(china_tz).timestamp())
+
+    if expiry:
+        diff = expiry - now_ts
+        if diff > 0:
+            days = diff // 86400
+            hours = (diff % 86400) // 3600
+            primary = f"剩余 {days} 天 {hours} 小时" if days else f"剩余 {hours} 小时"
+        else:
+            primary = "已过期"
+    else:
+        primary = "时间待定"
+
+    return {
+        "title": sanitize_text(game.get("title", "")),
+        "primary": primary,
+        "secondary": f"来自 {sanitize_text(game.get('store', 'ITAD'))}",
+        "tertiary": f"{game.get('gameCount', 0)} 款游戏",
+        "description": "",
+        "coverUrl": "",
+    }
+
+
 def serialize_for_client(payload: Optional[Dict[str, Any]]) -> str:
     """序列化分享数据为客户端 JSON"""
     if not payload:
@@ -1267,13 +1371,15 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         psn = []
 
     steam = snapshot.get("steam", [])
+    itad = snapshot.get("itad", [])
 
     epic_now_count = len(epic_now)
     epic_upcoming_count = len(epic_upcoming)
     steam_count = len(steam)
     psn_count = len(psn)
+    itad_count = len(itad)
     epic_total_count = epic_now_count + epic_upcoming_count
-    total_count = epic_total_count + steam_count + psn_count
+    total_count = epic_total_count + steam_count + psn_count + itad_count
 
     share_payload = build_share_payload(snapshot)
     share_ready = share_payload is not None
@@ -1303,6 +1409,8 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         "EPIC_UPCOMING_COUNT": str(epic_upcoming_count),
         "STEAM_COUNT": str(steam_count),
         "PSN_COUNT": str(psn_count),
+        "ITAD_COUNT": str(itad_count),
+        "TAB_BADGE_ITAD": str(itad_count),
         "EPIC_NOW_CONTENT": render_epic_section_content(
             epic_now, "当前暂无正在进行的限免活动。", "now"
         ),
@@ -1314,6 +1422,9 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         ),
         "PSN_CONTENT": render_psn_section_content(
             psn, "暂未检测到 PlayStation 公布的会员免费游戏。"
+        ),
+        "ITAD_CONTENT": render_itad_section_content(
+            itad, "暂未检测到 ITAD Bundle Giveaways。"
         ),
         "SHARE_BUTTON_DISABLED": (
             "" if share_ready else ' aria-disabled="true" tabindex="-1"'
@@ -1392,14 +1503,16 @@ def render_history_page(
         else:
             psn = []
 
-        total = len(epic_now) + len(epic_upcoming) + len(steam) + len(psn)
+        itad = snap.get("itad") or []
+
+        total = len(epic_now) + len(epic_upcoming) + len(steam) + len(psn) + len(itad)
 
         def _subsection(title: str, count: int, body_html: str) -> str:
             return (
-                '<div class="epic-freebies__section" style="padding: 18px 20px;">'
-                '<header class="epic-freebies__section-header">'
-                f'<h4 class="epic-freebies__section-title">{escape_html(title)}</h4>'
-                f'<span class="epic-freebies__section-count">{count}</span>'
+                '<div class="p-4 lg:p-6 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card mb-4 last:mb-0">'
+                '<header class="flex items-center justify-between gap-3 mb-4">'
+                f'<h4 class="text-sm lg:text-base font-semibold tracking-wide m-0 text-steam-text">{escape_html(title)}</h4>'
+                f'<span class="px-3 py-1 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-wide">{count}</span>'
                 "</header>"
                 f'<div class="epic-freebies__section-body">{body_html}</div>'
                 "</div>"
@@ -1434,18 +1547,25 @@ def render_history_page(
                 render_psn_section_content(psn, "暂未检测到 PlayStation 公布的会员免费游戏。"),
             )
         )
+        body_parts.append(
+            _subsection(
+                "ITAD Bundle Giveaways",
+                len(itad),
+                render_itad_section_content(itad, "暂未检测到 ITAD Bundle Giveaways。"),
+            )
+        )
 
         blocks.append(
-            '<div class="epic-freebies__section">'
-            '<header class="epic-freebies__section-header">'
-            f'<h3 class="epic-freebies__section-title">{escape_html(fetched_at_display)}</h3>'
-            f'<span class="epic-freebies__section-count">{total}</span>'
+            '<div class="mb-8 last:mb-0">'
+            '<header class="flex items-center justify-between gap-4 mb-5 p-4 lg:p-6 rounded-steam-lg bg-steam-section border border-steam-accent/15">'
+            f'<h3 class="text-base lg:text-lg font-bold tracking-wide m-0 text-steam-text">{escape_html(fetched_at_display)}</h3>'
+            f'<span class="px-3 py-1 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-wide">{total}</span>'
             "</header>"
             f'<div class="epic-freebies__section-body">{"".join(body_parts)}</div>'
             "</div>"
         )
 
-    content_html = "".join(blocks) if blocks else '<div class="epic-freebies__panel-empty">暂无历史记录</div>'
+    content_html = "".join(blocks) if blocks else '<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">暂无历史记录</div>'
 
     # history 页 favicon 相对路径不同
     favicon_href = "../logo.png"
@@ -1457,22 +1577,59 @@ def render_history_page(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{escape_html(base_title)}</title>
   <link rel="icon" type="image/png" href="{favicon_href}">
-  {style_block}
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {{
+      theme: {{
+        extend: {{
+          colors: {{
+            'steam-bg': '#0a151f',
+            'steam-text': '#f3f6fb',
+            'steam-text-muted': '#9bb5d0',
+            'steam-accent': '#66c0f4',
+            'steam-accent-strong': '#1994d6',
+          }},
+          borderRadius: {{
+            'steam-xl': '28px',
+            'steam-lg': '20px',
+          }},
+          backgroundImage: {{
+            'steam-section': 'linear-gradient(145deg, rgba(10, 19, 29, 0.92), rgba(6, 12, 21, 0.9))',
+          }},
+          boxShadow: {{
+            'steam-card': '0 24px 45px rgba(4, 8, 16, 0.55)',
+          }},
+        }},
+      }},
+    }}
+  </script>
+  <style>
+    body {{
+      font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: radial-gradient(45% 60% at 10% 10%, rgba(102, 192, 244, 0.18), transparent 60%),
+                  radial-gradient(30% 40% at 80% 0%, rgba(19, 126, 207, 0.18), transparent 70%),
+                  linear-gradient(160deg, #060e17 0%, #0b1826 40%, #02070d 100%);
+      -webkit-font-smoothing: antialiased;
+    }}
+    .line-clamp-3 {{ display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }}
+  </style>
 </head>
-<body>
-  <div class="steam-page">
-    <div class="steam-shell">
-      <header class="epic-hero" role="banner">
-        <div class="epic-hero__content">
-          <span class="epic-hero__eyebrow">Game Freebie Radar</span>
-          <h1 class="epic-hero__title">历史记录</h1>
-          <p class="epic-hero__desc">仅当抓取结果与上次不同才会新增一条历史记录。</p>
-          <div class="epic-hero__callout">
-            <span class="epic-hero__pill"><a href="../" style="color: inherit; text-decoration: none;">返回主页</a></span>
+<body class="m-0 min-h-screen text-steam-text antialiased">
+  <div class="relative min-h-screen py-10 lg:py-14">
+    <div class="mx-auto max-w-[1180px] px-4 lg:px-8">
+      <header class="relative overflow-hidden rounded-steam-xl bg-gradient-to-br from-[rgba(17,28,42,0.95)] to-[rgba(9,15,24,0.9)] border border-steam-accent/20 shadow-steam-hero flex flex-col gap-4 p-8 lg:p-14 mb-10">
+        <div class="absolute inset-0 -z-10 opacity-60 bg-[radial-gradient(145deg,rgba(19,126,207,0.22),transparent_65%)]"></div>
+        <div class="relative z-10 flex flex-col gap-3 max-w-xl">
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-widest uppercase">Game Freebie Radar</span>
+          <h1 class="text-2xl lg:text-[36px] font-bold tracking-wide m-0">历史记录</h1>
+          <p class="text-steam-text-muted text-sm leading-relaxed max-w-lg m-0">仅当抓取结果与上次不同才会新增一条历史记录。</p>
+          <div class="flex items-center gap-3">
+            <a href="../" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-steam-md bg-steam-bg/80 border border-steam-accent/20 text-steam-text-muted text-xs tracking-wide no-underline hover:border-steam-accent/40 transition-colors">返回主页</a>
           </div>
         </div>
       </header>
-      <section class="epic-freebies" role="main">
+      <section class="p-6 lg:p-10 xl:p-12 rounded-steam-xl bg-steam-section border border-steam-accent/15 shadow-steam-section" role="main">
         {content_html}
       </section>
     </div>

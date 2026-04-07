@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from epic_fetch import fetch_epic
 from psn_fetch import fetch_psn
 from steam_fetch import fetch_steam
+from itad_fetch import fetch_itad
 from render_html import render_html, render_history_page
 from history_db import open_db, get_latest_meta, insert_record, list_snapshots
 
@@ -105,6 +106,15 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         print(f"[FAIL] STEAM 抓取失败: {e}")
         results["steam"] = []
 
+    # ITAD Giveaways
+    try:
+        itad_data = await fetch_itad()
+        results["itad"] = itad_data
+        print("[OK] ITAD Giveaways 抓取完成")
+    except Exception as e:
+        print(f"[FAIL] ITAD Giveaways 抓取失败: {e}")
+        results["itad"] = []
+
     epic_data = results.get("epic", {"now": [], "upcoming": []})
     steam_data = results.get("steam", [])
 
@@ -116,10 +126,12 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         "epic": epic_data,
         "steam": steam_data,
         "psn": results.get("psn", []),
+        "itad": results.get("itad", []),
         "sources": {
             "epic": "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions",
             "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese",
             "psn": "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/",
+            "itad": "https://isthereanydeal.com/giveaways/",
         },
     }
     return snapshot
@@ -135,11 +147,12 @@ def _timestamp_cn() -> str:
 
 def _canonicalize_for_hash(snapshot: Dict[str, Any]) -> Dict[str, Any]:
     """
-    用于“是否变更”的去重：只保留决定性字段，避免 fetchedAt/描述变动导致重复记录。
+    用于"是否变更"的去重：只保留决定性字段，避免 fetchedAt/描述变动导致重复记录。
     """
     epic = snapshot.get("epic") or {}
     steam = snapshot.get("steam") or []
     psn = snapshot.get("psn") or []
+    itad = snapshot.get("itad") or []
 
     def pick_epic(item: Dict[str, Any]) -> Dict[str, Any]:
         return {
@@ -158,15 +171,24 @@ def _canonicalize_for_hash(snapshot: Dict[str, Any]) -> Dict[str, Any]:
             "link": item.get("link"),
         }
 
+    def pick_itad(item: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "title": item.get("title"),
+            "url": item.get("url"),
+            "expiry": item.get("expiry"),
+        }
+
     epic_now = sorted([pick_epic(x) for x in (epic.get("now") or []) if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
     epic_upcoming = sorted([pick_epic(x) for x in (epic.get("upcoming") or []) if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
     steam_list = sorted([pick_simple(x) for x in steam if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
     psn_list = sorted([pick_simple(x) for x in psn if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
+    itad_list = sorted([pick_itad(x) for x in itad if isinstance(x, dict)], key=lambda x: (str(x.get("title") or ""), str(x.get("url") or "")))
 
     return {
         "epic": {"now": epic_now, "upcoming": epic_upcoming},
         "steam": steam_list,
         "psn": psn_list,
+        "itad": itad_list,
     }
 
 
@@ -216,8 +238,9 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     print(f"Epic: {len(snapshot['epic'].get('now', []))} 正在免费, {len(snapshot['epic'].get('upcoming', []))} 即将免费")
     print(f"Steam: {len(snapshot['steam'])} 条")
     print(f"PSN: {len(snapshot['psn'])} 条")
+    print(f"ITAD Giveaways: {len(snapshot['itad'])} 个")
 
-    # 输出“本次记录”的 JSON（用于 Pages 直接访问），始终覆盖为当前快照
+    # 输出"本次记录"的 JSON（用于 Pages 直接访问），始终覆盖为当前快照
     site_dir = Path(output_dir)
     current_json_path = site_dir / "白嫖信息.json"
     current_json_path.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")

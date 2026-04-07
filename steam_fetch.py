@@ -27,55 +27,71 @@ PLATFORM_LABELS = {
 }
 
 
-async def fetch_html() -> str:
-    """使用 Playwright 抓取 Steam 页面 HTML"""
-    try:
-        async with async_playwright() as playwright:
-            browser = await playwright.chromium.launch(
-                headless=True,
-                args=[
-                    "--disable-blink-features=AutomationControlled",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu",
-                ],
+async def _fetch_with_aiohttp() -> str:
+    """使用 aiohttp 抓取 Steam 页面 HTML（主要方法）"""
+    async with aiohttp.ClientSession() as session:
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+        }
+        async with session.get(STEAM_FREEBIES_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+            resp.raise_for_status()
+            return await resp.text()
+
+
+async def _fetch_with_playwright() -> str:
+    """使用 Playwright 抓取 Steam 页面 HTML（备选方法）"""
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(
+            headless=True,
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+            ],
+        )
+        context = None
+        try:
+            context = await browser.new_context(
+                user_agent=USER_AGENT,
+                viewport={"width": 1280, "height": 720},
+                device_scale_factor=1,
+                is_mobile=False,
+                java_script_enabled=True,
             )
-            context = None
-            try:
-                context = await browser.new_context(
-                    user_agent=USER_AGENT,
-                    viewport={"width": 1280, "height": 720},
-                    device_scale_factor=1,
-                    is_mobile=False,
-                    java_script_enabled=True,
-                )
-                await context.add_init_script(
-                    "Object.defineProperty(navigator, 'webdriver', { get: () => undefined });"
-                )
-                page = await context.new_page()
-                await page.goto(STEAM_FREEBIES_URL, wait_until="networkidle", timeout=45_000)
-                await page.wait_for_load_state("domcontentloaded")
-                await page.wait_for_selector("#search_resultsRows", timeout=45_000)
-                await page.wait_for_timeout(1_500)
-                html_content = await page.content()
-                return html_content
-            finally:
-                if context is not None:
-                    await context.close()
-                await browser.close()
-    except PlaywrightTimeoutError:
-        # 回退到 aiohttp
-        async with aiohttp.ClientSession() as session:
-            headers = {
-                "User-Agent": USER_AGENT,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Connection": "keep-alive",
-                "Upgrade-Insecure-Requests": "1",
-            }
-            async with session.get(STEAM_FREEBIES_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as resp:
-                resp.raise_for_status()
-                return await resp.text()
+            await context.add_init_script(
+                "Object.defineProperty(navigator, 'webdriver', { get: () => undefined });"
+            )
+            page = await context.new_page()
+            await page.goto(STEAM_FREEBIES_URL, wait_until="networkidle", timeout=45_000)
+            await page.wait_for_load_state("domcontentloaded")
+            await page.wait_for_selector("#search_resultsRows", timeout=45_000)
+            await page.wait_for_timeout(1_500)
+            html_content = await page.content()
+            return html_content
+        finally:
+            if context is not None:
+                await context.close()
+            await browser.close()
+
+
+async def fetch_html() -> str:
+    """使用 aiohttp 抓取 Steam 页面 HTML（主要方法，Playwright 作为备选）"""
+    try:
+        return await _fetch_with_aiohttp()
+    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+        print(f"aiohttp 获取失败，尝试 Playwright: {e}")
+        try:
+            return await _fetch_with_playwright()
+        except PlaywrightTimeoutError:
+            raise
+        except Exception as e2:
+            print(f"Playwright 也失败: {e2}")
+            raise RuntimeError(f"Steam 页面抓取失败: {e2}")
 
 
 def parse_steam_freebies(html_content: str) -> List[Dict[str, Any]]:
