@@ -9,61 +9,25 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9956808351564739" crossorigin="anonymous"></script>
     <!-- AMP Auto Ads -->
     <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
-    <!-- Tailwind CSS CDN with config -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'steam-bg': '#0a151f',
-                        'steam-bg-deep': '#060e17',
-                        'steam-bg-panel': '#0b1826',
-                        'steam-text': '#f3f6fb',
-                        'steam-text-muted': '#9bb5d0',
-                        'steam-accent': '#66c0f4',
-                        'steam-accent-strong': '#1994d6',
-                    },
-                    borderRadius: {
-                        'steam-xl': '28px',
-                        'steam-lg': '20px',
-                        'steam-md': '14px',
-                    },
-                    fontFamily: {
-                        'steam': '"Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif',
-                    },
-                    spacing: {
-                        'steam-section-gap': '28px',
-                    },
-                    backgroundImage: {
-                        'steam-body': 'radial-gradient(120% 80% at 10% 10%, rgba(102, 192, 244, 0.18), transparent 65%), linear-gradient(160deg, #060e17 0%, #0b1826 40%, #02070d 100%)',
-                        'steam-hero': 'linear-gradient(135deg, rgba(17, 28, 42, 0.95), rgba(9, 15, 24, 0.9)), linear-gradient(145deg, rgba(19, 126, 207, 0.22), transparent 65%)',
-                        'steam-card': 'linear-gradient(180deg, rgba(16, 28, 43, 0.92), rgba(11, 18, 29, 0.9))',
-                        'steam-section': 'linear-gradient(145deg, rgba(10, 19, 29, 0.92), rgba(6, 12, 21, 0.9))',
-                        'steam-accent-gradient': 'linear-gradient(135deg, rgba(102, 192, 244, 0.25), rgba(102, 192, 244, 0.05))',
-                    },
-                    boxShadow: {
-                        'steam-card': '0 24px 45px rgba(4, 8, 16, 0.55)',
-                        'steam-card-hover': '0 36px 70px rgba(4, 8, 16, 0.7)',
-                        'steam-hero': '0 40px 80px rgba(5, 10, 18, 0.55)',
-                        'steam-section': '0 32px 70px rgba(4, 9, 16, 0.6)',
-                    },
-                },
-            },
-        }
-    </script>
     <style>
         body {
             font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
-            background: radial-gradient(45% 60% at 10% 10%, rgba(102, 192, 244, 0.18), transparent 60%),
-                        radial-gradient(30% 40% at 80% 0%, rgba(19, 126, 207, 0.18), transparent 70%),
-                        linear-gradient(160deg, #060e17 0%, #0b1826 40%, #02070d 100%);
+            background: #0a0a0a;
             -webkit-font-smoothing: antialiased;
         }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 12s linear infinite;
+        }
         .countdown-tick {
             animation: countdown-pulse 0.3s ease-out;
         }
@@ -73,154 +37,161 @@
         }
     </style>
 </head>
-<body class="m-0 min-h-screen text-steam-text antialiased">
+<body class="m-0 min-h-screen text-white antialiased">
+
     <!-- AMP Auto Ads -->
     <amp-auto-ads type="adsense" data-ad-client="ca-pub-9956808351564739"></amp-auto-ads>
 
-    <div class="relative min-h-screen py-10 lg:py-14">
-        <div class="mx-auto max-w-[1180px] px-4 lg:px-8">
+    <section class="max-w-7xl mx-auto my-12 font-sans bg-[#d10000] p-1 sm:p-2 overflow-hidden selection:bg-white selection:text-red-600">
+        <div class="relative bg-black text-white shadow-[20px_20px_0_0_#fff,-1px_-1px_0_0_#000]">
 
-            <!-- Hero Section -->
-            <header class="relative overflow-hidden rounded-steam-xl bg-steam-hero border border-steam-accent/20 shadow-steam-hero flex flex-col gap-5 p-8 lg:p-14 mb-10">
-                <div class="absolute inset-0 -z-10 opacity-60 bg-[radial-gradient(145deg,rgba(19,126,207,0.22),transparent_65%)]"></div>
-                <div class="relative z-10 flex flex-col gap-4 max-w-xl">
-                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-widest uppercase">
-                        Game Freebie Radar
-                    </span>
-                    <h1 class="text-3xl lg:text-[46px] font-bold tracking-wide m-0">白嫖游戏信息</h1>
-                    <p class="text-steam-text-muted text-sm lg:text-base leading-relaxed max-w-lg m-0">聚合 EPIC | Steam | PlayStation | ITAD Giveaways 限免信息，实时同步官方档期。</p>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-steam-md bg-steam-bg/80 border border-steam-accent/20 text-steam-text-muted text-xs tracking-wide">
-                            定时刷新缓存 · 自动生成分享长图
-                        </span>
-                        <span class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-steam-md bg-steam-bg/80 border border-steam-accent/20 text-steam-text-muted text-xs tracking-wide">
-                            最后同步：{{FETCHED_AT}}
-                        </span>
+            <!-- 点状纹理 -->
+            <div class="absolute inset-0 opacity-15 pointer-events-none" style="background-image: radial-gradient(#fff 2px, transparent 2px); background-size: 28px 28px;"></div>
+
+            <!-- 顶部栏 -->
+            <div class="relative z-10 flex justify-between items-center px-6 py-4 border-b-[10px] border-white bg-zinc-950">
+                <div class="flex gap-6 items-center">
+                    <svg class="w-6 h-6 text-red-600 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M12 3L2 21H22L12 3Z" /></svg>
+                    <h2 class="text-xs font-black tracking-[0.4em] italic uppercase hidden md:inline">GBTGAME_FREEBIE_RADAR_V3</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] text-zinc-500 font-bold italic">LAST_SYNC: {{FETCHED_AT}}</span>
+                    <div class="bg-red-600 text-white px-6 py-1 font-black transform -skew-x-12 italic shadow-[4px_4px_0_0_#fff] text-xs">
+                        侦测中...
                     </div>
                 </div>
-            </header>
+            </div>
 
-            <!-- Main Content -->
-            <section class="relative p-6 lg:p-10 xl:p-12 rounded-steam-xl bg-steam-section border border-steam-accent/15 shadow-steam-section" role="main">
+            <!-- 主内容区 -->
+            <div class="relative z-10 p-6 lg:p-12">
 
-                <!-- Heading Row -->
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-                    <div class="flex flex-col gap-3">
-                        <h2 class="text-xl lg:text-2xl font-bold tracking-widest uppercase m-0">限免目录</h2>
-                        <p class="text-steam-text-muted text-sm leading-relaxed max-w-xl m-0">当前已收录 {{TOTAL_COUNT}} 条限免记录，可在下方切换平台查看详情。</p>
+                <!-- 标题区 -->
+                <div class="relative mb-20 transform -rotate-1 z-20">
+                    <div class="bg-white text-black inline-block px-4 py-1 font-black text-[10px] uppercase tracking-widest transform translate-x-6">INTEL_MISSION</div>
+                    <div class="bg-black border-[6px] border-white p-6 shadow-[12px_12px_0_0_#d10000] flex flex-col md:flex-row justify-between items-end gap-6">
+                        <div>
+                            <h1 class="text-5xl md:text-7xl font-black text-white italic leading-none flex items-center gap-4">
+                                <span class="text-red-600 text-6xl">/</span>白嫖游戏速报
+                            </h1>
+                            <p class="text-zinc-400 mt-4 border-l-8 border-red-600 pl-4 py-1 italic text-sm">聚合 EPIC | Steam | PlayStation | ITAD 限免情报</p>
+                        </div>
+                        <a class="share-button bg-white text-black px-10 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[8px_8px_0_0_#000] text-sm whitespace-nowrap no-underline"
+                           data-share-button href="{{SHARE_BUTTON_URL}}" download="{{SHARE_BUTTON_FILENAME}}">
+                            {{SHARE_BUTTON_LABEL}}
+                        </a>
                     </div>
-                    <a class="share-button inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-full border border-steam-accent/30 bg-steam-accent-gradient text-steam-text text-xs tracking-widest uppercase font-semibold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.25)] hover:border-steam-accent/40 disabled:cursor-not-allowed disabled:opacity-55 disabled:pointer-events-none min-h-[44px] min-w-[160px]"
-                       data-share-button href="{{SHARE_BUTTON_URL}}" download="{{SHARE_BUTTON_FILENAME}}" rel="noopener"{{SHARE_BUTTON_DISABLED}}>
-                        {{SHARE_BUTTON_LABEL}}
-                    </a>
                 </div>
 
-                <!-- Tab Navigation - Mobile Horizontal Scroll -->
-                <nav class="inline-flex items-center p-1.5 rounded-full border border-steam-accent/20 bg-steam-bg/80 gap-1.5 overflow-x-auto scrollbar-hide mb-8" role="tablist" aria-label="限免平台切换">
-                    <button class="epic-freebies__tab is-active relative px-4 py-3 rounded-full border-none bg-transparent text-steam-text-muted text-xs tracking-widest uppercase cursor-pointer transition-all duration-200 hover:text-steam-text hover:-translate-y-0.5 flex items-center gap-2.5 whitespace-nowrap min-h-[44px]"
-                            role="tab" aria-selected="true" aria-controls="free-panel-epic" data-tab="epic">
-                        Epic 限免
-                        <span class="epic-freebies__tab-badge min-w-[28px] px-2.5 py-1 rounded-full bg-steam-accent/20 text-steam-text text-xs tracking-wide text-center" data-badge="epic">{{TAB_BADGE_EPIC}}</span>
+                <!-- Tab 导航 -->
+                <nav class="flex flex-wrap gap-4 mb-16 relative z-10" role="tablist" aria-label="限免平台切换">
+                    <button class="epic-freebies__tab is-active group relative px-8 py-3 bg-red-600 text-white font-black italic transform skew-x-12 shadow-[6px_6px_0_0_#fff]" role="tab" aria-selected="true" aria-controls="free-panel-epic" data-tab="epic">
+                        <span class="relative z-10">EPIC 限免 <span class="bg-white text-red-600 px-2 ml-2 not-italic">{{TAB_BADGE_EPIC}}</span></span>
                     </button>
-                    <button class="epic-freebies__tab relative px-4 py-3 rounded-full border-none bg-transparent text-steam-text-muted text-xs tracking-widest uppercase cursor-pointer transition-all duration-200 hover:text-steam-text hover:-translate-y-0.5 flex items-center gap-2.5 whitespace-nowrap min-h-[44px]"
-                            role="tab" aria-selected="false" aria-controls="free-panel-steam" data-tab="steam">
-                        Steam 限免
-                        <span class="epic-freebies__tab-badge min-w-[28px] px-2.5 py-1 rounded-full bg-steam-accent/20 text-steam-text text-xs tracking-wide text-center" data-badge="steam">{{TAB_BADGE_STEAM}}</span>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-steam" data-tab="steam">
+                        <span class="relative z-10">STEAM 限免 <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_STEAM}}</span></span>
                     </button>
-                    <button class="epic-freebies__tab relative px-4 py-3 rounded-full border-none bg-transparent text-steam-text-muted text-xs tracking-widest uppercase cursor-pointer transition-all duration-200 hover:text-steam-text hover:-translate-y-0.5 flex items-center gap-2.5 whitespace-nowrap min-h-[44px]"
-                            role="tab" aria-selected="false" aria-controls="free-panel-psn" data-tab="psn">
-                        PlayStation 限免
-                        <span class="epic-freebies__tab-badge min-w-[28px] px-2.5 py-1 rounded-full bg-steam-accent/20 text-steam-text text-xs tracking-wide text-center" data-badge="psn">{{TAB_BADGE_PSN}}</span>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-psn" data-tab="psn">
+                        <span class="relative z-10">PS_PLUS <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_PSN}}</span></span>
                     </button>
-                    <button class="epic-freebies__tab relative px-4 py-3 rounded-full border-none bg-transparent text-steam-text-muted text-xs tracking-widest uppercase cursor-pointer transition-all duration-200 hover:text-steam-text hover:-translate-y-0.5 flex items-center gap-2.5 whitespace-nowrap min-h-[44px]"
-                            role="tab" aria-selected="false" aria-controls="free-panel-itad" data-tab="itad">
-                        ITAD Giveaways
-                        <span class="epic-freebies__tab-badge min-w-[28px] px-2.5 py-1 rounded-full bg-steam-accent/20 text-steam-text text-xs tracking-wide text-center" data-badge="itad">{{TAB_BADGE_ITAD}}</span>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-itad" data-tab="itad">
+                        <span class="relative z-10">ITAD <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_ITAD}}</span></span>
                     </button>
                 </nav>
 
                 <!-- Tab Panels -->
                 <div class="epic-freebies__panels">
 
-                    <!-- Epic Panel -->
+                    <!-- Epic Panel (active) -->
                     <div class="epic-freebies__panel is-active" role="tabpanel" id="free-panel-epic" data-panel="epic">
-                        <!-- Epic Now -->
-                        <div class="p-5 lg:p-8 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card mb-6">
-                            <header class="flex items-center justify-between gap-4 mb-5">
-                                <h3 class="text-base lg:text-lg font-semibold tracking-wide m-0">EPIC 正在免费</h3>
-                                <span class="epic-freebies__section-count px-3.5 py-1.5 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-widest uppercase" data-count="now">{{EPIC_NOW_COUNT}}</span>
-                            </header>
-                            <div class="epic-freebies__section-body" data-section-body="now">
+                        <!-- Now Section -->
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">Now_Available / 正在免费</h3>
+                            </div>
+                            <div class="grid grid-cols-1 gap-12">
                                 {{EPIC_NOW_CONTENT}}
                             </div>
                         </div>
-                        <!-- Epic Upcoming -->
-                        <div class="p-5 lg:p-8 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card">
-                            <header class="flex items-center justify-between gap-4 mb-5">
-                                <h3 class="text-base lg:text-lg font-semibold tracking-wide m-0">EPIC 即将免费</h3>
-                                <span class="epic-freebies__section-count px-3.5 py-1.5 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-widest uppercase" data-count="upcoming">{{EPIC_UPCOMING_COUNT}}</span>
-                            </header>
-                            <div class="epic-freebies__section-body" data-section-body="upcoming">
+                        <!-- Upcoming Section -->
+                        <div class="mb-10">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-white skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase text-zinc-400">Upcoming_Missions / 预告</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {{EPIC_UPCOMING_CONTENT}}
                             </div>
                         </div>
                     </div>
 
                     <!-- Steam Panel -->
-                    <div class="epic-freebies__panel" role="tabpanel" id="free-panel-steam" data-panel="steam">
-                        <div class="p-5 lg:p-8 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card">
-                            <header class="flex items-center justify-between gap-4 mb-5">
-                                <h3 class="text-base lg:text-lg font-semibold tracking-wide m-0">Steam 限免</h3>
-                                <span class="epic-freebies__section-count px-3.5 py-1.5 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-widest uppercase" data-count="steam">{{STEAM_COUNT}}</span>
-                            </header>
-                            <div class="epic-freebies__section-body" data-section-body="steam">
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-steam" data-panel="steam">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">Steam_Deals / Steam 限免</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {{STEAM_CONTENT}}
                             </div>
                         </div>
                     </div>
 
                     <!-- PSN Panel -->
-                    <div class="epic-freebies__panel" role="tabpanel" id="free-panel-psn" data-panel="psn">
-                        <div class="p-5 lg:p-8 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card">
-                            <header class="flex items-center justify-between gap-4 mb-5">
-                                <h3 class="text-base lg:text-lg font-semibold tracking-wide m-0">PlayStation 本月会员免费</h3>
-                                <span class="epic-freebies__section-count px-3.5 py-1.5 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-widest uppercase" data-count="psn">{{PSN_COUNT}}</span>
-                            </header>
-                            <div class="epic-freebies__section-body" data-section-body="psn">
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-psn" data-panel="psn">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">PS_Plus / PlayStation 会员福利</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {{PSN_CONTENT}}
                             </div>
                         </div>
                     </div>
 
                     <!-- ITAD Panel -->
-                    <div class="epic-freebies__panel" role="tabpanel" id="free-panel-itad" data-panel="itad">
-                        <div class="p-5 lg:p-8 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card">
-                            <header class="flex items-center justify-between gap-4 mb-5">
-                                <h3 class="text-base lg:text-lg font-semibold tracking-wide m-0">ITAD Bundle Giveaways</h3>
-                                <span class="epic-freebies__section-count px-3.5 py-1.5 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-widest uppercase" data-count="itad">{{ITAD_COUNT}}</span>
-                            </header>
-                            <div class="epic-freebies__section-body" data-section-body="itad">
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-itad" data-panel="itad">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">ITAD_Bundle / ITAD 礼包</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {{ITAD_CONTENT}}
                             </div>
                         </div>
                     </div>
 
                 </div>
-            </section>
+            </div>
 
-            <!-- Footer -->
-            <footer class="mt-12 pt-6 pb-4 border-t border-steam-accent/20 text-steam-text-muted text-xs tracking-wide flex flex-wrap justify-center items-center gap-x-5 gap-y-3 text-center">
-                <img class="w-8 h-8 rounded-full object-cover border border-steam-accent/40" src="https://avatars.githubusercontent.com/u/63827263?v=4" alt="Nodesire7 头像" width="32" height="32">
-                <div class="flex flex-wrap justify-center items-center gap-x-4 gap-y-2">
-                    <span>作者：<a href="https://github.com/nodesire7/" target="_blank" rel="noopener noreferrer" class="text-steam-accent no-underline hover:underline">Nodesire7</a></span>
-                    <span>邮箱：<a href="mailto:amocnfk@gmail.com" class="text-steam-accent no-underline hover:underline">amocnfk@gmail.com</a></span>
-                    <span>仓库：<a href="https://github.com/nodesire7/FreeGame-info" target="_blank" rel="noopener noreferrer" class="text-steam-accent no-underline hover:underline">FreeGame-info</a></span>
-                    <span>数据源：<a href="https://isthereanydeal.com/" target="_blank" rel="noopener noreferrer" class="text-steam-accent no-underline hover:underline">IsThereAnyDeal</a></span>
-                    {{ARCHIVE_LINKS}}
+            <!-- 底部滚动条 -->
+            <div class="relative bg-white h-16 overflow-hidden flex items-center border-t-[10px] border-black z-30">
+                <div class="absolute inset-y-0 left-0 bg-red-600 w-48 -skew-x-[35deg] -translate-x-12 z-10 shadow-[20px_0_0_0_#000]"></div>
+                <div class="animate-marquee whitespace-nowrap flex items-center z-0 relative">
+                    <span class="text-black font-black text-3xl italic mx-12 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-red-600 font-black text-3xl italic mx-12 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-black font-black text-3xl italic mx-12 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-red-600 font-black text-3xl italic mx-12 tracking-tighter">GBTGAME.ME</span>
                 </div>
-            </footer>
+            </div>
+
         </div>
-    </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto mt-8 pb-8 px-4 text-center text-zinc-600 text-xs">
+        <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-3">
+            <img class="w-8 h-8 rounded-full object-cover border border-zinc-700" src="https://avatars.githubusercontent.com/u/63827263?v=4" alt="Nodesire7 头像" width="32" height="32">
+            <span>作者：<a href="https://github.com/nodesire7/" target="_blank" rel="noopener noreferrer" class="text-red-600 no-underline hover:underline">Nodesire7</a></span>
+            <span>邮箱：<a href="mailto:amocnfk@gmail.com" class="text-red-600 no-underline hover:underline">amocnfk@gmail.com</a></span>
+            <span>仓库：<a href="https://github.com/nodesire7/FreeGame-info" target="_blank" rel="noopener noreferrer" class="text-red-600 no-underline hover:underline">FreeGame-info</a></span>
+            <span>数据源：<a href="https://isthereanydeal.com/" target="_blank" rel="noopener noreferrer" class="text-red-600 no-underline hover:underline">IsThereAnyDeal</a></span>
+            {{ARCHIVE_LINKS}}
+        </div>
+    </footer>
 
     <script type="application/json" id="share-payload">{{SHARE_DATA_JSON}}</script>
     <script>

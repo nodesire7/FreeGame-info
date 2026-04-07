@@ -10,17 +10,17 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# 常量
+# 常量 - Red Hacker Brutalist Style
 SHARE_CANVAS_WIDTH = 1080
-SHARE_PADDING = 72
-SHARE_TITLE_BLOCK_HEIGHT = 120
-SHARE_SECTION_GAP = 52
-SHARE_CARD_HEIGHT = 220
-SHARE_CARD_GAP = 24
-SHARE_CARD_RADIUS = 24
-SHARE_CARD_INSET = 24
-SHARE_COVER_WIDTH = 268
-SHARE_COVER_RADIUS = 18
+SHARE_PADDING = 48
+SHARE_TITLE_BLOCK_HEIGHT = 200
+SHARE_SECTION_GAP = 64
+SHARE_CARD_HEIGHT = 180
+SHARE_CARD_GAP = 16
+SHARE_CARD_RADIUS = 0
+SHARE_CARD_INSET = 16
+SHARE_COVER_WIDTH = 200
+SHARE_COVER_RADIUS = 0
 MAX_SHARE_ITEMS = 4
 SHARE_FONT_FAMILY = "Noto Sans SC"
 
@@ -291,13 +291,13 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
         else '<span>暂无封面</span>'
     )
 
-    link_text = "查看详情" if variant == "upcoming" else "前往领取"
+    link_text = "立即抢夺"
     description = (game.get("description") or "Epic 官方暂未提供详细介绍。").strip()
 
     summary_html = ""
     if summary:
-        summary_inner = escape_html("</span><span class=\"whitespace-nowrap\">".join(summary))
-        summary_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 text-steam-text-muted text-xs tracking-wide mb-4"><span class="whitespace-nowrap">{summary_inner}</span></div>'
+        summary_inner = escape_html("</span><span class=\"bg-zinc-800 px-3 py-1\">".join(summary))
+        summary_html = f'<div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">{summary_inner}</span></div>'
 
     # 倒计时：默认使用截止时间（freeEndAt），没有则退化为 freeStartAt（仅用于展示）
     countdown_target_ms: Optional[int] = None
@@ -307,8 +307,8 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
         countdown_target_ms = int(free_start_at)
 
     countdown_attrs = ""
+    countdown_text = escape_html(primary_timer)
     if countdown_target_ms:
-        # 统一以"截止时间"倒计时
         countdown_prefix = "剩余"
         countdown_finished = "已结束"
         countdown_attrs = (
@@ -316,28 +316,35 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
             f' data-countdown-prefix="{escape_attribute(countdown_prefix)}"'
             f' data-countdown-finished="{escape_attribute(countdown_finished)}"'
         )
+        countdown_text = f'<span class="countdown-tick"{countdown_attrs}>{countdown_text}</span>'
+    else:
+        countdown_text = f'<span>{countdown_text}</span>'
 
-    return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
-  <div class="epic-freebies__card-cover relative lg:flex-[0_0_320px] rounded-2xl overflow-hidden flex items-center justify-center bg-steam-bg/90 border border-steam-accent/20 aspect-video lg:aspect-auto min-h-[180px]">
-    {cover_html}
-  </div>
-  <div class="flex-1 flex flex-col gap-4 min-w-0">
-    <header class="epic-freebies__card-header flex flex-col gap-3">
-      <div class="flex items-center gap-3 flex-wrap">
-        <h3 class="text-lg lg:text-xl font-bold tracking-wide m-0 text-steam-text">{escape_html(game["title"])}</h3>
-        <span class="epic-freebies__badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-steam-accent-strong/20 text-steam-accent text-xs tracking-wide">原价 {escape_html(price_label)}</span>
-      </div>
-      <p class="epic-freebies__card-desc text-steam-text-muted text-sm leading-relaxed line-clamp-3 m-0">{escape_html(description)}</p>
-    </header>
-    {summary_html}
-    <div class="epic-freebies__card-footer mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-steam-accent/10">
-      <div class="epic-freebies__card-timing flex flex-col gap-1.5 text-xs">
-        <span class="epic-freebies__meta-primary text-base font-semibold text-steam-text" style="color: var(--steam-text, #f3f6fb);"{countdown_attrs}>{escape_html(primary_timer)}</span>
-        <span class="epic-freebies__meta-secondary text-steam-text-muted text-sm">{escape_html(deadline_text)}</span>
-      </div>
-      <a class="epic-freebies__card-link w-full sm:w-auto text-center px-6 py-3 rounded-full bg-steam-accent-gradient to-steam-accent/65 text-steam-text text-sm tracking-widest uppercase font-bold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.35)] whitespace-nowrap" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">{link_text}</a>
+    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            {cover_html}
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 {escape_html(price_label)}</div>
     </div>
-  </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">{escape_html(description)}</p>
+        {summary_html}
+        <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-6 border-t-2 border-dashed border-zinc-800 pt-6">
+            <div class="flex flex-col">
+                <span class="text-2xl font-black text-red-600 italic">{countdown_text}</span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(deadline_text)}</span>
+            </div>
+            <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">{link_text}</a>
+        </div>
+    </div>
 </article>"""
 
 
@@ -379,30 +386,34 @@ def render_steam_card(game: Dict[str, Any]) -> str:
 
     summary_html = ""
     if summary:
-        summary_inner = escape_html("</span><span class=\"whitespace-nowrap\">".join(summary))
-        summary_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 text-steam-text-muted text-xs tracking-wide mb-4"><span class="whitespace-nowrap">{summary_inner}</span></div>'
+        summary_inner = escape_html("</span><span class=\"bg-zinc-800 px-3 py-1\">".join(summary))
+        summary_html = f'<div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">{summary_inner}</span></div>'
 
-    return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
-  <div class="epic-freebies__card-cover relative lg:flex-[0_0_320px] rounded-2xl overflow-hidden flex items-center justify-center bg-steam-bg/90 border border-steam-accent/20 aspect-video lg:aspect-auto min-h-[180px]">
-    {cover_html}
-  </div>
-  <div class="flex-1 flex flex-col gap-4 min-w-0">
-    <header class="epic-freebies__card-header flex flex-col gap-3">
-      <div class="flex items-center gap-3 flex-wrap">
-        <h3 class="text-lg lg:text-xl font-bold tracking-wide m-0 text-steam-text">{escape_html(game["title"])}</h3>
-        <span class="epic-freebies__badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-steam-accent-strong/20 text-steam-accent text-xs tracking-wide">Steam 限免</span>
-      </div>
-      <p class="epic-freebies__card-desc text-steam-text-muted text-sm leading-relaxed line-clamp-3 m-0">{escape_html(description)}</p>
-    </header>
-    {summary_html}
-    <div class="epic-freebies__card-footer mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-steam-accent/10">
-      <div class="epic-freebies__card-timing flex flex-col gap-1.5 text-xs">
-        <span class="epic-freebies__meta-primary text-base font-semibold text-steam-accent">{escape_html(price_text)}</span>
-        <span class="epic-freebies__meta-secondary text-steam-text-muted text-sm">{escape_html(price_detail)}</span>
-      </div>
-      <a class="epic-freebies__card-link w-full sm:w-auto text-center px-6 py-3 rounded-full bg-steam-accent-gradient to-steam-accent/65 text-steam-text text-sm tracking-widest uppercase font-bold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.35)] whitespace-nowrap" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">前往 Steam 领取</a>
+    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            {cover_html}
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">Steam 限免</div>
     </div>
-  </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">{escape_html(description)}</p>
+        {summary_html}
+        <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-6 border-t-2 border-dashed border-zinc-800 pt-6">
+            <div class="flex flex-col">
+                <span class="text-2xl font-black text-red-600 italic">{escape_html(price_text)}</span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(price_detail)}</span>
+            </div>
+            <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
 </article>"""
 
 
@@ -419,7 +430,7 @@ def render_psn_card(game: Dict[str, Any]) -> str:
     timing_parts = []
     if game.get("highlight"):
         timing_parts.append(
-            f'<span class="epic-freebies__meta-primary">{escape_html(game["highlight"])}</span>'
+            f'<span class="text-lg font-black text-red-600 italic">{escape_html(game["highlight"])}</span>'
         )
     if game.get("platforms"):
         # platforms 可能是列表或字符串
@@ -427,34 +438,40 @@ def render_psn_card(game: Dict[str, Any]) -> str:
         if isinstance(platforms, list):
             platforms = " / ".join(platforms)
         timing_parts.append(
-            f'<span class="epic-freebies__meta-secondary">{escape_html(str(platforms))}</span>'
+            f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">{escape_html(str(platforms))}</span>'
         )
     if game.get("period"):
         timing_parts.append(
-            f'<span class="epic-freebies__meta-secondary">领取时间：{escape_html(game["period"])}</span>'
+            f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">领取时间：{escape_html(game["period"])}</span>'
         )
 
     description = (game.get("description") or "当前仍在同步 PlayStation 官方描述。").strip()
 
-    return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
-  <div class="epic-freebies__card-cover relative lg:flex-[0_0_320px] rounded-2xl overflow-hidden flex items-center justify-center bg-steam-bg/90 border border-steam-accent/20 aspect-video lg:aspect-auto min-h-[180px]">
-    {cover_html}
-  </div>
-  <div class="flex-1 flex flex-col gap-4 min-w-0">
-    <header class="epic-freebies__card-header flex flex-col gap-3">
-      <div class="flex items-center gap-3 flex-wrap">
-        <h3 class="text-lg lg:text-xl font-bold tracking-wide m-0 text-steam-text">{escape_html(game["title"])}</h3>
-        <span class="epic-freebies__badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-steam-accent-strong/20 text-steam-accent text-xs tracking-wide">PlayStation</span>
-      </div>
-      <p class="epic-freebies__card-desc text-steam-text-muted text-sm leading-relaxed line-clamp-3 m-0">{escape_html(description)}</p>
-    </header>
-    <div class="epic-freebies__card-footer mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-steam-accent/10">
-      <div class="epic-freebies__card-timing flex flex-col gap-1.5 text-xs">
-        {"".join(timing_parts)}
-      </div>
-      <a class="epic-freebies__card-link w-full sm:w-auto text-center px-6 py-3 rounded-full bg-steam-accent-gradient to-steam-accent/65 text-steam-text text-sm tracking-widest uppercase font-bold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.35)] whitespace-nowrap" href="{escape_attribute(game["link"])}" target="_blank" rel="noopener noreferrer">前往 PS Store 查看</a>
+    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            {cover_html}
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">PlayStation</div>
     </div>
-  </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">{escape_html(description)}</p>
+        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic">
+            {"".join(timing_parts)}
+        </div>
+        <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-6 border-t-2 border-dashed border-zinc-800 pt-6">
+            <div class="flex flex-col">
+            </div>
+            <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
 </article>"""
 
 
@@ -463,7 +480,8 @@ def render_epic_section_content(items: List[Dict[str, Any]], empty_text: str, va
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_epic_card(item, variant) for item in items)
-    return f'<div class="flex flex-col gap-5">\n{cards}\n</div>'
+    grid_class = "grid grid-cols-1 gap-12" if variant == "now" else "grid grid-cols-1 md:grid-cols-2 gap-8"
+    return f'<div class="{grid_class}">\n{cards}\n</div>'
 
 
 def render_steam_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
@@ -471,7 +489,7 @@ def render_steam_section_content(items: List[Dict[str, Any]], empty_text: str) -
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_steam_card(item) for item in items)
-    return f'<div class="flex flex-col gap-5">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 md:grid-cols-2 gap-8">\n{cards}\n</div>'
 
 
 def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
@@ -479,7 +497,7 @@ def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> 
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_psn_card(item) for item in items)
-    return f'<div class="flex flex-col gap-5">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 md:grid-cols-2 gap-8">\n{cards}\n</div>'
 
 
 def render_itad_card(game: Dict[str, Any]) -> str:
@@ -525,26 +543,20 @@ def render_itad_card(game: Dict[str, Any]) -> str:
     else:
         badge_text = "ITAD Giveaway"
 
-    return f"""<article class="flex flex-col lg:flex-row gap-5 lg:gap-7 p-5 lg:p-7 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card hover:-translate-y-1 hover:shadow-steam-card-hover transition-all duration-200">
-  <div class="epic-freebies__card-cover--itad flex flex-col items-center justify-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-[rgba(26,40,60,0.95)] to-[rgba(16,28,44,0.9)] min-h-[180px] lg:min-h-auto lg:w-[320px]">
-    <span class="itad-store-badge px-4 py-2 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-sm font-semibold tracking-wide">{escape_html(store)}</span>
-    <span class="itad-game-count text-steam-text-muted text-xs">{escape_html(game_count_text)}</span>
-  </div>
-  <div class="flex-1 flex flex-col gap-4 min-w-0">
-    <header class="epic-freebies__card-header flex flex-col gap-3">
-      <div class="flex items-center gap-3 flex-wrap">
-        <h3 class="text-lg lg:text-xl font-bold tracking-wide m-0 text-steam-text">{escape_html(game["title"])}</h3>
-        <span class="epic-freebies__badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-steam-accent-strong/20 text-steam-accent text-xs tracking-wide">{escape_html(badge_text)}</span>
-      </div>
-    </header>
-    <div class="epic-freebies__card-footer mt-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-steam-accent/10">
-      <div class="epic-freebies__card-timing flex flex-col gap-1.5 text-xs">
-        <span class="epic-freebies__meta-primary text-base font-semibold text-steam-text">{escape_html(remaining_text)}</span>
-        <span class="epic-freebies__meta-secondary text-steam-text-muted text-sm">{escape_html(expiry_display)}</span>
-      </div>
-      <a class="epic-freebies__card-link w-full sm:w-auto text-center px-6 py-3 rounded-full bg-steam-accent-gradient to-steam-accent/65 text-steam-text text-sm tracking-widest uppercase font-bold no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_35px_rgba(102,192,244,0.35)] whitespace-nowrap" href="{escape_attribute(game["url"])}" target="_blank" rel="noopener noreferrer">前往 ITAD 查看</a>
+    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:rotate-1 transition-transform group">
+    <div class="lg:w-1/3 flex flex-col items-center justify-center gap-4 bg-zinc-900 border-4 border-zinc-700 p-8">
+        <span class="text-red-600 font-black text-2xl italic">{escape_html(store)}</span>
+        <span class="text-zinc-500 text-sm">{escape_html(game_count_text)}</span>
+        <span class="text-[10px] text-zinc-600 font-bold italic uppercase">FROM ITAD</span>
     </div>
-  </div>
+    <div class="lg:w-2/3 flex flex-col justify-between py-4">
+        <h4 class="text-2xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
+        <div class="flex flex-col gap-2">
+            <span class="text-xl font-black text-red-600 italic countdown-tick" data-countdown-target="{expiry * 1000 if expiry else ''}" data-countdown-prefix="剩余" data-countdown-finished="已结束">{escape_html(remaining_text)}</span>
+            <span class="text-[10px] text-zinc-500 font-bold uppercase">截止：{escape_html(expiry_display)}</span>
+        </div>
+        <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-8 py-3 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase mt-6" target="_blank" rel="noopener noreferrer">ITAD 查看</a>
+    </div>
 </article>"""
 
 
@@ -553,13 +565,11 @@ def render_itad_section_content(items: List[Dict[str, Any]], empty_text: str) ->
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_itad_card(item) for item in items)
-    return f'<div class="flex flex-col gap-5">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 md:grid-cols-2 gap-8">\n{cards}\n</div>'
 
 
 def get_share_client_script() -> str:
-    """获取分享客户端脚本（完整版本）"""
-    # 完整的 JavaScript 代码，包含分享图片生成功能
-    # 从 render.service.ts 的 getShareClientScriptTemplate 方法提取
+    """获取分享客户端脚本（完整版本）- Red Hacker Brutalist Style"""
     return """(function() {
   'use strict';
 
@@ -602,7 +612,6 @@ def get_share_client_script() -> str:
       }
       const body = formatCountdown(diff);
       node.textContent = body ? `${prefix} ${body}` : finished;
-      // Trigger reflow to restart animation
       node.classList.remove('countdown-tick');
       void node.offsetWidth;
       node.classList.add('countdown-tick');
@@ -610,7 +619,6 @@ def get_share_client_script() -> str:
   };
 
   updateCountdowns();
-  // 每秒刷新一次
   setInterval(updateCountdowns, 1000);
 
   const shareButton = document.querySelector('[data-share-button]');
@@ -674,7 +682,7 @@ def get_share_client_script() -> str:
         }
       }
 
-      const blob = await renderShareCanvas(payload);
+      const blob = await renderShareCanvas(payload, null);
       await triggerDownload(blob, payload.suggestedFileName);
       button.textContent = '已生成';
       setTimeout(function() {
@@ -692,7 +700,7 @@ def get_share_client_script() -> str:
     }
   }
 
-  async function renderShareCanvas(payload) {
+  async function renderShareCanvas(payload, qrCodeDataUrl) {
     const config = payload.config;
     const sections = payload.sections;
     const height = measureCanvasHeight(sections, config);
@@ -707,42 +715,77 @@ def get_share_client_script() -> str:
     }
 
     ctx.textBaseline = 'top';
-    paintBackground(ctx, height, config);
 
+    // === BLACK BACKGROUND ===
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, config.width, height);
+
+    // === WHITE DOT GRID PATTERN ===
+    const dotSpacing = 28;
+    const dotRadius = 1;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    for (let x = dotSpacing / 2; x < config.width; x += dotSpacing) {
+      for (let y = dotSpacing / 2; y < height; y += dotSpacing) {
+        ctx.beginPath();
+        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // === TITLE BLOCK ===
     let cursorY = config.padding;
-    ctx.fillStyle = '#f3f6fb';
-    ctx.font = font(config.fontWeights.semibold, 42, config.fontFamily);
-    ctx.fillText('白嫖游戏信息', config.padding, cursorY);
-    cursorY += 54;
 
-    ctx.font = font(config.fontWeights.regular, 20, config.fontFamily);
-    ctx.fillStyle = '#a0bed8';
-    ctx.fillText('Epic · Steam · PlayStation 限免速览', config.padding, cursorY);
-    cursorY += 36;
+    // Red bar at top (6px)
+    ctx.fillStyle = '#d10000';
+    ctx.fillRect(0, 0, config.width, 6);
 
-    ctx.font = font(config.fontWeights.light, 18, config.fontFamily);
-    ctx.fillStyle = '#7f9bb8';
+    // White title: "白嫖游戏速报" in bold 52px
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(config.fontWeights.bold, 52, config.fontFamily);
+    ctx.fillText('白嫖游戏速报', config.padding, cursorY);
+    cursorY += 64;
+
+    // Gray subtitle
+    ctx.fillStyle = '#888888';
+    ctx.font = font(config.fontWeights.regular, 18, config.fontFamily);
+    ctx.fillText('GBTGAME FREEBIES · EPIC · STEAM · PSN · ITAD', config.padding, cursorY);
+    cursorY += 28;
+
+    // Timestamp line
+    ctx.fillStyle = '#666666';
+    ctx.font = font(config.fontWeights.light, 14, config.fontFamily);
     ctx.fillText(
-      '生成时间：' + payload.generatedAtDisplay + ' · 条目数：' + payload.totalItems,
+      'GENERATED: ' + payload.generatedAtDisplay + ' · ' + payload.totalItems + ' ITEMS',
       config.padding,
       cursorY,
     );
     cursorY = config.padding + config.titleBlockHeight;
 
+    // === SECTIONS ===
     const cardWidth = config.width - config.padding * 2;
 
     for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
       const section = sections[sectionIndex];
-      ctx.font = font(config.fontWeights.semibold, 28, config.fontFamily);
-      ctx.fillStyle = '#66c0f4';
-      ctx.fillText(section.title, config.padding, cursorY);
-      cursorY += 40;
 
+      // Section header: red vertical bar + white uppercase bold
+      ctx.fillStyle = '#d10000';
+      ctx.fillRect(config.padding, cursorY, 4, 40);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = font(config.fontWeights.bold, 32, config.fontFamily);
+      ctx.fillText(section.title.toUpperCase(), config.padding + 16, cursorY + 32);
+      cursorY += 56;
+
+      // Draw items
       for (let itemIndex = 0; itemIndex < section.items.length; itemIndex += 1) {
         if (itemIndex > 0) {
           cursorY += config.cardGap;
         }
-        await drawCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
+        if (section.type === 'itad') {
+          await drawItadCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
+        } else {
+          await drawCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
+        }
         cursorY += config.cardHeight;
       }
 
@@ -750,6 +793,49 @@ def get_share_client_script() -> str:
         cursorY += config.sectionGap;
       }
     }
+
+    // === FOOTER WITH QR CODE ===
+    const footerHeight = 160;
+    cursorY = height - footerHeight;
+
+    // Black footer bar
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, cursorY, config.width, footerHeight);
+
+    // White top border 6px
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, cursorY, config.width, 6);
+
+    // Red accent bar on left side of footer
+    ctx.fillStyle = '#d10000';
+    ctx.fillRect(0, cursorY, 8, footerHeight);
+
+    // Draw QR code at bottom center
+    if (qrCodeDataUrl) {
+      const qrSize = config.qrSize || 100;
+      const qrX = (config.width - qrSize) / 2;
+      const qrY = cursorY + 16;
+
+      const qrImg = new Image();
+      await new Promise(function(resolve, reject) {
+        qrImg.onload = resolve;
+        qrImg.onerror = reject;
+        qrImg.src = qrCodeDataUrl;
+      });
+      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+    }
+
+    // Text below QR
+    const qrSize = config.qrSize || 100;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
+    ctx.textAlign = 'center';
+    ctx.fillText(
+      '扫描获取最新限免 · GBTGAME.ME',
+      config.width / 2,
+      cursorY + qrSize + 32,
+    );
+    ctx.textAlign = 'left';
 
     return await new Promise(function(resolve, reject) {
       canvas.toBlob(
@@ -767,10 +853,11 @@ def get_share_client_script() -> str:
   }
 
   function measureCanvasHeight(sections, config) {
+    const footerHeight = 160;
     let total = config.padding * 2 + config.titleBlockHeight;
     for (let i = 0; i < sections.length; i += 1) {
       const section = sections[i];
-      total += 40;
+      total += 56; // section header
       total += section.items.length * config.cardHeight;
       if (section.items.length > 1) {
         total += (section.items.length - 1) * config.cardGap;
@@ -779,163 +866,167 @@ def get_share_client_script() -> str:
         total += config.sectionGap;
       }
     }
+    total += footerHeight;
     return Math.ceil(total);
   }
 
-  function paintBackground(ctx, height, config) {
-    const gradient = ctx.createLinearGradient(0, 0, config.width, height);
-    gradient.addColorStop(0, 'rgba(10, 18, 29, 0.96)');
-    gradient.addColorStop(1, 'rgba(6, 12, 21, 0.9)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, config.width, height);
-  }
-
   async function drawCard(ctx, item, config, x, y, width) {
-    fillRoundedRect(
-      ctx,
-      x,
-      y,
-      width,
-      config.cardHeight,
-      config.cardRadius,
-      'rgba(15, 24, 36, 0.92)',
-      'rgba(102, 192, 244, 0.2)',
-    );
+    // BLACK CARD with WHITE 4px border (NO rounded corners)
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(x, y, width, config.cardHeight);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x, y, width, config.cardHeight);
 
     const coverX = x + config.cardInset;
     const coverY = y + config.cardInset;
     const coverHeight = config.cardHeight - config.cardInset * 2;
+    const coverWidth = config.coverWidth;
 
-    ctx.save();
-    traceRoundedRect(
-      ctx,
-      coverX,
-      coverY,
-      config.coverWidth,
-      coverHeight,
-      config.coverRadius,
-    );
-    ctx.clip();
+    // Cover with WHITE 4px border, no radius
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(coverX, coverY, coverWidth, coverHeight);
 
+    // Load and draw cover image
     const coverImage = await loadCover(item.coverUrl);
     if (coverImage) {
       const scale = Math.max(
-        config.coverWidth / coverImage.width,
+        coverWidth / coverImage.width,
         coverHeight / coverImage.height,
       );
       const drawWidth = coverImage.width * scale;
       const drawHeight = coverImage.height * scale;
-      const dx = coverX + (config.coverWidth - drawWidth) / 2;
+      const dx = coverX + (coverWidth - drawWidth) / 2;
       const dy = coverY + (coverHeight - drawHeight) / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(coverX, coverY, coverWidth, coverHeight);
+      ctx.clip();
       ctx.drawImage(coverImage, dx, dy, drawWidth, drawHeight);
+      ctx.restore();
     } else {
-      ctx.fillStyle = '#11202f';
-      ctx.fillRect(coverX, coverY, config.coverWidth, coverHeight);
-      ctx.fillStyle = '#305677';
-      ctx.font = font(config.fontWeights.regular, 18, config.fontFamily);
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(coverX, coverY, coverWidth, coverHeight);
+      ctx.fillStyle = '#444444';
+      ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
       ctx.textAlign = 'center';
-      ctx.fillText(
-        '封面缺失',
-        coverX + config.coverWidth / 2,
-        coverY + coverHeight / 2 - 10,
-      );
+      ctx.fillText('NO IMAGE', coverX + coverWidth / 2, coverY + coverHeight / 2);
       ctx.textAlign = 'left';
     }
-    ctx.restore();
 
-    const textX = coverX + config.coverWidth + config.cardInset;
+    // Content area (right side, 60%)
+    const textX = coverX + coverWidth + config.cardInset;
     const textWidth = x + width - config.cardInset - textX;
     let cursorY = y + config.cardInset;
 
-    cursorY = drawWrappedText(ctx, item.title, {
-      x: textX,
-      y: cursorY,
-      width: textWidth,
-      lineHeight: 32,
-      font: font(config.fontWeights.semibold, 26, config.fontFamily),
-      color: '#f3f6fb',
-      maxLines: 2,
-    }) + 6;
+    // Title: white bold italic 22px uppercase
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(config.fontWeights.bold, 22, config.fontFamily);
+    ctx.fillText(item.title.toUpperCase(), textX, cursorY);
+    cursorY += 30;
 
-    cursorY = drawWrappedText(ctx, item.primary, {
-      x: textX,
-      y: cursorY,
-      width: textWidth,
-      lineHeight: 26,
-      font: font(config.fontWeights.regular, 20, config.fontFamily),
-      color: '#66c0f4',
-      maxLines: 2,
-    });
-
-    if (item.secondary) {
-      cursorY = drawWrappedText(ctx, item.secondary, {
+    // Description: gray 14px, max 2 lines
+    if (item.description) {
+      cursorY = drawWrappedText(ctx, item.description, {
         x: textX,
         y: cursorY,
         width: textWidth,
-        lineHeight: 24,
-        font: font(config.fontWeights.regular, 18, config.fontFamily),
-        color: '#9bb5d0',
-        maxLines: 1,
-      });
-    }
-
-    if (item.tertiary) {
-      cursorY = drawWrappedText(ctx, item.tertiary, {
-        x: textX,
-        y: cursorY,
-        width: textWidth,
-        lineHeight: 24,
-        font: font(config.fontWeights.regular, 16, config.fontFamily),
-        color: '#7f9bb8',
+        lineHeight: 20,
+        font: font(config.fontWeights.regular, 14, config.fontFamily),
+        color: '#888888',
         maxLines: 2,
       });
+      cursorY += 4;
     }
 
-    if (item.description) {
-      drawWrappedText(ctx, item.description, {
-        x: textX,
-        y: cursorY + 4,
-        width: textWidth,
-        lineHeight: 24,
-        font: font(config.fontWeights.regular, 16, config.fontFamily),
-        color: '#7891ab',
-        maxLines: 3,
-      });
+    // Price tag: red background #d10000 with white text
+    if (item.tertiary) {
+      const priceText = '原价 ' + item.tertiary;
+      ctx.fillStyle = '#d10000';
+      const priceWidth = ctx.measureText(priceText).width + 16;
+      ctx.fillRect(textX, cursorY, priceWidth, 24);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = font(config.fontWeights.regular, 12, config.fontFamily);
+      ctx.fillText(priceText, textX + 8, cursorY + 16);
+      cursorY += 32;
     }
+
+    // Timer: red bold italic 20px
+    if (item.primary) {
+      ctx.fillStyle = '#d10000';
+      ctx.font = font(config.fontWeights.bold, 20, config.fontFamily);
+      ctx.fillText(item.primary, textX, cursorY);
+      cursorY += 28;
+    }
+
+    // CTA button: white background, black text
+    const btnText = '立即抢夺';
+    ctx.fillStyle = '#ffffff';
+    const btnWidth = 120;
+    const btnHeight = 32;
+    ctx.fillRect(textX, cursorY, btnWidth, btnHeight);
+    ctx.fillStyle = '#000000';
+    ctx.font = font(config.fontWeights.bold, 14, config.fontFamily);
+    ctx.fillText(btnText, textX + 12, cursorY + 22);
   }
 
-  function traceRoundedRect(ctx, x, y, width, height, radius) {
-    const r = Math.min(radius, width / 2, height / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + width - r, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-    ctx.lineTo(x + width, y + height - r);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-    ctx.lineTo(x + r, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-  }
+  async function drawItadCard(ctx, item, config, x, y, width) {
+    // ITAD CARD - no cover, left side store info
+    const halfWidth = width / 2;
 
-  function fillRoundedRect(
-    ctx,
-    x,
-    y,
-    width,
-    height,
-    radius,
-    fillStyle,
-    strokeStyle,
-  ) {
-    traceRoundedRect(ctx, x, y, width, height, radius);
-    ctx.fillStyle = fillStyle;
-    ctx.fill();
-    if (strokeStyle) {
-      ctx.strokeStyle = strokeStyle;
-      ctx.stroke();
+    // BLACK CARD with WHITE 4px border
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(x, y, width, config.cardHeight);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x, y, width, config.cardHeight);
+
+    // Left side: store name in large red bold
+    ctx.fillStyle = '#d10000';
+    ctx.font = font(config.fontWeights.bold, 28, config.fontFamily);
+    ctx.fillText((item.secondary || 'ITAD').toUpperCase(), x + config.cardInset, y + config.cardInset + 28);
+
+    // Game count below
+    if (item.tertiary) {
+      ctx.fillStyle = '#888888';
+      ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
+      ctx.fillText(item.tertiary, x + config.cardInset, y + config.cardInset + 52);
     }
+
+    // "FROM ITAD" label
+    ctx.fillStyle = '#666666';
+    ctx.font = font(config.fontWeights.regular, 12, config.fontFamily);
+    ctx.fillText('FROM ITAD', x + config.cardInset, y + config.cardInset + 72);
+
+    // Right side: title, timer, CTA
+    const textX = x + halfWidth + config.cardInset;
+    const textWidth = halfWidth - config.cardInset * 2;
+    let cursorY = y + config.cardInset;
+
+    // Title: white bold uppercase
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
+    ctx.fillText(item.title.toUpperCase(), textX, cursorY);
+    cursorY += 26;
+
+    // Timer: red bold italic
+    if (item.primary) {
+      ctx.fillStyle = '#d10000';
+      ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
+      ctx.fillText(item.primary, textX, cursorY);
+      cursorY += 26;
+    }
+
+    // CTA button
+    const btnText = '立即抢夺';
+    ctx.fillStyle = '#ffffff';
+    const btnWidth = 100;
+    const btnHeight = 28;
+    ctx.fillRect(textX, cursorY, btnWidth, btnHeight);
+    ctx.fillStyle = '#000000';
+    ctx.font = font(config.fontWeights.bold, 12, config.fontFamily);
+    ctx.fillText(btnText, textX + 8, cursorY + 18);
   }
 
   async function loadCover(url) {
@@ -983,7 +1074,7 @@ def get_share_client_script() -> str:
     if (!text) {
       return [];
     }
-    const normalized = text.replace(/\\s+/g, ' ').trim();
+    const normalized = text.replace(/\s+/g, ' ').trim();
     if (!normalized) {
       return [];
     }
@@ -1068,6 +1159,7 @@ def get_share_client_script() -> str:
 })();"""
 
 
+
 def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """构建分享数据"""
     sections = []
@@ -1141,6 +1233,7 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         sections.append(
             {
                 "title": "ITAD Bundle Giveaways",
+                "type": "itad",
                 "items": [
                     map_itad_share_item(item) for item in itad[:MAX_SHARE_ITEMS]
                 ],
@@ -1182,8 +1275,10 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "cardInset": SHARE_CARD_INSET,
             "coverWidth": SHARE_COVER_WIDTH,
             "coverRadius": SHARE_COVER_RADIUS,
-            "fontWeights": {"light": 300, "regular": 400, "semibold": 600, "bold": 700},
+            "fontWeights": {"light": 300, "regular": 400, "semibold": 600, "bold": 900},
             "fontFamily": f'"{SHARE_FONT_FAMILY}","Microsoft YaHei","PingFang SC","Heiti SC",sans-serif',
+            "qrSize": 100,
+            "qrMargin": 6,
         },
     }
 

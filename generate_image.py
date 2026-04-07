@@ -6,9 +6,23 @@
 import os
 import sys
 import json
+import qrcode
 import base64
+from io import BytesIO
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+
+
+
+def generate_qr_base64(data: str, size: int = 100) -> str:
+    """Generate QR code as base64 PNG"""
+    qr = qrcode.QRCode(version=1, box_size=10, border=4)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="white", back_color="black")
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    return base64.b64encode(buffer.getvalue()).decode()
 
 
 def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200, height: int = None):
@@ -126,18 +140,23 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
                 pass
             
             # 执行 Canvas 渲染代码
-            # 使用内联实现生成拼图（与 HTML 页面中的逻辑一致）
+            qr_url = 'https://gbtgame.me'
+            qr_code_base64 = generate_qr_base64(qr_url, 100)
+
             image_base64 = page.evaluate("""
-                async (payload) => {
+async ({payload, qrCodeBase64}) => {
                     const config = payload.config;
                     const sections = payload.sections;
-                    
+
+                    const qrCodeDataUrl = qrCodeBase64 ? "data:image/png;base64," + qrCodeBase64 : null;
+
                     // 计算画布高度
                     function measureCanvasHeight(sections, config) {
+                        const footerHeight = 160;
                         let total = config.padding * 2 + config.titleBlockHeight;
                         for (let i = 0; i < sections.length; i += 1) {
                             const section = sections[i];
-                            total += 40;
+                            total += 56;
                             total += section.items.length * config.cardHeight;
                             if (section.items.length > 1) {
                                 total += (section.items.length - 1) * config.cardGap;
@@ -146,36 +165,10 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
                                 total += config.sectionGap;
                             }
                         }
+                        total += footerHeight;
                         return Math.ceil(total);
                     }
-                    
-                    // 绘制圆角矩形路径
-                    function traceRoundedRect(ctx, x, y, width, height, radius) {
-                        const r = Math.min(radius, width / 2, height / 2);
-                        ctx.beginPath();
-                        ctx.moveTo(x + r, y);
-                        ctx.lineTo(x + width - r, y);
-                        ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-                        ctx.lineTo(x + width, y + height - r);
-                        ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-                        ctx.lineTo(x + r, y + height);
-                        ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-                        ctx.lineTo(x, y + r);
-                        ctx.quadraticCurveTo(x, y, x + r, y);
-                        ctx.closePath();
-                    }
-                    
-                    // 填充圆角矩形
-                    function fillRoundedRect(ctx, x, y, width, height, radius, fillStyle, strokeStyle) {
-                        traceRoundedRect(ctx, x, y, width, height, radius);
-                        ctx.fillStyle = fillStyle;
-                        ctx.fill();
-                        if (strokeStyle) {
-                            ctx.strokeStyle = strokeStyle;
-                            ctx.stroke();
-                        }
-                    }
-                    
+
                     // 加载图片（支持跨域）
                     async function loadCover(url) {
                         if (!url) return null;
@@ -193,18 +186,16 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
                             return null;
                         }
                     }
-                    
-                    // 文本换行（修复正则表达式转义）
+
+                    // 文本换行
                     function wrapText(ctx, text, maxWidth, maxLines) {
                         if (!text) return [];
-                        // 规范化空白字符（将多个空白字符替换为单个空格）
-                        const normalized = text.replace(/\\s+/g, ' ').trim();
+                        const normalized = text.replace(/\s+/g, ' ').trim();
                         if (!normalized) return [];
-                        // 按字符分割，支持中文和 emoji
                         const characters = Array.from(normalized);
                         const lines = [];
                         let current = '';
-                        
+
                         for (let i = 0; i < characters.length; i += 1) {
                             const candidate = current + characters[i];
                             if (ctx.measureText(candidate).width > maxWidth && current) {
@@ -217,7 +208,7 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
                         if (current) {
                             lines.push(current);
                         }
-                        
+
                         if (typeof maxLines === 'number' && maxLines > 0 && lines.length > maxLines) {
                             const truncated = lines.slice(0, maxLines);
                             let lastLine = truncated[maxLines - 1];
@@ -227,17 +218,17 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
                             truncated[maxLines - 1] = lastLine ? lastLine + '…' : '…';
                             return truncated;
                         }
-                        
+
                         return lines;
                     }
-                    
+
                     // 绘制换行文本
                     function drawWrappedText(ctx, text, options) {
                         if (!text) return options.y;
                         ctx.font = options.font;
                         ctx.fillStyle = options.color;
                         ctx.textAlign = 'left';
-                        
+
                         const lines = wrapText(ctx, text, options.width, options.maxLines);
                         let cursor = options.y;
                         for (let i = 0; i < lines.length; i += 1) {
@@ -246,156 +237,302 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
                         }
                         return cursor;
                     }
-                    
+
                     // 字体函数
                     function font(weight, size, family) {
                         return weight + ' ' + size + 'px ' + family;
                     }
-                    
+
                     // 绘制卡片
                     async function drawCard(ctx, item, config, x, y, width) {
-                        fillRoundedRect(
-                            ctx, x, y, width, config.cardHeight, config.cardRadius,
-                            'rgba(15, 24, 36, 0.92)', 'rgba(102, 192, 244, 0.2)'
-                        );
-                        
+                        // BLACK CARD with WHITE 4px border (NO rounded corners)
+                        ctx.fillStyle = '#0a0a0a';
+                        ctx.fillRect(x, y, width, config.cardHeight);
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 4;
+                        ctx.strokeRect(x, y, width, config.cardHeight);
+
                         const coverX = x + config.cardInset;
                         const coverY = y + config.cardInset;
                         const coverHeight = config.cardHeight - config.cardInset * 2;
-                        
-                        ctx.save();
-                        traceRoundedRect(ctx, coverX, coverY, config.coverWidth, coverHeight, config.coverRadius);
-                        ctx.clip();
-                        
+                        const coverWidth = config.coverWidth;
+
+                        // Cover with WHITE 4px border, no radius
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 4;
+                        ctx.strokeRect(coverX, coverY, coverWidth, coverHeight);
+
+                        // Load and draw cover image
                         const coverImage = await loadCover(item.coverUrl);
                         if (coverImage) {
                             const scale = Math.max(
-                                config.coverWidth / coverImage.width,
+                                coverWidth / coverImage.width,
                                 coverHeight / coverImage.height
                             );
                             const drawWidth = coverImage.width * scale;
                             const drawHeight = coverImage.height * scale;
-                            const dx = coverX + (config.coverWidth - drawWidth) / 2;
+                            const dx = coverX + (coverWidth - drawWidth) / 2;
                             const dy = coverY + (coverHeight - drawHeight) / 2;
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.rect(coverX, coverY, coverWidth, coverHeight);
+                            ctx.clip();
                             ctx.drawImage(coverImage, dx, dy, drawWidth, drawHeight);
+                            ctx.restore();
                         } else {
-                            ctx.fillStyle = '#11202f';
-                            ctx.fillRect(coverX, coverY, config.coverWidth, coverHeight);
-                            ctx.fillStyle = '#305677';
-                            ctx.font = font(config.fontWeights.regular, 18, config.fontFamily);
+                            ctx.fillStyle = '#1a1a1a';
+                            ctx.fillRect(coverX, coverY, coverWidth, coverHeight);
+                            ctx.fillStyle = '#444444';
+                            ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
                             ctx.textAlign = 'center';
-                            ctx.fillText('封面缺失', coverX + config.coverWidth / 2, coverY + coverHeight / 2 - 10);
+                            ctx.fillText('NO IMAGE', coverX + coverWidth / 2, coverY + coverHeight / 2);
                             ctx.textAlign = 'left';
                         }
-                        ctx.restore();
-                        
-                        const textX = coverX + config.coverWidth + config.cardInset;
+
+                        // Content area (right side, 60%)
+                        const textX = coverX + coverWidth + config.cardInset;
                         const textWidth = x + width - config.cardInset - textX;
                         let cursorY = y + config.cardInset;
-                        
-                        cursorY = drawWrappedText(ctx, item.title, {
-                            x: textX, y: cursorY, width: textWidth, lineHeight: 32,
-                            font: font(config.fontWeights.semibold, 26, config.fontFamily),
-                            color: '#f3f6fb', maxLines: 2
-                        }) + 6;
-                        
-                        cursorY = drawWrappedText(ctx, item.primary, {
-                            x: textX, y: cursorY, width: textWidth, lineHeight: 26,
-                            font: font(config.fontWeights.regular, 20, config.fontFamily),
-                            color: '#66c0f4', maxLines: 2
-                        });
-                        
-                        if (item.secondary) {
-                            cursorY = drawWrappedText(ctx, item.secondary, {
-                                x: textX, y: cursorY, width: textWidth, lineHeight: 24,
-                                font: font(config.fontWeights.regular, 18, config.fontFamily),
-                                color: '#9bb5d0', maxLines: 1
-                            });
-                        }
-                        
-                        if (item.tertiary) {
-                            cursorY = drawWrappedText(ctx, item.tertiary, {
-                                x: textX, y: cursorY, width: textWidth, lineHeight: 24,
-                                font: font(config.fontWeights.regular, 16, config.fontFamily),
-                                color: '#7f9bb8', maxLines: 2
-                            });
-                        }
-                        
+
+                        // Title: white bold 22px uppercase
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = font(config.fontWeights.bold, 22, config.fontFamily);
+                        ctx.fillText(item.title.toUpperCase(), textX, cursorY);
+                        cursorY += 30;
+
+                        // Description: gray 14px, max 2 lines
                         if (item.description) {
-                            drawWrappedText(ctx, item.description, {
-                                x: textX, y: cursorY + 4, width: textWidth, lineHeight: 24,
-                                font: font(config.fontWeights.regular, 16, config.fontFamily),
-                                color: '#7891ab', maxLines: 3
+                            cursorY = drawWrappedText(ctx, item.description, {
+                                x: textX, y: cursorY, width: textWidth, lineHeight: 20,
+                                font: font(config.fontWeights.regular, 14, config.fontFamily),
+                                color: '#888888', maxLines: 2
                             });
+                            cursorY += 4;
                         }
+
+                        // Price tag: red background #d10000 with white text
+                        if (item.tertiary) {
+                            const priceText = '原价 ' + item.tertiary;
+                            ctx.fillStyle = '#d10000';
+                            const priceWidth = ctx.measureText(priceText).width + 16;
+                            ctx.fillRect(textX, cursorY, priceWidth, 24);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = font(config.fontWeights.regular, 12, config.fontFamily);
+                            ctx.fillText(priceText, textX + 8, cursorY + 16);
+                            cursorY += 32;
+                        }
+
+                        // Timer: red bold 20px
+                        if (item.primary) {
+                            ctx.fillStyle = '#d10000';
+                            ctx.font = font(config.fontWeights.bold, 20, config.fontFamily);
+                            ctx.fillText(item.primary, textX, cursorY);
+                            cursorY += 28;
+                        }
+
+                        // CTA button: white background, black text
+                        const btnText = '立即抢夺';
+                        ctx.fillStyle = '#ffffff';
+                        const btnWidth = 120;
+                        const btnHeight = 32;
+                        ctx.fillRect(textX, cursorY, btnWidth, btnHeight);
+                        ctx.fillStyle = '#000000';
+                        ctx.font = font(config.fontWeights.bold, 14, config.fontFamily);
+                        ctx.fillText(btnText, textX + 12, cursorY + 22);
                     }
-                    
+
+                    // 绘制ITAD卡片
+                    async function drawItadCard(ctx, item, config, x, y, width) {
+                        const halfWidth = width / 2;
+
+                        // BLACK CARD with WHITE 4px border
+                        ctx.fillStyle = '#0a0a0a';
+                        ctx.fillRect(x, y, width, config.cardHeight);
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 4;
+                        ctx.strokeRect(x, y, width, config.cardHeight);
+
+                        // Left side: store name in large red bold
+                        ctx.fillStyle = '#d10000';
+                        ctx.font = font(config.fontWeights.bold, 28, config.fontFamily);
+                        ctx.fillText((item.secondary || 'ITAD').toUpperCase(), x + config.cardInset, y + config.cardInset + 28);
+
+                        // Game count below
+                        if (item.tertiary) {
+                            ctx.fillStyle = '#888888';
+                            ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
+                            ctx.fillText(item.tertiary, x + config.cardInset, y + config.cardInset + 52);
+                        }
+
+                        // "FROM ITAD" label
+                        ctx.fillStyle = '#666666';
+                        ctx.font = font(config.fontWeights.regular, 12, config.fontFamily);
+                        ctx.fillText('FROM ITAD', x + config.cardInset, y + config.cardInset + 72);
+
+                        // Right side: title, timer, CTA
+                        const textX = x + halfWidth + config.cardInset;
+                        const textWidth = halfWidth - config.cardInset * 2;
+                        let cursorY = y + config.cardInset;
+
+                        // Title: white bold uppercase
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
+                        ctx.fillText(item.title.toUpperCase(), textX, cursorY);
+                        cursorY += 26;
+
+                        // Timer: red bold
+                        if (item.primary) {
+                            ctx.fillStyle = '#d10000';
+                            ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
+                            ctx.fillText(item.primary, textX, cursorY);
+                            cursorY += 26;
+                        }
+
+                        // CTA button
+                        const btnText = '立即抢夺';
+                        ctx.fillStyle = '#ffffff';
+                        const btnWidth = 100;
+                        const btnHeight = 28;
+                        ctx.fillRect(textX, cursorY, btnWidth, btnHeight);
+                        ctx.fillStyle = '#000000';
+                        ctx.font = font(config.fontWeights.bold, 12, config.fontFamily);
+                        ctx.fillText(btnText, textX + 8, cursorY + 18);
+                    }
+
                     // 创建画布
                     const height = measureCanvasHeight(sections, config);
                     const canvas = document.createElement('canvas');
                     canvas.width = config.width;
                     canvas.height = height;
-                    
+
                     const ctx = canvas.getContext('2d');
                     if (!ctx) {
                         throw new Error('Canvas 2D context is unavailable');
                     }
-                    
+
                     ctx.textBaseline = 'top';
-                    
-                    // 绘制背景
-                    const gradient = ctx.createLinearGradient(0, 0, config.width, height);
-                    gradient.addColorStop(0, 'rgba(10, 18, 29, 0.96)');
-                    gradient.addColorStop(1, 'rgba(6, 12, 21, 0.9)');
-                    ctx.fillStyle = gradient;
+
+                    // === BLACK BACKGROUND ===
+                    ctx.fillStyle = '#000000';
                     ctx.fillRect(0, 0, config.width, height);
-                    
-                    // 绘制标题
+
+                    // === WHITE DOT GRID PATTERN ===
+                    const dotSpacing = 28;
+                    const dotRadius = 1;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                    for (let x = dotSpacing / 2; x < config.width; x += dotSpacing) {
+                        for (let y = dotSpacing / 2; y < height; y += dotSpacing) {
+                            ctx.beginPath();
+                            ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+
+                    // === TITLE BLOCK ===
                     let cursorY = config.padding;
-                    ctx.fillStyle = '#f3f6fb';
-                    ctx.font = font(config.fontWeights.semibold, 42, config.fontFamily);
-                    ctx.fillText('白嫖游戏信息', config.padding, cursorY);
-                    cursorY += 54;
-                    
-                    ctx.font = font(config.fontWeights.regular, 20, config.fontFamily);
-                    ctx.fillStyle = '#a0bed8';
-                    ctx.fillText('Epic · Steam · PlayStation 限免速览', config.padding, cursorY);
-                    cursorY += 36;
-                    
-                    ctx.font = font(config.fontWeights.light, 18, config.fontFamily);
-                    ctx.fillStyle = '#7f9bb8';
+
+                    // Red bar at top (6px)
+                    ctx.fillStyle = '#d10000';
+                    ctx.fillRect(0, 0, config.width, 6);
+
+                    // White title: "白嫖游戏速报" in bold 52px
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = font(config.fontWeights.bold, 52, config.fontFamily);
+                    ctx.fillText('白嫖游戏速报', config.padding, cursorY);
+                    cursorY += 64;
+
+                    // Gray subtitle
+                    ctx.fillStyle = '#888888';
+                    ctx.font = font(config.fontWeights.regular, 18, config.fontFamily);
+                    ctx.fillText('GBTGAME FREEBIES · EPIC · STEAM · PSN · ITAD', config.padding, cursorY);
+                    cursorY += 28;
+
+                    // Timestamp line
+                    ctx.fillStyle = '#666666';
+                    ctx.font = font(config.fontWeights.light, 14, config.fontFamily);
                     ctx.fillText(
-                        '生成时间：' + payload.generatedAtDisplay + ' · 条目数：' + payload.totalItems,
+                        'GENERATED: ' + payload.generatedAtDisplay + ' · ' + payload.totalItems + ' ITEMS',
                         config.padding, cursorY
                     );
                     cursorY = config.padding + config.titleBlockHeight;
-                    
-                    // 绘制各个区块
+
+                    // === SECTIONS ===
                     const cardWidth = config.width - config.padding * 2;
                     for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
                         const section = sections[sectionIndex];
-                        ctx.font = font(config.fontWeights.semibold, 28, config.fontFamily);
-                        ctx.fillStyle = '#66c0f4';
-                        ctx.fillText(section.title, config.padding, cursorY);
-                        cursorY += 40;
-                        
+
+                        // Section header: red vertical bar + white uppercase bold
+                        ctx.fillStyle = '#d10000';
+                        ctx.fillRect(config.padding, cursorY, 4, 40);
+
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = font(config.fontWeights.bold, 32, config.fontFamily);
+                        ctx.fillText(section.title.toUpperCase(), config.padding + 16, cursorY + 32);
+                        cursorY += 56;
+
                         for (let itemIndex = 0; itemIndex < section.items.length; itemIndex += 1) {
                             if (itemIndex > 0) {
                                 cursorY += config.cardGap;
                             }
-                            await drawCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
+                            if (section.type === 'itad') {
+                                await drawItadCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
+                            } else {
+                                await drawCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
+                            }
                             cursorY += config.cardHeight;
                         }
-                        
+
                         if (sectionIndex !== sections.length - 1) {
                             cursorY += config.sectionGap;
                         }
                     }
-                    
+
+                    // === FOOTER WITH QR CODE ===
+                    const footerHeight = 160;
+                    cursorY = height - footerHeight;
+
+                    // Black footer bar
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, cursorY, config.width, footerHeight);
+
+                    // White top border 6px
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, cursorY, config.width, 6);
+
+                    // Red accent bar on left side of footer
+                    ctx.fillStyle = '#d10000';
+                    ctx.fillRect(0, cursorY, 8, footerHeight);
+
+                    // Draw QR code at bottom center
+                    if (qrCodeDataUrl) {
+                        const qrSize = config.qrSize || 100;
+                        const qrX = (config.width - qrSize) / 2;
+                        const qrY = cursorY + 16;
+
+                        const qrImg = new Image();
+                        await new Promise(function(resolve, reject) {
+                            qrImg.onload = resolve;
+                            qrImg.onerror = reject;
+                            qrImg.src = qrCodeDataUrl;
+                        });
+                        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+                    }
+
+                    // Text below QR
+                    const qrSize = config.qrSize || 100;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
+                    ctx.textAlign = 'center';
+                    ctx.fillText(
+                        '扫描获取最新限免 · GBTGAME.ME',
+                        config.width / 2,
+                        cursorY + qrSize + 32
+                    );
+                    ctx.textAlign = 'left';
+
                     // 导出为 base64
                     return canvas.toDataURL('image/png');
-                }
-            """, share_payload)
+                }""", {"payload": share_payload, "qrCodeBase64": qr_code_base64})
             
             # 从 base64 数据 URL 中提取图片数据
             if not image_base64 or not image_base64.startswith('data:image'):
