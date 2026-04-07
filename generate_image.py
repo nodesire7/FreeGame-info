@@ -63,9 +63,9 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1200,
             except Exception as e:
                 print(f"⚠️  networkidle 等待超时: {e}，继续尝试...")
 
-            # 等待 share-payload 元素出现
+            # 等待 share-payload 元素出现（state='attached' 因为 script 标签始终隐藏）
             try:
-                page.wait_for_selector('#share-payload', timeout=10000)
+                page.wait_for_selector('#share-payload', timeout=10000, state='attached')
             except Exception as e:
                 print(f"⚠️  未找到 #share-payload 元素: {e}")
 

@@ -563,11 +563,6 @@ def get_share_client_script() -> str:
     return """(function() {
   'use strict';
 
-  const root = document.querySelector('.epic-freebies');
-  if (!root) {
-    return;
-  }
-
   // =========================
   // 倒计时（以截止时间计算）
   // =========================
@@ -610,9 +605,9 @@ def get_share_client_script() -> str:
   // 每秒刷新一次
   setInterval(updateCountdowns, 1000);
 
-  const shareButton = root.querySelector('[data-share-button]');
-  const tabs = Array.from(root.querySelectorAll('.epic-freebies__tab'));
-  const panels = Array.from(root.querySelectorAll('.epic-freebies__panel'));
+  const shareButton = document.querySelector('[data-share-button]');
+  const tabs = Array.from(document.querySelectorAll('.epic-freebies__tab'));
+  const panels = Array.from(document.querySelectorAll('.epic-freebies__panel'));
 
   let sharePayload = null;
   const payloadNode = document.getElementById('share-payload');
