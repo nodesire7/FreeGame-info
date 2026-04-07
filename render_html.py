@@ -1042,11 +1042,7 @@ def get_share_client_script() -> str:
     panels.forEach(function(panel) {
       const isActive = panel.getAttribute('data-panel') === targetKey;
       panel.classList.toggle('is-active', isActive);
-      if (isActive) {
-        panel.removeAttribute('hidden');
-      } else {
-        panel.setAttribute('hidden', 'hidden');
-      }
+      panel.classList.toggle('hidden', !isActive);
     });
   }
 

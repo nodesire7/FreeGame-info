@@ -160,7 +160,7 @@
                     </div>
 
                     <!-- Steam Panel -->
-                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-steam" data-panel="steam">
+                    <div class="epic-freebies__panel" role="tabpanel" id="free-panel-steam" data-panel="steam">
                         <div class="p-5 lg:p-8 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card">
                             <header class="flex items-center justify-between gap-4 mb-5">
                                 <h3 class="text-base lg:text-lg font-semibold tracking-wide m-0">Steam 限免</h3>
@@ -173,7 +173,7 @@
                     </div>
 
                     <!-- PSN Panel -->
-                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-psn" data-panel="psn">
+                    <div class="epic-freebies__panel" role="tabpanel" id="free-panel-psn" data-panel="psn">
                         <div class="p-5 lg:p-8 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card">
                             <header class="flex items-center justify-between gap-4 mb-5">
                                 <h3 class="text-base lg:text-lg font-semibold tracking-wide m-0">PlayStation 本月会员免费</h3>
@@ -186,7 +186,7 @@
                     </div>
 
                     <!-- ITAD Panel -->
-                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-itad" data-panel="itad">
+                    <div class="epic-freebies__panel" role="tabpanel" id="free-panel-itad" data-panel="itad">
                         <div class="p-5 lg:p-8 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card">
                             <header class="flex items-center justify-between gap-4 mb-5">
                                 <h3 class="text-base lg:text-lg font-semibold tracking-wide m-0">ITAD Bundle Giveaways</h3>
