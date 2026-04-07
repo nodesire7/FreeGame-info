@@ -44,7 +44,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
+          cache: pip
+          cache-dependency-path: requirements.txt
 
       - name: Install dependencies
         run: |
@@ -56,9 +57,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ hashFiles('requirements.txt') }}
+          key: playwright-${{ hashFiles('requirements.txt') }}
           restore-keys: |
-            playwright-chromium-
+            playwright-
 
       - name: Install Playwright (Chromium)
         if: steps.cache-playwright.outputs.cache-hit != 'true'
