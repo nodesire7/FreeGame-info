@@ -478,26 +478,30 @@ def render_psn_card(game: Dict[str, Any]) -> str:
 def render_epic_section_content(items: List[Dict[str, Any]], empty_text: str, variant: str) -> str:
     """渲染 Epic 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+    # All epic cards use the same featured horizontal style for desktop readability
+    # variant controls layout: "now"=1-col featured, "upcoming"=2-col featured
+    grid_class = "grid grid-cols-1 gap-12" if variant == "now" else "grid grid-cols-1 xl:grid-cols-2 gap-10"
     cards = "\n".join(render_epic_card(item, variant) for item in items)
-    grid_class = "grid grid-cols-1 gap-12" if variant == "now" else "grid grid-cols-1 md:grid-cols-2 gap-8"
     return f'<div class="{grid_class}">\n{cards}\n</div>'
 
 
 def render_steam_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 Steam 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+    # Steam cards use featured horizontal style, 2-col on xl screens
     cards = "\n".join(render_steam_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 md:grid-cols-2 gap-8">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 xl:grid-cols-2 gap-10">\n{cards}\n</div>'
 
 
 def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 PlayStation 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+    # PSN cards use featured horizontal style, 2-col on xl screens
     cards = "\n".join(render_psn_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 md:grid-cols-2 gap-8">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 xl:grid-cols-2 gap-10">\n{cards}\n</div>'
 
 
 def render_itad_card(game: Dict[str, Any]) -> str:
@@ -543,19 +547,21 @@ def render_itad_card(game: Dict[str, Any]) -> str:
     else:
         badge_text = "ITAD Giveaway"
 
-    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:rotate-1 transition-transform group">
-    <div class="lg:w-1/3 flex flex-col items-center justify-center gap-4 bg-zinc-900 border-4 border-zinc-700 p-8">
-        <span class="text-red-600 font-black text-2xl italic">{escape_html(store)}</span>
-        <span class="text-zinc-500 text-sm">{escape_html(game_count_text)}</span>
+    return f"""<article class="relative flex flex-col gap-6 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-8 transform hover:-rotate-1 transition-transform group">
+    <!-- Store info banner -->
+    <div class="flex items-center justify-between bg-zinc-900 border-4 border-zinc-700 px-6 py-4">
+        <span class="text-red-600 font-black text-xl lg:text-2xl italic">{escape_html(store)}</span>
+        <span class="text-zinc-500 text-xs lg:text-sm">{escape_html(game_count_text)}</span>
         <span class="text-[10px] text-zinc-600 font-bold italic uppercase">FROM ITAD</span>
     </div>
-    <div class="lg:w-2/3 flex flex-col justify-between py-4">
-        <h4 class="text-2xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <div class="flex flex-col gap-2">
-            <span class="text-xl font-black text-red-600 italic countdown-tick" data-countdown-target="{expiry * 1000 if expiry else ''}" data-countdown-prefix="剩余" data-countdown-finished="已结束">{escape_html(remaining_text)}</span>
+    <!-- Content stacked -->
+    <div class="flex flex-col gap-4">
+        <h4 class="text-xl lg:text-2xl font-black italic tracking-tighter uppercase">{escape_html(game["title"])}</h4>
+        <div class="flex flex-col gap-1">
+            <span class="text-lg lg:text-xl font-black text-red-600 italic countdown-tick" data-countdown-target="{expiry * 1000 if expiry else ''}" data-countdown-prefix="剩余" data-countdown-finished="已结束">{escape_html(remaining_text)}</span>
             <span class="text-[10px] text-zinc-500 font-bold uppercase">截止：{escape_html(expiry_display)}</span>
         </div>
-        <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-8 py-3 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase mt-6" target="_blank" rel="noopener noreferrer">ITAD 查看</a>
+        <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-6 py-3 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase mt-2 self-start" target="_blank" rel="noopener noreferrer">ITAD 查看</a>
     </div>
 </article>"""
 
@@ -563,9 +569,10 @@ def render_itad_card(game: Dict[str, Any]) -> str:
 def render_itad_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 ITAD Giveaways 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+    # ITAD uses horizontal layout, 2-col on xl screens
     cards = "\n".join(render_itad_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 md:grid-cols-2 gap-8">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 xl:grid-cols-2 gap-10">\n{cards}\n</div>'
 
 
 def get_share_client_script() -> str:
@@ -1074,7 +1081,7 @@ def get_share_client_script() -> str:
     if (!text) {
       return [];
     }
-    const normalized = text.replace(/\s+/g, ' ').trim();
+    const normalized = text.replace(/\\s+/g, ' ').trim();
     if (!normalized) {
       return [];
     }
@@ -1419,6 +1426,8 @@ def map_itad_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
         "tertiary": f"{game.get('gameCount', 0)} 款游戏",
         "description": "",
         "coverUrl": "",
+        "store": sanitize_text(game.get("store", "ITAD")),
+        "gameCount": game.get("gameCount", 0),
     }
 
 

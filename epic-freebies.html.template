@@ -109,9 +109,7 @@
                                 <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
                                 <h3 class="text-4xl font-black italic uppercase">Now_Available / 正在免费</h3>
                             </div>
-                            <div class="grid grid-cols-1 gap-12">
-                                {{EPIC_NOW_CONTENT}}
-                            </div>
+                            {{EPIC_NOW_CONTENT}}
                         </div>
                         <!-- Upcoming Section -->
                         <div class="mb-10">
@@ -119,9 +117,7 @@
                                 <div class="h-12 w-3 bg-white skew-x-[20deg]"></div>
                                 <h3 class="text-4xl font-black italic uppercase text-zinc-400">Upcoming_Missions / 预告</h3>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {{EPIC_UPCOMING_CONTENT}}
-                            </div>
+                            {{EPIC_UPCOMING_CONTENT}}
                         </div>
                     </div>
 
@@ -132,9 +128,7 @@
                                 <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
                                 <h3 class="text-4xl font-black italic uppercase">Steam_Deals / Steam 限免</h3>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {{STEAM_CONTENT}}
-                            </div>
+                            {{STEAM_CONTENT}}
                         </div>
                     </div>
 
@@ -145,9 +139,7 @@
                                 <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
                                 <h3 class="text-4xl font-black italic uppercase">PS_Plus / PlayStation 会员福利</h3>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {{PSN_CONTENT}}
-                            </div>
+                            {{PSN_CONTENT}}
                         </div>
                     </div>
 
@@ -158,9 +150,7 @@
                                 <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
                                 <h3 class="text-4xl font-black italic uppercase">ITAD_Bundle / ITAD 礼包</h3>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {{ITAD_CONTENT}}
-                            </div>
+                            {{ITAD_CONTENT}}
                         </div>
                     </div>
 
@@ -168,13 +158,15 @@
             </div>
 
             <!-- 底部滚动条 -->
-            <div class="relative bg-white h-16 overflow-hidden flex items-center border-t-[10px] border-black z-30">
-                <div class="absolute inset-y-0 left-0 bg-red-600 w-48 -skew-x-[35deg] -translate-x-12 z-10 shadow-[20px_0_0_0_#000]"></div>
+            <div class="relative bg-white h-12 lg:h-20 overflow-hidden flex items-center border-t-[6px] lg:border-t-[10px] border-black z-30">
+                <div class="absolute inset-y-0 left-0 bg-red-600 w-32 lg:w-48 -skew-x-[35deg] -translate-x-12 z-10 shadow-[20px_0_0_0_#000]"></div>
                 <div class="animate-marquee whitespace-nowrap flex items-center z-0 relative">
-                    <span class="text-black font-black text-3xl italic mx-12 tracking-tighter">GBTGAME.ME</span>
-                    <span class="text-red-600 font-black text-3xl italic mx-12 tracking-tighter">GBTGAME.ME</span>
-                    <span class="text-black font-black text-3xl italic mx-12 tracking-tighter">GBTGAME.ME</span>
-                    <span class="text-red-600 font-black text-3xl italic mx-12 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                    <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
                 </div>
             </div>
 
