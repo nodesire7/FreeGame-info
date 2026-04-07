@@ -64,6 +64,13 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .countdown-tick {
+            animation: countdown-pulse 0.3s ease-out;
+        }
+        @keyframes countdown-pulse {
+            0% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body class="m-0 min-h-screen text-steam-text antialiased">

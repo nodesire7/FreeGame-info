@@ -582,7 +582,10 @@ def get_share_client_script() -> str:
   };
 
   const updateCountdowns = () => {
-    if (!countdownNodes.length) return;
+    if (!countdownNodes.length) {
+      console.warn('Countdown: no nodes found');
+      return;
+    }
     const now = Date.now();
     countdownNodes.forEach((node) => {
       const targetRaw = node.getAttribute('data-countdown-target');
@@ -594,10 +597,15 @@ def get_share_client_script() -> str:
       const diff = target - now;
       if (diff <= 0) {
         node.textContent = finished;
+        node.classList.remove('countdown-tick');
         return;
       }
       const body = formatCountdown(diff);
       node.textContent = body ? `${prefix} ${body}` : finished;
+      // Trigger reflow to restart animation
+      node.classList.remove('countdown-tick');
+      void node.offsetWidth;
+      node.classList.add('countdown-tick');
     });
   };
 
