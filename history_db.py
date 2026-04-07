@@ -49,6 +49,14 @@ def get_latest_meta(conn: sqlite3.Connection) -> Tuple[Optional[str], Optional[s
     return row[0], row[1]
 
 
+def get_latest_image_rel(conn: sqlite3.Connection) -> Optional[str]:
+    """返回最新一条记录的归档图片路径"""
+    row = conn.execute(
+        "SELECT image FROM records ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    return row[0] if row else None
+
+
 def insert_record(
     conn: sqlite3.Connection,
     *,

@@ -19,7 +19,7 @@ from psn_fetch import fetch_psn
 from steam_fetch import fetch_steam
 from itad_fetch import fetch_itad
 from render_html import render_html, render_history_page
-from history_db import open_db, get_latest_meta, insert_record, list_snapshots
+from history_db import open_db, get_latest_meta, get_latest_image_rel, insert_record, list_snapshots
 
 
 async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
@@ -267,13 +267,13 @@ def main() -> Tuple[Optional[str], Optional[str]]:
 
         # 先生成主页 HTML（页脚包含历史入口/最新图片）
         if os.path.exists(template_path):
-            html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts)
+            html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts, share_webp_url=image_rel)
             Path(html_output_path).write_text(html_content, encoding="utf-8")
             print(f"\nHTML 已生成到 {html_output_path}")
         else:
             print(f"\n警告: 找不到模板文件 {template_path}，跳过 HTML 生成")
 
-        # 生成图片（仅在新增历史时生成）
+        # 生成历史图片（仅在新增历史时生成）
         try:
             from generate_image import generate_webp_from_html
 
@@ -297,7 +297,8 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     else:
         # 未变化：仍生成主页 HTML，但 latest_ts 指向上一次记录
         if os.path.exists(template_path):
-            html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts)
+            latest_image_rel = get_latest_image_rel(conn)
+            html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts, share_webp_url=latest_image_rel)
             Path(html_output_path).write_text(html_content, encoding="utf-8")
             print(f"\nHTML 已生成到 {html_output_path}")
         else:

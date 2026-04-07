@@ -35,6 +35,18 @@
             0% { opacity: 0.6; transform: scale(0.98); }
             100% { opacity: 1; transform: scale(1); }
         }
+        /* Tab 激活状态样式：跟随 is-active class 切换 */
+        .epic-freebies__tab.is-active {
+            background-color: rgb(220 38 38 / var(--tw-bg-opacity, 1));
+            color: rgb(255 255 255 / 1);
+            box-shadow: 6px 6px 0 0 #fff;
+        }
+        .epic-freebies__tab.is-active .bg-white {
+            background-color: rgb(255 255 255 / 1);
+        }
+        .epic-freebies__tab.is-active .text-red-600 {
+            color: rgb(220 38 38 / 1);
+        }
     </style>
 </head>
 <body class="m-0 min-h-screen text-white antialiased">
@@ -84,8 +96,8 @@
 
                 <!-- Tab 导航 -->
                 <nav class="flex flex-wrap gap-4 mb-16 relative z-10" role="tablist" aria-label="限免平台切换">
-                    <button class="epic-freebies__tab is-active group relative px-8 py-3 bg-red-600 text-white font-black italic transform skew-x-12 shadow-[6px_6px_0_0_#fff]" role="tab" aria-selected="true" aria-controls="free-panel-epic" data-tab="epic">
-                        <span class="relative z-10">EPIC 限免 <span class="bg-white text-red-600 px-2 ml-2 not-italic">{{TAB_BADGE_EPIC}}</span></span>
+                    <button class="epic-freebies__tab is-active group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="true" aria-controls="free-panel-epic" data-tab="epic">
+                        <span class="relative z-10">EPIC 限免 <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_EPIC}}</span></span>
                     </button>
                     <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-steam" data-tab="steam">
                         <span class="relative z-10">STEAM 限免 <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_STEAM}}</span></span>

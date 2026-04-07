@@ -505,7 +505,7 @@ def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> 
 
 
 def render_itad_card(game: Dict[str, Any]) -> str:
-    """渲染 ITAD Giveaway 卡片"""
+    """渲染 ITAD Giveaway 卡片（使用与其他平台一致的横向 Featured 风格）"""
     # 计算剩余时间
     expiry = game.get("expiry")
     china_tz = timezone(timedelta(hours=8))
@@ -545,23 +545,44 @@ def render_itad_card(game: Dict[str, Any]) -> str:
     elif is_mature:
         badge_text = "MATURE"
     else:
-        badge_text = "ITAD Giveaway"
+        badge_text = "ITAD"
 
-    return f"""<article class="relative flex flex-col gap-6 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-8 transform hover:-rotate-1 transition-transform group">
-    <!-- Store info banner -->
-    <div class="flex items-center justify-between bg-zinc-900 border-4 border-zinc-700 px-6 py-4">
-        <span class="text-red-600 font-black text-xl lg:text-2xl italic">{escape_html(store)}</span>
-        <span class="text-zinc-500 text-xs lg:text-sm">{escape_html(game_count_text)}</span>
+    # 使用与其他平台一致的横向 Featured 风格
+    countdown_target_ms = expiry * 1000 if expiry else None
+    countdown_attrs = ""
+    countdown_text = escape_html(remaining_text)
+    if countdown_target_ms:
+        countdown_attrs = (
+            f' data-countdown-target="{countdown_target_ms}"'
+            f' data-countdown-prefix="剩余"'
+            f' data-countdown-finished="已结束"'
+        )
+        countdown_text = f'<span class="countdown-tick"{countdown_attrs}>{countdown_text}</span>'
+    else:
+        countdown_text = f'<span>{countdown_text}</span>'
+
+    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">{escape_html(badge_text)}</div>
+
+    <!-- Store info (left side, replacing cover) -->
+    <div class="lg:w-2/5 flex flex-col items-center justify-center gap-4 bg-zinc-900 border-[8px] border-white shadow-2xl aspect-video">
+        <span class="text-red-600 font-black text-2xl lg:text-3xl italic">{escape_html(store)}</span>
+        <span class="text-zinc-500 text-sm">{escape_html(game_count_text)}</span>
         <span class="text-[10px] text-zinc-600 font-bold italic uppercase">FROM ITAD</span>
     </div>
-    <!-- Content stacked -->
-    <div class="flex flex-col gap-4">
-        <h4 class="text-xl lg:text-2xl font-black italic tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <div class="flex flex-col gap-1">
-            <span class="text-lg lg:text-xl font-black text-red-600 italic countdown-tick" data-countdown-target="{expiry * 1000 if expiry else ''}" data-countdown-prefix="剩余" data-countdown-finished="已结束">{escape_html(remaining_text)}</span>
-            <span class="text-[10px] text-zinc-500 font-bold uppercase">截止：{escape_html(expiry_display)}</span>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">ITAD Bundle Giveaway · {escape_html(game_count_text)}</p>
+        <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-6 border-t-2 border-dashed border-zinc-800 pt-6">
+            <div class="flex flex-col">
+                <span class="text-2xl font-black text-red-600 italic">{countdown_text}</span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">截止：{escape_html(expiry_display)}</span>
+            </div>
+            <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">ITAD 查看</a>
         </div>
-        <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-6 py-3 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase mt-2 self-start" target="_blank" rel="noopener noreferrer">ITAD 查看</a>
     </div>
 </article>"""
 
@@ -1263,7 +1284,7 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
     # 使用中国时区生成文件名
     china_tz = timezone(timedelta(hours=8))
-    suggested_file_name = f"GBTGame限免拼图-{datetime.now(china_tz).strftime('%Y%m%d-%H%M')}.png"
+    suggested_file_name = f"GBTGame限免拼图-{datetime.now(china_tz).strftime('%Y%m%d-%H%M')}.webp"
 
     return {
         "generatedAtDisplay": format_full_datetime(generated_at_timestamp),
@@ -1443,7 +1464,7 @@ def serialize_for_client(payload: Optional[Dict[str, Any]]) -> str:
     return json_str
 
 
-def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts: str | None = None) -> str:
+def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts: str | None = None, share_webp_url: str | None = None) -> str:
     """渲染 HTML"""
     with open(template_path, "r", encoding="utf-8") as f:
         template = f.read()
@@ -1548,12 +1569,12 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         "SHARE_BUTTON_DISABLED": (
             "" if share_ready else ' aria-disabled="true" tabindex="-1"'
         ),
-        "SHARE_BUTTON_LABEL": "生成分享拼图" if share_ready else "分享数据未就绪",
+        "SHARE_BUTTON_LABEL": "下载分享图片" if share_webp_url else ("生成分享拼图" if share_ready else "分享数据未就绪"),
         "SHARE_BUTTON_FILENAME": escape_attribute(
             (share_payload.get("suggestedFileName") if share_payload else None)
-            or "GBTGame限免拼图.png"
+            or "GBTGame限免拼图.webp"
         ),
-        "SHARE_BUTTON_URL": escape_attribute("#"),
+        "SHARE_BUTTON_URL": escape_attribute(share_webp_url or "#"),
         "SHARE_DATA_JSON": share_data_json,
         "CLIENT_SCRIPT": share_script,
         "ARCHIVE_LINKS": archive_links,

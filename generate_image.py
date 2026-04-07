@@ -8,6 +8,7 @@ import sys
 import base64
 from io import BytesIO
 from pathlib import Path
+from typing import Optional
 
 import qrcode
 from PIL import Image
@@ -156,6 +157,120 @@ def build_share_html(payload: dict) -> str:
 </body>
 </html>"""
     return html
+
+
+def generate_share_screenshot(snapshot: dict, output_file: str, qr_url: str = "https://gbtgame.me") -> Optional[str]:
+    """
+    根据快照数据生成分享截图（Build 时直接调用，无需浏览器交互）
+
+    Args:
+        snapshot: 完整快照数据
+        output_file: 输出的图片文件路径
+        qr_url: 二维码指向的 URL
+
+    Returns:
+        生成的 WebP 文件路径，失败返回 None
+    """
+    import tempfile
+
+    try:
+        from render_html import build_share_payload, serialize_for_client
+    except ImportError:
+        print("⚠️  无法导入 render_html，使用内联方式构建分享数据")
+        return None
+
+    # 构建分享数据
+    share_payload = build_share_payload(snapshot)
+    if not share_payload:
+        print("⚠️  分享数据为空，跳过分享截图生成")
+        return None
+
+    # 添加 QR URL
+    share_payload['qrUrl'] = qr_url
+
+    # 生成完整 HTML
+    share_html = build_share_html(share_payload)
+
+    # 写入临时文件
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.html', encoding='utf-8', delete=False) as f:
+        f.write(share_html)
+        temp_html_path = f.name
+
+    try:
+        # 使用 Playwright 截图
+        result = _playwright_screenshot(temp_html_path, output_file)
+        return result
+    finally:
+        # 清理临时文件
+        try:
+            os.unlink(temp_html_path)
+        except Exception:
+            pass
+
+
+def _playwright_screenshot(html_file: str, output_file: str) -> Optional[str]:
+    """使用 Playwright 对 HTML 文件截图"""
+    from pathlib import Path
+
+    if not os.path.exists(html_file):
+        print(f"错误: 找不到 HTML 文件 {html_file}")
+        return None
+
+    html_path = Path(html_file).absolute()
+    output_path = Path(output_file)
+    actual_output = output_file
+
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=True,
+                args=[
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                ]
+            )
+
+            context = browser.new_context(viewport={'width': 1080, 'height': 1920})
+            page = context.new_page()
+
+            page.goto(f"file://{html_path}", wait_until='domcontentloaded', timeout=60000)
+
+            try:
+                page.wait_for_load_state('networkidle', timeout=30000)
+            except Exception as e:
+                print(f"⚠️  networkidle 等待超时: {e}，继续...")
+
+            page.wait_for_timeout(2000)
+
+            screenshot_bytes = page.screenshot(type='png', full_page=True)
+            page.close()
+            browser.close()
+
+        # 保存为 PNG（后续可转为 WebP）
+        if output_path.suffix.lower() == '.webp':
+            temp_png = output_path.with_suffix('.png')
+            temp_png.write_bytes(screenshot_bytes)
+            try:
+                img = Image.open(temp_png).convert('RGBA')
+                img.save(output_file, 'PNG')
+                temp_png.unlink()
+                img.close()
+            except Exception as e:
+                print(f"⚠️  WebP 转换失败: {e}，保存为 PNG")
+                actual_output = str(temp_png)
+        else:
+            Path(output_file).write_bytes(screenshot_bytes)
+
+        file_size = Path(actual_output).stat().st_size
+        print(f"✅ 分享截图生成成功: {actual_output} ({file_size} bytes)")
+        return actual_output
+
+    except Exception as e:
+        print(f"❌ 截图失败: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
 
 
 def generate_webp_from_html(html_file: str, output_file: str, width: int = 1080, height: int = None):
