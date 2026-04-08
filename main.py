@@ -221,6 +221,74 @@ def _sync_history_to_site(history_dir: Path, site_dir: Path) -> None:
                 shutil.copy2(item, dst_records / item.name)
 
 
+def generate_feed(snapshot: Dict[str, Any], output_dir: str) -> None:
+    """生成 RSS 2.0 Feed，供 AdSense 索引使用"""
+    items_xml = []
+    fetched_at = snapshot.get("fetchedAt", datetime.now(_china_tz()).isoformat())
+
+    def make_item(title: str, link: str, description: str, pub_date: str) -> str:
+        return f"""    <item>
+        <title>{escape_xml(title)}</title>
+        <link>{escape_xml(link)}</link>
+        <description>{escape_xml(description)}</description>
+        <pubDate>{pub_date}</pubDate>
+    </item>"""
+
+    def escape_xml(text: str) -> str:
+        if not text:
+            return ""
+        return (text.replace("&", "&amp;")
+                   .replace("<", "&lt;")
+                   .replace(">", "&gt;")
+                   .replace("'", "&apos;")
+                   .replace('"', "&quot;"))
+
+    # EPIC Now
+    for game in (snapshot.get("epic") or {}).get("now", []):
+        title = game.get("title", "EPIC 免费游戏")
+        link = game.get("link", "")
+        desc = game.get("description", "")[:200]
+        items_xml.append(make_item(title, link, desc, fetched_at))
+
+    # Steam
+    for game in snapshot.get("steam", []):
+        title = game.get("title", "Steam 免费游戏")
+        link = game.get("link", "")
+        desc = (game.get("shortDescription") or "")[:200]
+        items_xml.append(make_item(title, link, desc, fetched_at))
+
+    # PSN
+    for game in snapshot.get("psn", []):
+        title = game.get("title", "PS Plus 免费游戏")
+        link = game.get("link", "")
+        desc = (game.get("description") or "")[:200]
+        items_xml.append(make_item(title, link, desc, fetched_at))
+
+    # ITAD
+    for game in snapshot.get("itad", []):
+        title = game.get("title", "ITAD 礼包")
+        link = game.get("url", "")
+        desc = (game.get("description") or "")[:200]
+        items_xml.append(make_item(title, link, desc, fetched_at))
+
+    feed_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>白嫖游戏速报 | GBTGAME</title>
+        <link>https://gameinfo.gbtgame.me</link>
+        <description>聚合 EPIC | Steam | PlayStation | ITAD 限免情报</description>
+        <language>zh-CN</language>
+        <lastBuildDate>{fetched_at}</lastBuildDate>
+        <atom:link href="https://gameinfo.gbtgame.me/feed.xml" rel="self" type="application/rss+xml"/>
+        {"".join(items_xml)}
+    </channel>
+</rss>"""
+
+    feed_path = os.path.join(output_dir, "feed.xml")
+    Path(feed_path).write_text(feed_xml, encoding="utf-8")
+    print(f"Feed 已生成到 {feed_path}")
+
+
 def main() -> Tuple[Optional[str], Optional[str]]:
     """主函数"""
     parser = ArgumentParser()
@@ -315,6 +383,9 @@ def main() -> Tuple[Optional[str], Optional[str]]:
         render_history_page(snapshots, template_path="epic-freebies.html.template"),
         encoding="utf-8",
     )
+
+    # === 生成 RSS Feed ===
+    generate_feed(snapshot, output_dir)
 
     # 将历史文件同步到 site/history 供 Pages 发布
     _sync_history_to_site(history_dir, site_dir)
