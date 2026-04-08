@@ -10,6 +10,8 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9956808351564739" crossorigin="anonymous"></script>
     <!-- AMP Auto Ads -->
     <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
+    <!-- AMP Ad -->
+    <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <style>
@@ -54,6 +56,16 @@
 
     <!-- AMP Auto Ads -->
     <amp-auto-ads type="adsense" data-ad-client="ca-pub-9956808351564739"></amp-auto-ads>
+
+    <!-- AMP Ad -->
+    <amp-ad width="100vw" height="320"
+         type="adsense"
+         data-ad-client="ca-pub-9956808351564739"
+         data-ad-slot="2738598187"
+         data-auto-format="mcrspv"
+         data-full-width="">
+      <div overflow=""></div>
+    </amp-ad>
 
     <section class="max-w-7xl mx-auto my-12 font-sans bg-[#d10000] p-1 sm:p-2 overflow-hidden selection:bg-white selection:text-red-600">
         <div class="relative bg-black text-white shadow-[20px_20px_0_0_#fff,-1px_-1px_0_0_#000]">
