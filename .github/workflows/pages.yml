@@ -73,7 +73,7 @@ jobs:
           touch site/.nojekyll
 
       - name: Generate ads.txt
-        run: echo "google.com, pub-9956808351564739, DIRECT, f08c47fec0942fa0" > site/ads.txt
+        run: cp ads.txt site/ads.txt
 
       - name: Persist history store (only when changed)
         shell: bash
