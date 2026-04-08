@@ -337,8 +337,8 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
         <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
         <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">{escape_html(description)}</p>
         {summary_html}
-        <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-6 border-t-2 border-dashed border-zinc-800 pt-6">
-            <div class="flex flex-col">
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
                 <span class="text-2xl font-black text-red-600 italic">{countdown_text}</span>
                 <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(deadline_text)}</span>
             </div>
@@ -406,8 +406,8 @@ def render_steam_card(game: Dict[str, Any]) -> str:
         <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
         <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">{escape_html(description)}</p>
         {summary_html}
-        <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-6 border-t-2 border-dashed border-zinc-800 pt-6">
-            <div class="flex flex-col">
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
                 <span class="text-2xl font-black text-red-600 italic">{escape_html(price_text)}</span>
                 <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(price_detail)}</span>
             </div>
@@ -427,23 +427,23 @@ def render_psn_card(game: Dict[str, Any]) -> str:
         else '<span>暂无封面</span>'
     )
 
-    timing_parts = []
-    if game.get("highlight"):
-        timing_parts.append(
-            f'<span class="text-lg font-black text-red-600 italic">{escape_html(game["highlight"])}</span>'
-        )
+    # 组装 meta 行：highlight + 平台 + 领取时间，全部在同一行
+    meta_items = []
+    highlight = escape_html(game.get("highlight", "PS Plus 会员免费"))
+    if highlight:
+        meta_items.append(f'<span class="font-black text-red-600 italic">{highlight}</span>')
     if game.get("platforms"):
-        # platforms 可能是列表或字符串
         platforms = game["platforms"]
         if isinstance(platforms, list):
             platforms = " / ".join(platforms)
-        timing_parts.append(
+        meta_items.append(
             f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">{escape_html(str(platforms))}</span>'
         )
     if game.get("period"):
-        timing_parts.append(
-            f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">领取时间：{escape_html(game["period"])}</span>'
+        meta_items.append(
+            f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">领取：{escape_html(game["period"])}</span>'
         )
+    meta_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 items-center">{"".join(meta_items)}</div>'
 
     description = (game.get("description") or "当前仍在同步 PlayStation 官方描述。").strip()
 
@@ -462,13 +462,9 @@ def render_psn_card(game: Dict[str, Any]) -> str:
     <!-- Content -->
     <div class="lg:w-3/5 flex flex-col justify-between py-2">
         <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">{escape_html(description)}</p>
-        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic">
-            {"".join(timing_parts)}
-        </div>
-        <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-6 border-t-2 border-dashed border-zinc-800 pt-6">
-            <div class="flex flex-col">
-            </div>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-2">{escape_html(description)}</p>
+        {meta_html}
+        <div class="mt-6 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
             <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
         </div>
     </div>
@@ -566,20 +562,19 @@ def render_itad_card(game: Dict[str, Any]) -> str:
     <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">{escape_html(badge_text)}</div>
 
     <!-- Store info (left side, replacing cover) -->
-    <div class="lg:w-2/5 flex flex-col items-center justify-center gap-4 bg-zinc-900 border-[8px] border-white shadow-2xl aspect-video">
-        <span class="text-red-600 font-black text-2xl lg:text-3xl italic">{escape_html(store)}</span>
-        <span class="text-zinc-500 text-sm">{escape_html(game_count_text)}</span>
+    <div class="lg:w-2/5 flex flex-row items-center justify-center gap-3 bg-zinc-900 border-[8px] border-white shadow-2xl aspect-video">
+        <span class="text-red-600 font-black text-xl lg:text-2xl italic">{escape_html(store)}</span>
+        <span class="text-zinc-500 text-xs lg:text-sm">{escape_html(game_count_text)}</span>
         <span class="text-[10px] text-zinc-600 font-bold italic uppercase">FROM ITAD</span>
     </div>
 
     <!-- Content -->
     <div class="lg:w-3/5 flex flex-col justify-between py-2">
         <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">ITAD Bundle Giveaway · {escape_html(game_count_text)}</p>
-        <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-6 border-t-2 border-dashed border-zinc-800 pt-6">
-            <div class="flex flex-col">
-                <span class="text-2xl font-black text-red-600 italic">{countdown_text}</span>
-                <span class="text-[10px] text-zinc-500 font-bold uppercase">截止：{escape_html(expiry_display)}</span>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-2">ITAD Bundle Giveaway · {escape_html(game_count_text)}</p>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">{countdown_text} · 截止 {escape_html(expiry_display)}</span>
             </div>
             <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">ITAD 查看</a>
         </div>
