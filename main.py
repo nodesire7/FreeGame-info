@@ -387,6 +387,11 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     # === 生成 RSS Feed ===
     generate_feed(snapshot, output_dir)
 
+    # === 生成 robots.txt ===
+    robots_path = os.path.join(output_dir, "robots.txt")
+    Path(robots_path).write_text("User-agent: *\nAllow: /\n", encoding="utf-8")
+    print(f"robots.txt 已生成")
+
     # 将历史文件同步到 site/history 供 Pages 发布
     _sync_history_to_site(history_dir, site_dir)
 
