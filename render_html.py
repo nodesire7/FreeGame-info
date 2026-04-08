@@ -350,51 +350,73 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
 
 def render_steam_card(game: Dict[str, Any]) -> str:
     """渲染 Steam 游戏卡片"""
+    # 构建 meta 行：开发商 / 发行商 / 类型 / 发行日期 / 平台
     summary = []
-    if game.get("releaseDate"):
-        summary.append(f"发行：{game['releaseDate']}")
+    developers = game.get("developers", [])
+    publishers = game.get("publishers", [])
+    genres = game.get("genres", [])
     platforms = game.get("platforms", [])
-    if platforms:
-        summary.append(f"平台：{' / '.join(platforms)}")
 
+    if developers:
+        summary.append(f"开发：{escape_html(' / '.join(developers))}")
+    if publishers:
+        summary.append(f"发行：{escape_html(' / '.join(publishers))}")
+    if genres:
+        summary.append(f"类型：{escape_html(' / '.join(genres[:3]))}")
+    if game.get("releaseDate"):
+        summary.append(f"发行：{escape_html(game['releaseDate'])}")
+    if platforms:
+        summary.append(f"平台：{escape_html(' / '.join(platforms))}")
+
+    # 价格信息
     discount_text = game.get("discountText")
     final_price = game.get("finalPrice")
-    if discount_text:
-        price_text = f"折扣：{discount_text}"
-        if final_price:
-            price_text += f" · 现价 {final_price}"
+    if discount_text and final_price:
+        price_display = f"{discount_text} · {final_price}"
     elif final_price:
-        price_text = f"现价 {final_price}"
+        price_display = f"现价 {final_price}"
+    elif discount_text:
+        price_display = f"折扣：{discount_text}"
     else:
-        price_text = "折扣信息：待定"
+        price_display = "免费"
 
     price_parts = []
     if game.get("originalPrice"):
         price_parts.append(f"原价 {game['originalPrice']}")
     if final_price:
         price_parts.append(f"现价 {final_price}")
-    price_detail = " → ".join(price_parts) if price_parts else "价格信息暂缺"
+    price_detail = " → ".join(price_parts) if price_parts else ""
 
-    cover = game.get("image", "")
+    # 描述：优先用 API 的 shortDescription，其次用 reviewSummary，最后才是占位符
+    description = game.get("shortDescription") or game.get("reviewSummary") or ""
+    if description:
+        description = escape_html(description)
+    else:
+        description = "限免详情请前往 Steam 商店页查看。"
+
+    # meta 行 HTML
+    if summary:
+        # 先对每个 summary 项单独 escape，再拼 HTML
+        summary_html_parts = []
+        for item in summary:
+            summary_html_parts.append(f'<span class="bg-zinc-800 px-3 py-1">{item}</span>')
+        summary_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(summary_html_parts)}</div>'
+    else:
+        summary_html = ""
+
+    cover = game.get("image", "") or game.get("headerImage", "")
     cover_html = (
         f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"] + " 封面")}" loading="lazy">'
         if cover
-        else '<span>暂无封面</span>'
+        else '<span class="w-full h-full flex items-center justify-center text-zinc-600 text-xs bg-zinc-800">暂无封面</span>'
     )
-
-    description = (game.get("reviewSummary") or "限免详情请前往 Steam 商店页查看。").strip()
-
-    summary_html = ""
-    if summary:
-        summary_inner = escape_html("</span><span class=\"bg-zinc-800 px-3 py-1\">".join(summary))
-        summary_html = f'<div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">{summary_inner}</span></div>'
 
     return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
     <!-- GET corner badge -->
     <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
 
     <!-- Cover image -->
-    <div class="lg:w-2/5 relative">
+    <div class="lg:w-2/5 relative min-w-0">
         <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
             {cover_html}
         </div>
@@ -402,16 +424,16 @@ def render_steam_card(game: Dict[str, Any]) -> str:
     </div>
 
     <!-- Content -->
-    <div class="lg:w-3/5 flex flex-col justify-between py-2">
-        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">{escape_html(description)}</p>
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{description}</p>
         {summary_html}
         <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
             <div class="flex flex-col gap-1">
-                <span class="text-2xl font-black text-red-600 italic">{escape_html(price_text)}</span>
+                <span class="text-2xl font-black text-red-600 italic">{escape_html(price_display)}</span>
                 <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(price_detail)}</span>
             </div>
-            <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            <a href="{escape_attribute(game['link'])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
         </div>
     </div>
 </article>"""
@@ -476,8 +498,8 @@ def render_epic_section_content(items: List[Dict[str, Any]], empty_text: str, va
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
     # All epic cards use the same featured horizontal style for desktop readability
-    # variant controls layout: "now"=1-col featured, "upcoming"=2-col featured
-    grid_class = "grid grid-cols-1 gap-12" if variant == "now" else "grid grid-cols-1 xl:grid-cols-2 gap-10"
+    # variant controls layout: "now"=1-col featured, "upcoming"=2-col featured at 3xl+(2000px)
+    grid_class = "grid grid-cols-1 gap-12" if variant == "now" else "grid grid-cols-1 3xl:grid-cols-2 gap-10"
     cards = "\n".join(render_epic_card(item, variant) for item in items)
     return f'<div class="{grid_class}">\n{cards}\n</div>'
 
@@ -486,18 +508,18 @@ def render_steam_section_content(items: List[Dict[str, Any]], empty_text: str) -
     """渲染 Steam 区块内容"""
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
-    # Steam cards use featured horizontal style, 2-col on xl screens
+    # Steam cards: 2-col at 3xl+(2000px) so common PC resolutions (1280-1920px) show full-width cards
     cards = "\n".join(render_steam_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
 
 
 def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 PlayStation 区块内容"""
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
-    # PSN cards use featured horizontal style, 2-col on xl screens
+    # PSN cards: 2-col at 3xl+(2000px) so common PC resolutions (1280-1920px) show full-width cards
     cards = "\n".join(render_psn_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
 
 
 def render_itad_card(game: Dict[str, Any]) -> str:
@@ -586,9 +608,9 @@ def render_itad_section_content(items: List[Dict[str, Any]], empty_text: str) ->
     """渲染 ITAD Giveaways 区块内容"""
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
-    # ITAD uses horizontal layout, 2-col on xl screens
+    # ITAD cards: 2-col at 3xl+(2000px) so common PC resolutions (1280-1920px) show full-width cards
     cards = "\n".join(render_itad_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
 
 
 def get_share_client_script() -> str:
