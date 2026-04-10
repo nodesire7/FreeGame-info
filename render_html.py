@@ -406,7 +406,7 @@ def render_steam_card(game: Dict[str, Any]) -> str:
 
     cover = game.get("image", "") or game.get("headerImage", "")
     cover_html = (
-        f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"] + " 封面")}" loading="lazy">'
+        f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"] + " 封面")}" loading="lazy" class="w-full h-full object-cover">'
         if cover
         else '<span class="w-full h-full flex items-center justify-center text-zinc-600 text-xs bg-zinc-800">暂无封面</span>'
     )
@@ -444,7 +444,7 @@ def render_psn_card(game: Dict[str, Any]) -> str:
     # 兼容新旧格式（新格式用 cover，旧格式用 image）
     cover = game.get("cover") or game.get("image", "")
     cover_html = (
-        f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"])}" loading="lazy">'
+        f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"])}" loading="lazy" class="w-full h-full object-cover">'
         if cover
         else '<span>暂无封面</span>'
     )

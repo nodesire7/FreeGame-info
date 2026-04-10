@@ -2,17 +2,19 @@
 """
 PSN 限免游戏抓取脚本：
 - 抓取 https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/ 页面
-- 优先使用 aiohttp，Playwright 作为备选
-- 返回简化的 JSON 格式（与用户提供的新 JS 逻辑一致）
+- 使用 Playwright 获取页面 HTML + 动态渲染描述
+- 从 PSN 商店页提取真实描述（subtitle / mainTitle / paragraphs）
 - 格式：title, description, link, cover, status
 """
 import asyncio
 import json
 import os
+import re
 from typing import Any, Dict, List, Optional
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import aiohttp
+from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 
 PSN_SOURCE_URL = "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/"
@@ -22,173 +24,195 @@ USER_AGENT = (
 )
 
 
-async def _fetch_with_aiohttp() -> str:
-    """使用 aiohttp 获取页面 HTML（主要方法）"""
-    async with aiohttp.ClientSession() as session:
-        headers = {
-            "User-Agent": USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Connection": "keep-alive",
-        }
-        async with session.get(PSN_SOURCE_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as resp:
-            resp.raise_for_status()
-            return await resp.text()
-
-
-async def _fetch_with_playwright() -> str:
-    """使用 Playwright 获取页面 HTML（备选方法）"""
+async def _fetch_listing_html() -> str:
+    """使用 Playwright 获取 PSN 限免列表页 HTML"""
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled"],
+        )
         context = await browser.new_context(
             user_agent=USER_AGENT,
             viewport={"width": 1920, "height": 1080},
             locale="zh-CN",
         )
         page = await context.new_page()
-
-        # 设置页面导航超时
         page.set_default_timeout(120_000)
 
-        # 使用更宽松的等待策略
         await page.goto(PSN_SOURCE_URL, wait_until="domcontentloaded", timeout=120_000)
-        await page.wait_for_load_state("domcontentloaded")
+        await page.wait_for_load_state("networkidle")
+        await page.wait_for_timeout(5_000)
 
-        # 等待页面内容加载
-        await page.wait_for_timeout(10_000)
-
-        # 尝试等待关键元素加载
         try:
-            await page.wait_for_selector('.content-grid .box', timeout=30_000)
+            await page.wait_for_selector(".content-grid .box", timeout=30_000)
         except Exception:
-            print("警告: 未找到 .content-grid .box 元素，继续尝试...")
+            print("警告: 未找到 .content-grid .box 元素")
 
         html = await page.content()
         await browser.close()
         return html
 
 
-async def fetch_html() -> str:
-    """
-    使用 aiohttp 获取页面 HTML（主要方法，Playwright 作为备选）
-    """
-    try:
-        return await _fetch_with_aiohttp()
-    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-        print(f"aiohttp 获取失败，尝试 Playwright: {e}")
-        return await _fetch_with_playwright()
-
-
-def parse_psn(html: str) -> List[Dict[str, Any]]:
-    """
-    解析 PSN 限免游戏
-    根据用户提供的 JavaScript 逻辑：
-    - 目标容器：.content-grid .box
-    - 提取字段：title, description, link, cover, status
-    """
-    from bs4 import BeautifulSoup
-    
+def _parse_listing(html: str) -> List[Dict[str, Any]]:
+    """解析 PSN 限免列表页，提取游戏卡片基础信息"""
     soup = BeautifulSoup(html, "html.parser")
     base_url = "https://www.playstation.com"
     items: List[Dict[str, Any]] = []
     seen_titles: set[str] = set()
 
-    # 1. 找到所有游戏卡片区域
-    boxes = soup.select('.content-grid .box')
-    
+    boxes = soup.select(".content-grid .box")
     if not boxes:
         print("警告: 未找到 .content-grid .box 元素")
         return []
 
-    # 2. 遍历每个 box
     for box in boxes:
-        # 提取标题
-        title_el = box.select_one('h3.txt-block-paragraph__title')
+        title_el = box.select_one("h3.txt-block-paragraph__title")
         if not title_el:
             continue
-        
         title = title_el.get_text(strip=True)
-        if not title:
-            continue
-        
-        # 去重
-        if title in seen_titles:
+        if not title or title in seen_titles:
             continue
         seen_titles.add(title)
 
-        # 提取描述
-        desc_el = box.select_one('p.txt-style-base')
-        description = desc_el.get_text(strip=True) if desc_el else ""
-
         # 提取链接
-        link_el = box.select_one('a.btn--cta')
+        link_el = box.select_one("a.btn--cta")
         link = ""
         if link_el:
-            href = link_el.get('href', '').strip()
+            href = link_el.get("href", "").strip()
             if href:
-                if href.startswith('/'):
+                if href.startswith("/"):
                     link = urljoin(base_url, href)
-                elif href.startswith('http'):
+                elif href.startswith("http"):
                     link = href
-        
+
         if not link:
             continue
 
-        # 提取封面图
-        # 匹配 JS 逻辑：
-        # 1. 优先使用 media-block 的 data-src（当前 box 内）
-        # 2. 如果没有，查找相邻 box 的 .imageblock .media-block
+        # 提取封面
         cover = ""
-        
-        # 情况1: 当前 box 内的 media-block
-        media_block = box.select_one('.media-block')
+        media_block = box.select_one(".media-block")
         if media_block:
-            data_src = media_block.get('data-src', '').strip()
+            data_src = media_block.get("data-src", "").strip()
             if data_src:
                 cover = urljoin(base_url, data_src)
-        
-        # 情况2: 查找相邻 box 的 .imageblock .media-block（如果情况1没找到）
         if not cover:
-            parent_grid = box.parent  # 获取父级容器
+            parent_grid = box.parent
             if parent_grid:
-                # 在父级内查找相邻的 .imageblock .media-block
-                adjacent_media = parent_grid.select('.imageblock .media-block')
+                adjacent_media = parent_grid.select(".imageblock .media-block")
                 if adjacent_media:
-                    # 取第一个匹配的元素
                     adj_media = adjacent_media[0]
-                    data_src = adj_media.get('data-src', '').strip()
+                    data_src = adj_media.get("data-src", "").strip()
                     if data_src:
                         cover = urljoin(base_url, data_src)
-        
-        # 兜底: 如果都没有 data-src，尝试从 img 标签获取
         if not cover:
-            img_el = box.select_one('img')
+            img_el = box.select_one("img")
             if img_el:
-                src = img_el.get('src', '').strip() or img_el.get('data-src', '').strip()
+                src = img_el.get("src", "").strip() or img_el.get("data-src", "").strip()
                 if src:
                     cover = urljoin(base_url, src)
 
         items.append({
-            "platform": "PSN",
             "title": title,
-            "description": description,
-            "originalPrice": "会员免费",
-            "date": "本月有效",
             "link": link,
             "cover": cover,
-            "status": "ACTIVE"
         })
 
     return items
 
 
+async def _fetch_store_description(link: str) -> str:
+    """
+    使用 Playwright 访问 PSN 商店页，提取动态加载的描述：
+    - subtitle (.txt-block-title__subtitle)
+    - mainTitle (.txt-block-title__title)
+    - paragraphs (.txt-block__paragraph p.txt-style-base)
+    """
+    if not link:
+        return ""
+
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(
+                headless=True,
+                args=["--disable-blink-features=AutomationControlled"],
+            )
+            context = await browser.new_context(
+                user_agent=USER_AGENT,
+                viewport={"width": 1920, "height": 1080},
+                locale="zh-CN",
+            )
+            page = await context.new_page()
+            page.set_default_timeout(60_000)
+
+            await page.goto(link, wait_until="domcontentloaded", timeout=60_000)
+            await page.wait_for_load_state("networkidle")
+            await page.wait_for_timeout(5_000)
+
+            # 提取 subtitle
+            subtitle = await page.eval_on_selector(
+                ".txt-block-title__subtitle", "el => el ? el.innerText.trim() : ''"
+            ) or ""
+
+            # 提取 mainTitle
+            main_title = await page.eval_on_selector(
+                ".txt-block-title__title", "el => el ? el.innerText.trim() : ''"
+            ) or ""
+
+            # 提取所有段落
+            paragraphs = await page.eval_on_selector_all(
+                ".txt-block__paragraph p.txt-style-base",
+                "els => els.map(el => el.innerText.trim()).filter(t => t)"
+            ) or []
+
+            description_parts = []
+            if subtitle:
+                description_parts.append(subtitle)
+            if main_title:
+                description_parts.append(main_title)
+            if paragraphs:
+                description_parts.extend(paragraphs)
+
+            await browser.close()
+            return "\n\n".join(description_parts)
+    except Exception as e:
+        print(f"  ⚠️ 获取描述失败 {link}: {e}")
+        return ""
+
+
 async def fetch_psn() -> List[Dict[str, Any]]:
     """
-    获取 PSN 限免游戏列表
+    获取 PSN 限免游戏列表，包含从商店页提取的真实描述
     """
-    html = await fetch_html()
-    items = parse_psn(html)
+    print("PSN: 正在抓取限免列表页...")
+    html = await _fetch_listing_html()
+    items = _parse_listing(html)
+
+    if not items:
+        print("PSN: 未找到任何游戏")
+        return []
+
+    print(f"PSN: 解析到 {len(items)} 款游戏，正在从商店页获取描述...")
+
+    # 批量获取每个游戏的商店页描述
+    for i, item in enumerate(items):
+        link = item.get("link", "")
+        if link:
+            print(f"  PSN: [{i+1}/{len(items)}] 获取描述 {item['title'][:20]}...")
+            description = await _fetch_store_description(link)
+            item["description"] = description
+            item["platform"] = "PSN"
+            item["originalPrice"] = "会员免费"
+            item["date"] = "本月有效"
+            item["status"] = "ACTIVE"
+            await asyncio.sleep(0.5)  # 避免请求过快
+        else:
+            item["description"] = ""
+            item["platform"] = "PSN"
+            item["originalPrice"] = "会员免费"
+            item["date"] = "本月有效"
+            item["status"] = "ACTIVE"
+
+    print(f"PSN: 描述获取完成")
     return items
 
 
@@ -202,23 +226,18 @@ def save_json(data: List[Dict[str, Any]], path: str = "PSN.json") -> None:
 async def main():
     """主函数"""
     import sys
-    
     output = sys.argv[1] if len(sys.argv) > 1 else "PSN.json"
-    
     try:
         data = await fetch_psn()
         save_json(data, output)
-        
-        print(f"PSN 抓取完成！")
-        print(f"  找到 {len(data)} 款限免游戏")
-        print(f"  已写入: {output}")
-        
-        # 打印游戏列表
-        for i, game in enumerate(data, start=1):
-            print(f"  {i}. {game.get('title', 'Unknown')}")
-        
+        print(f"PSN: 抓取完成，找到 {len(data)} 款，已写入 {output}")
+        for i, game in enumerate(data, 1):
+            desc_preview = (game.get("description") or "无描述")[:40]
+            print(f"  {i}. {game.get('title')} - {desc_preview}...")
     except Exception as e:
-        print(f"错误: {str(e)}")
+        print(f"错误: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 
