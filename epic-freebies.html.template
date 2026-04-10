@@ -11,6 +11,40 @@
     <!-- Google AdSense -->
     <meta name="google-adsense-account" content="ca-pub-9956808351564739">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9956808351564739" crossorigin="anonymous"></script>
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "白嫖游戏速报 | GBTGAME",
+        "url": "https://gameinfo.gbtgame.me",
+        "description": "聚合 EPIC、Steam、PlayStation、ITAD 限免游戏情报",
+        "publisher": {
+            "@type": "Organization",
+            "name": "GBTGAME",
+            "url": "https://gameinfo.gbtgame.me"
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://gameinfo.gbtgame.me/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "白嫖游戏速报",
+        "url": "https://gameinfo.gbtgame.me",
+        "description": "实时更新 EPIC、Steam、PlayStation 平台的免费游戏限免信息",
+        "isAccessibleForFree": "True",
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": [".epic-freebies__panel"]
+        }
+    }
+    </script>
     <!-- AMP Auto Ads -->
     <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
     <!-- AMP Ad -->
@@ -233,13 +267,24 @@
             <!-- 底部滚动条 -->
             <div class="relative bg-white h-12 lg:h-20 overflow-hidden flex items-center border-t-[6px] lg:border-t-[10px] border-black z-30">
                 <div class="absolute inset-y-0 left-0 bg-red-600 w-32 lg:w-48 -skew-x-[35deg] -translate-x-12 z-10 shadow-[20px_0_0_0_#000]"></div>
-                <div class="animate-marquee whitespace-nowrap flex items-center z-0 relative">
-                    <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
-                    <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
-                    <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
-                    <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
-                    <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
-                    <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                <!-- overflow-hidden 裁剪动画内容，形成无缝滚动窗口 -->
+                <div class="w-full overflow-hidden z-0">
+                    <div class="animate-marquee whitespace-nowrap flex w-max">
+                        <!-- 原始组 -->
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <!-- 重复组（与原始组完全相同，保证无缝衔接） -->
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                    </div>
                 </div>
             </div>
 
