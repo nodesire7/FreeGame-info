@@ -246,12 +246,120 @@ def _merge_api_data(
     return merged
 
 
+async def _fetch_steam_store_metadata(app_id: int) -> Dict[str, Any]:
+    """
+    使用 Playwright 访问 Steam 商店页，通过 JS 提取丰富元数据：
+    title / price / releaseDate / developer / publisher / reviews / tags /
+    features / shortDesc / detailedDescHTML / sysReq / languages / headerImage
+    """
+    store_url = f"https://store.steampowered.com/app/{app_id}/?cc=cn&l=schinese"
+
+    js_code = """
+() => {
+    const data = {};
+    data.title = document.querySelector('#appHubAppName')?.innerText.trim() || '';
+    data.price = (document.querySelector('.game_purchase_price.price') ||
+                  document.querySelector('.discount_final_price'))?.innerText.trim() || '免费/暂无定价';
+    data.releaseDate = document.querySelector('.release_date .date')?.innerText.trim() || '';
+    data.developer = document.querySelector('#developers_list a')?.innerText.trim() || '';
+    const pubEls = document.querySelectorAll('.dev_row .summary.column');
+    data.publisher = pubEls[1]?.innerText.trim() || '';
+
+    const getReview = (selector) => {
+        const el = document.querySelector(selector);
+        if (!el) return '无';
+        const summary = el.querySelector('.game_review_summary')?.innerText.trim() || '';
+        const detail = el.getAttribute('data-stellar-tooltip-content')?.replace(/<br>/g, ' ') || '';
+        return summary ? `${summary} (${detail})` : '无';
+    };
+    data.reviews = {
+        all: getReview('.user_reviews_summary_row[data-stellar-tooltip-content*="全部"]'),
+        recent: getReview('.user_reviews_summary_row[data-stellar-tooltip-content*="最近"]')
+    };
+
+    data.tags = Array.from(document.querySelectorAll('.app_tag'))
+        .map(tag => tag.innerText.trim()).filter(t => t !== '+').slice(0, 10);
+    data.features = Array.from(document.querySelectorAll('.label[data-tooltip-text]'))
+        .map(el => el.innerText.trim());
+
+    data.shortDesc = document.querySelector('.game_description_snippet')?.innerText.trim() || '';
+    data.detailedDescHTML = document.querySelector('#game_area_description')?.innerHTML.trim() || '';
+
+    data.sysReq = {};
+    document.querySelectorAll('.game_area_sys_req_leftCol, .game_area_sys_req_rightCol, .game_area_sys_req_full').forEach(block => {
+        const txt = block.innerText || '';
+        const isMin = txt.includes('最低') || txt.includes('Minimum') || txt.includes('最低配置');
+        const key = isMin ? 'Minimum' : 'Recommended';
+        if (!data.sysReq[key]) {
+            data.sysReq[key] = Array.from(block.querySelectorAll('ul.bb_ul li')).map(li => li.innerText.trim());
+        }
+    });
+
+    data.languages = '';
+    const langRow = document.querySelector('.game_language_options tr:nth-child(2)');
+    if (langRow) {
+        data.languages = (langRow.innerText || '').replace(/\\s+/g, ' ').trim();
+    }
+    data.headerImage = document.querySelector('.game_header_image_full')?.src || '';
+
+    return data;
+}
+"""
+
+    defaults = {
+        "reviews": {"all": "无", "recent": "无"},
+        "tags": [], "features": [], "shortDesc": "", "detailedDescHTML": "",
+        "sysReq": {}, "languages": "", "headerImage": "",
+        "price": "", "releaseDate": "", "developer": "", "publisher": "",
+    }
+
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(
+                headless=True,
+                args=["--disable-blink-features=AutomationControlled"],
+            )
+            context = await browser.new_context(
+                user_agent=USER_AGENT,
+                viewport={"width": 1920, "height": 1080},
+                locale="zh-CN",
+            )
+            page = await context.new_page()
+            page.set_default_timeout(60_000)
+
+            await page.goto(store_url, wait_until="load", timeout=60_000)
+            await page.wait_for_timeout(4_000)
+
+            metadata = await page.evaluate(js_code)
+            await browser.close()
+
+            result = dict(defaults)
+            result["title"] = metadata.get("title", "")
+            result["price"] = metadata.get("price", "")
+            result["releaseDate"] = metadata.get("releaseDate", "")
+            result["developer"] = metadata.get("developer", "")
+            result["publisher"] = metadata.get("publisher", "")
+            result["reviews"] = metadata.get("reviews", result["reviews"])
+            result["tags"] = metadata.get("tags", [])
+            result["features"] = metadata.get("features", [])
+            result["shortDesc"] = metadata.get("shortDesc", "")
+            result["detailedDescHTML"] = metadata.get("detailedDescHTML", "")
+            result["sysReq"] = metadata.get("sysReq", {})
+            result["languages"] = metadata.get("languages", "")
+            result["headerImage"] = metadata.get("headerImage", "")
+            return result
+    except Exception as e:
+        print(f"  ⚠️ Steam 商店页抓取失败 app/{app_id}: {e}")
+        return defaults
+
+
 async def fetch_steam(output_path: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     抓取 Steam 限免数据：
     1. 爬取搜索结果页面（基础信息）
     2. 批量调用 Steam API 获取详细信息
-    3. 合并数据后返回
+    3. Playwright 访问商店页提取丰富元数据（tags/reviews/sysReq等）
+    4. 合并数据后返回
     """
     print("开始抓取 Steam 限免数据...")
 
@@ -299,7 +407,7 @@ async def fetch_steam(output_path: Optional[str] = None) -> List[Dict[str, Any]]
             if i + API_BATCH_SIZE < len(app_ids_to_fetch):
                 await asyncio.sleep(API_REQUEST_INTERVAL)
 
-    # Step 4: 合并数据
+    # Step 4: 合并 API 数据
     for idx, app_id in app_ids_with_indices:
         api_data = all_api_results.get(app_id, {})
         items[idx] = _merge_api_data(items[idx], api_data)
@@ -308,7 +416,47 @@ async def fetch_steam(output_path: Optional[str] = None) -> List[Dict[str, Any]]
     enriched_count = sum(1 for _, aid in app_ids_with_indices if all_api_results.get(aid))
     print(f"Steam: API 详情获取完成，{enriched_count}/{len(app_ids_with_indices)} 条成功 enrichment")
 
-    # Step 5: 输出
+    # Step 5: Playwright 访问商店页提取丰富元数据
+    print(f"Steam: 正在从商店页获取丰富元数据...")
+    for i, item in enumerate(items):
+        app_id = item.get("appId")
+        if not app_id:
+            continue
+        title_short = (item.get("title") or "?")[:25]
+        print(f"  Steam: [{i+1}/{len(items)}] {title_short}...")
+        store_meta = await _fetch_steam_store_metadata(app_id)
+
+        # 覆盖/补充已有字段
+        if store_meta.get("developer"):
+            item["developers"] = [store_meta["developer"]]
+        if store_meta.get("publisher"):
+            item["publishers"] = [store_meta["publisher"]]
+        if store_meta.get("releaseDate"):
+            item["releaseDate"] = store_meta["releaseDate"]
+        if store_meta.get("price"):
+            item["price_steam"] = store_meta["price"]
+        if store_meta.get("shortDesc"):
+            item["shortDescription"] = store_meta["shortDesc"]
+        if store_meta.get("detailedDescHTML"):
+            item["detailedDescriptionHTML"] = store_meta["detailedDescHTML"]
+        if store_meta.get("tags"):
+            item["steamTags"] = store_meta["tags"]
+        if store_meta.get("reviews"):
+            item["reviews"] = store_meta["reviews"]
+        if store_meta.get("features"):
+            item["features"] = store_meta["features"]
+        if store_meta.get("sysReq"):
+            item["sysReq"] = store_meta["sysReq"]
+        if store_meta.get("languages"):
+            item["languages"] = store_meta["languages"]
+        if store_meta.get("headerImage"):
+            item["headerImage"] = store_meta["headerImage"]
+
+        await asyncio.sleep(0.5)
+
+    print(f"Steam: 商店页元数据获取完成")
+
+    # Step 6: 输出
     if output_path:
         os.makedirs(os.path.dirname(output_path) if os.path.dirname(output_path) else ".", exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:

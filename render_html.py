@@ -371,23 +371,19 @@ def render_steam_card(game: Dict[str, Any]) -> str:
     # 价格信息
     discount_text = game.get("discountText")
     final_price = game.get("finalPrice")
+    price_steam = game.get("price_steam", "")
     if discount_text and final_price:
         price_display = f"{discount_text} · {final_price}"
     elif final_price:
         price_display = f"现价 {final_price}"
     elif discount_text:
         price_display = f"折扣：{discount_text}"
+    elif price_steam:
+        price_display = escape_html(price_steam)
     else:
         price_display = "免费"
 
-    price_parts = []
-    if game.get("originalPrice"):
-        price_parts.append(f"原价 {game['originalPrice']}")
-    if final_price:
-        price_parts.append(f"现价 {final_price}")
-    price_detail = " → ".join(price_parts) if price_parts else ""
-
-    # 描述：优先用 API 的 shortDescription，其次用 reviewSummary，最后才是占位符
+    # 描述：优先用 shortDescription
     description = game.get("shortDescription") or game.get("reviewSummary") or ""
     if description:
         description = escape_html(description)
@@ -396,13 +392,48 @@ def render_steam_card(game: Dict[str, Any]) -> str:
 
     # meta 行 HTML
     if summary:
-        # 先对每个 summary 项单独 escape，再拼 HTML
         summary_html_parts = []
         for item in summary:
             summary_html_parts.append(f'<span class="bg-zinc-800 px-3 py-1">{item}</span>')
         summary_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(summary_html_parts)}</div>'
     else:
         summary_html = ""
+
+    # Tags
+    tags: List[str] = game.get("steamTags", []) or []
+    tags_html = ""
+    if tags:
+        tags_str = "".join(
+            f'<span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(t)}</span>'
+            for t in tags[:6]
+        )
+        tags_html = f'<div class="flex flex-wrap gap-1 mt-2">{tags_str}</div>'
+
+    # Reviews
+    reviews = game.get("reviews") or {}
+    review_all = reviews.get("all", "") if isinstance(reviews, dict) else ""
+    review_recent = reviews.get("recent", "") if isinstance(reviews, dict) else ""
+    reviews_html = ""
+    if review_all and review_all != "无":
+        reviews_html = f'<span class="text-[10px] text-zinc-500 italic mr-4">评测：{escape_html(review_all)}</span>'
+    if review_recent and review_recent != "无":
+        reviews_html += f'<span class="text-[10px] text-zinc-500 italic">近期：{escape_html(review_recent)}</span>'
+    if reviews_html:
+        reviews_html = f'<div class="flex flex-wrap items-center mt-1">{reviews_html}</div>'
+
+    # Languages
+    languages = game.get("languages", "")
+    languages_html = f'<span class="text-[10px] text-zinc-600 italic">语言：{escape_html(languages)}</span>' if languages else ""
+
+    # Features
+    features: List[str] = game.get("features") or []
+    features_html = ""
+    if features:
+        feat_tags = "".join(
+            f'<span class="bg-zinc-900 border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(f)}</span>'
+            for f in features[:4]
+        )
+        features_html = f'<div class="flex flex-wrap gap-1 mt-2">{feat_tags}</div>'
 
     cover = game.get("image", "") or game.get("headerImage", "")
     cover_html = (
@@ -425,15 +456,23 @@ def render_steam_card(game: Dict[str, Any]) -> str:
 
     <!-- Content -->
     <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
-        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
-        <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{description}</p>
-        {summary_html}
-        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
-            <div class="flex flex-col gap-1">
-                <span class="text-2xl font-black text-red-600 italic">{escape_html(price_display)}</span>
-                <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(price_detail)}</span>
+        <div>
+            <h4 class="text-3xl font-black italic mb-3 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-3 border-l-4 border-zinc-800 pl-4 line-clamp-3">{description}</p>
+            {tags_html}
+            {reviews_html}
+            {languages_html}
+            {features_html}
+        </div>
+        <div class="mt-4">
+            {summary_html}
+            <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-2xl font-black text-red-600 italic">{escape_html(price_display)}</span>
+                    <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(game.get("originalPrice", ""))}</span>
+                </div>
+                <a href="{escape_attribute(game['link'])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
             </div>
-            <a href="{escape_attribute(game['link'])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
         </div>
     </div>
 </article>"""
