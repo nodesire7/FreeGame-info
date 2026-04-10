@@ -39,9 +39,8 @@ async def _fetch_listing_html() -> str:
         page = await context.new_page()
         page.set_default_timeout(120_000)
 
-        await page.goto(PSN_SOURCE_URL, wait_until="domcontentloaded", timeout=120_000)
-        await page.wait_for_load_state("networkidle")
-        await page.wait_for_timeout(5_000)
+        await page.goto(PSN_SOURCE_URL, wait_until="load", timeout=120_000)
+        await page.wait_for_timeout(8_000)
 
         try:
             await page.wait_for_selector(".content-grid .box", timeout=30_000)
@@ -144,8 +143,7 @@ async def _fetch_store_description(link: str) -> str:
             page = await context.new_page()
             page.set_default_timeout(60_000)
 
-            await page.goto(link, wait_until="domcontentloaded", timeout=60_000)
-            await page.wait_for_load_state("networkidle")
+            await page.goto(link, wait_until="load", timeout=60_000)
             await page.wait_for_timeout(5_000)
 
             # 提取 subtitle
