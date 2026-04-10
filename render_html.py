@@ -441,40 +441,67 @@ def render_steam_card(game: Dict[str, Any]) -> str:
 
 def render_psn_card(game: Dict[str, Any]) -> str:
     """渲染 PlayStation 游戏卡片"""
-    # 兼容新旧格式（新格式用 cover，旧格式用 image）
     cover = game.get("cover") or game.get("image", "")
     cover_html = (
         f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"])}" loading="lazy" class="w-full h-full object-cover">'
         if cover
-        else '<span>暂无封面</span>'
+        else '<span class="w-full h-full flex items-center justify-center text-zinc-600 text-xs bg-zinc-800">暂无封面</span>'
     )
 
-    # 组装 meta 行：highlight + 平台 + 领取时间，全部在同一行
-    meta_items = []
-    highlight = escape_html(game.get("highlight", "PS Plus 会员免费"))
-    if highlight:
-        meta_items.append(f'<span class="font-black text-red-600 italic">{highlight}</span>')
-    if game.get("platforms"):
-        platforms = game["platforms"]
-        if isinstance(platforms, list):
-            platforms = " / ".join(platforms)
-        meta_items.append(
-            f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">{escape_html(str(platforms))}</span>'
-        )
-    if game.get("period"):
-        meta_items.append(
-            f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">领取：{escape_html(game["period"])}</span>'
-        )
-    meta_html = f'<div class="flex flex-wrap gap-x-4 gap-y-2 items-center">{"".join(meta_items)}</div>'
+    description = game.get("description", "").strip()
+    publisher = escape_html(game.get("publisher", ""))
+    release_date = escape_html(game.get("releaseDate", ""))
+    price = escape_html(game.get("price", ""))
+    original_price = escape_html(game.get("originalPrice", ""))
+    currency = escape_html(game.get("currency", ""))
+    features: List[str] = game.get("features") or []
 
-    description = (game.get("description") or "当前仍在同步 PlayStation 官方描述。").strip()
+    # 构建 meta 行
+    meta_items = []
+    if publisher:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发行：{publisher}</span>')
+    if release_date:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发售：{release_date}</span>')
+    if price and original_price and original_price != price:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic line-through">{original_price}</span>')
+        meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">{price}</span>')
+    elif price:
+        meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">PS Plus 会员免费</span>')
+    else:
+        meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">PS Plus 会员免费</span>')
+    meta_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(meta_items)}</div>'
+
+    # 描述区（无论有无 description 都显示内容块）
+    if description:
+        desc_html = f'<p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{escape_html(description)}</p>'
+    else:
+        # 无简介时用 info 行代替
+        info_parts = []
+        if publisher:
+            info_parts.append(f"发行：{publisher}")
+        if release_date:
+            info_parts.append(f"发售：{release_date}")
+        if features:
+            feat_text = " / ".join(features[:3])
+            info_parts.append(f"特性：{feat_text}")
+        info_text = " | ".join(info_parts) if info_parts else "暂无简介信息"
+        desc_html = f'<div class="text-zinc-600 text-xs italic mb-4 border-l-4 border-zinc-800 pl-4 py-2 bg-zinc-900">{info_text}</div>'
+
+    # 特性标签
+    features_html = ""
+    if features:
+        feat_tags = "".join(
+            f'<span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(f)}</span>'
+            for f in features[:4]
+        )
+        features_html = f'<div class="flex flex-wrap gap-1 mt-2">{feat_tags}</div>'
 
     return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
     <!-- GET corner badge -->
     <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
 
     <!-- Cover image -->
-    <div class="lg:w-2/5 relative">
+    <div class="lg:w-2/5 relative min-w-0">
         <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
             {cover_html}
         </div>
@@ -482,12 +509,17 @@ def render_psn_card(game: Dict[str, Any]) -> str:
     </div>
 
     <!-- Content -->
-    <div class="lg:w-3/5 flex flex-col justify-between py-2">
-        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-2">{escape_html(description)}</p>
-        {meta_html}
-        <div class="mt-6 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
-            <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
+            {desc_html}
+            {features_html}
+        </div>
+        <div class="mt-4">
+            {meta_html}
+            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
+                <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
         </div>
     </div>
 </article>"""
