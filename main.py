@@ -319,6 +319,13 @@ def main() -> Tuple[Optional[str], Optional[str]]:
         shutil.copy2("logo.png", logo_dest)
         print(f"\nLogo 已复制到 {logo_dest}")
 
+    # 复制验证 txt 文件到 site 目录
+    txt_file = "6da64ae9f15c6a6e8149.txt"
+    if os.path.exists(txt_file):
+        txt_dest = os.path.join(output_dir, txt_file)
+        shutil.copy2(txt_file, txt_dest)
+        print(f"验证文件已复制到 {txt_dest}")
+
     # === 历史去重（SQLite）：仅当本次与上次不同才新增记录 ===
     conn = open_db(history_dir)
     current_hash = _snapshot_hash(snapshot)
