@@ -408,28 +408,28 @@
                     </div>
                 </div>
 
-                <!-- Desktop Ad（仅桌面端） -->
-                <div class="hidden md:block w-full mb-12">
-                    <div class="border-2 border-zinc-800 bg-zinc-950 px-6 py-4 flex items-center justify-center">
-                        <span class="text-[10px] text-zinc-600 font-bold italic mr-6 tracking-widest uppercase">AD</span>
+                <!-- Desktop Ad: 300x250 Banner（仅桌面端，标题下方） -->
+                <div class="hidden md:flex justify-center mb-12">
+                    <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-4 flex flex-col items-center justify-center gap-2">
+                        <span class="text-[10px] text-zinc-600 font-black italic tracking-widest uppercase">AD</span>
                         <script>
-                        (function(hwbzf){
+                        (function(rnoa){
                         var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                        s.settings = hwbzf || {}; s.src = "\/\/baggymaintenance.com\/c.Dt9\/6zbF2\/5\/leSlWOQq9zN\/jJkg0ZO\/D_c\/4GNfSt0V2\/OeTPQS4MN\/zog\/5T";
+                        s.settings = rnoa || {}; s.src = "\/\/profitable-grocery.com\/bOX\/VqsOd.GDl\/0gYjW\/cB\/GeGmj9puiZ\/UzljkLPiTSYd5iNDDukj4ZOgD-U\/t\/N\/jKkM0_OqT\/gj4bOiQZ";
                         s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
                         })({})
                         </script>
                     </div>
                 </div>
 
-                <!-- Mobile Ad（仅移动端） -->
+                <!-- Mobile Ad: In-Page Push（移动端，标题下方） -->
                 <div class="block md:hidden w-full mb-8">
                     <div class="border-2 border-zinc-800 bg-zinc-950 px-4 py-3 flex items-center justify-center">
                         <span class="text-[10px] text-zinc-600 font-bold italic mr-4 tracking-widest uppercase">AD</span>
                         <script>
-                        (function(hwbzf){
+                        (function(zlqb){
                         var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                        s.settings = hwbzf || {}; s.src = "\/\/baggymaintenance.com\/c.Dt9\/6zbF2\/5\/leSlWOQq9zN\/jJkg0ZO\/D_c\/4GNfSt0V2\/OeTPQS4MN\/zog\/5T";
+                        s.settings = zlqb || {}; s.src = "\/\/profitable-grocery.com\/bjX.VjscdhG\/lb0\/Y\/WZce\/letmC9muQZuUilJkBPIT\/YO5uNODpgK2-NGjnEttHNijhkA0TOFDSYd2_NhQf";
                         s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
                         })({})
                         </script>
@@ -466,7 +466,7 @@
                             {{EPIC_NOW_CONTENT}}
                         </div>
 
-                        <!-- Baggy Maintenance Ad（Epic Now 与 Upcoming 之间） -->
+                        <!-- In-Page Push Ad（Epic Now 与 Upcoming 之间，内容穿插） -->
                         <div class="w-full my-12">
                             <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-8 flex flex-col items-center justify-center gap-4">
                                 <div class="flex items-center gap-3 mb-2">
@@ -474,9 +474,9 @@
                                     <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
                                 </div>
                                 <script>
-                                (function(hwbzf){
+                                (function(zlqb){
                                 var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                                s.settings = hwbzf || {}; s.src = "\/\/baggymaintenance.com\/c.Dt9\/6zbF2\/5\/leSlWOQq9zN\/jJkg0ZO\/D_c\/4GNfSt0V2\/OeTPQS4MN\/zog\/5T";
+                                s.settings = zlqb || {}; s.src = "\/\/profitable-grocery.com\/bjX.VjscdhG\/lb0\/Y\/WZce\/letmC9muQZuUilJkBPIT\/YO5uNODpgK2-NGjnEttHNijhkA0TOFDSYd2_NhQf";
                                 s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
                                 })({})
                                 </script>
@@ -492,22 +492,6 @@
                             {{EPIC_UPCOMING_CONTENT}}
                         </div>
 
-                        <!-- New Ad Placement（Epic Upcoming 之后） -->
-                        <div class="w-full my-12">
-                            <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-8 flex flex-col items-center justify-center gap-4">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="h-3 w-3 bg-red-600 skew-x-[20deg]"></div>
-                                    <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
-                                </div>
-                                <script>
-                                (function(hwbzf){
-                                var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                                s.settings = hwbzf || {}; s.src = "\/\/baggymaintenance.com\/c.Dt9\/6zbF2\/5\/leSlWOQq9zN\/jJkg0ZO\/D_c\/4GNfSt0V2\/OeTPQS4MN\/zog\/5T";
-                                s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
-                                })({})
-                                </script>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Steam Panel -->
@@ -588,6 +572,15 @@
     <script type="application/json" id="share-payload">{{SHARE_DATA_JSON}}</script>
     <script>
     {{CLIENT_SCRIPT}}
+    </script>
+
+    <!-- Popunder: 新标签页打开（静默加载，无容器） -->
+    <script>
+    (function(byra){
+    var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+    s.settings = byra || {}; s.src = "\/\/baggymaintenance.com\/c_D.9v6Zba2\/5GlWSRWWQE9wN\/jXke0POkT\/kAwiMuSa0v2cOBTWQT5VORTeAY1B";
+    s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+    })({})
     </script>
 </body>
 </html>
