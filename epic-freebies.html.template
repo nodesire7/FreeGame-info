@@ -181,25 +181,31 @@
                 </div>
 
                 <!-- Desktop Ad（仅桌面端） -->
-                <div class="hidden md:block w-full mb-10">
-                    <script>
-                    (function(zcbhq){
-                    var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                    s.settings = zcbhq || {}; s.src = "\/\/profitable-grocery.com\/bgX\/VgsRd.G\/lr0\/YHWaci\/Ueime9culZBUvlpkzPdTfYV5gNfDWg\/2kM\/zZMgt\/NTjek\/0eOED_YOzCNHwW";
-                    s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
-                    })({})
-                    </script>
+                <div class="hidden md:block w-full mb-12">
+                    <div class="border-2 border-zinc-800 bg-zinc-950 px-6 py-4 flex items-center justify-center">
+                        <span class="text-[10px] text-zinc-600 font-bold italic mr-6 tracking-widest uppercase">AD</span>
+                        <script>
+                        (function(zcbhq){
+                        var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+                        s.settings = zcbhq || {}; s.src = "\/\/profitable-grocery.com\/bgX\/VgsRd.G\/lr0\/YHWaci\/Ueime9culZBUvlpkzPdTfYV5gNfDWg\/2kM\/zZMgt\/NTjek\/0eOED_YOzCNHwW";
+                        s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+                        })({})
+                        </script>
+                    </div>
                 </div>
 
                 <!-- Mobile Ad（仅移动端） -->
-                <div class="block md:hidden w-full mb-10">
-                    <script>
-                    (function(uuol){
-                    var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                    s.settings = uuol || {}; s.src = "\/\/profitable-grocery.com\/bXX\/V\/sQd.GDlC0KYMWtcI\/qePmf9\/u\/ZmU\/lGkKPXT\/YT5MNPDagh2\/NSDbkmtrNoj\/k\/0GONDvY\/1\/Mjww";
-                    s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
-                    })({})
-                    </script>
+                <div class="block md:hidden w-full mb-8">
+                    <div class="border-2 border-zinc-800 bg-zinc-950 px-4 py-3 flex items-center justify-center">
+                        <span class="text-[10px] text-zinc-600 font-bold italic mr-4 tracking-widest uppercase">AD</span>
+                        <script>
+                        (function(uuol){
+                        var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+                        s.settings = uuol || {}; s.src = "\/\/profitable-grocery.com\/bXX\/V\/sQd.GDlC0KYMWtcI\/qePmf9\/u\/ZmU\/lGkKPXT\/YT5MNPDagh2\/NSDbkmtrNoj\/k\/0GONDvY\/1\/Mjww";
+                        s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+                        })({})
+                        </script>
+                    </div>
                 </div>
 
                 <!-- Tab 导航 -->
@@ -233,25 +239,37 @@
                         </div>
 
                         <!-- Baggy Maintenance Ad（Epic Now 与 Upcoming 之间） -->
-                        <div class="w-full my-10">
-                            <script>
-                            (function(cikhx){
-                            var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                            s.settings = cikhx || {}; s.src = "\/\/baggymaintenance.com\/c.D\/9H6Ab\/2\/5Jl\/SuWlQl9\/NEjZkl0hOlDdYryDN_SS0\/2NO\/TNQN4_NJj\/I\/5Y";
-                            s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
-                            })({})
-                            </script>
+                        <div class="w-full my-12">
+                            <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-8 flex flex-col items-center justify-center gap-4">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="h-3 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                    <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
+                                </div>
+                                <script>
+                                (function(cikhx){
+                                var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+                                s.settings = cikhx || {}; s.src = "\/\/baggymaintenance.com\/c.D\/9H6Ab\/2\/5Jl\/SuWlQl9\/NEjZkl0hOlDdYryDN_SS0\/2NO\/TNQN4_NJj\/I\/5Y";
+                                s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+                                })({})
+                                </script>
+                            </div>
                         </div>
 
                         <!-- In-Article Ad -->
-                        <div class="w-full my-10 flex justify-center">
-                            <ins class="adsbygoogle"
-                                 style="display:block; text-align:center;"
-                                 data-ad-layout="in-article"
-                                 data-ad-format="fluid"
-                                 data-ad-client="ca-pub-9956808351564739"
-                                 data-ad-slot="7174132250"></ins>
-                            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                        <div class="w-full my-12">
+                            <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-8 flex flex-col items-center justify-center gap-4">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="h-3 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                    <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
+                                </div>
+                                <ins class="adsbygoogle"
+                                     style="display:block; text-align:center; width:100%;"
+                                     data-ad-layout="in-article"
+                                     data-ad-format="fluid"
+                                     data-ad-client="ca-pub-9956808351564739"
+                                     data-ad-slot="7174132250"></ins>
+                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                            </div>
                         </div>
 
                         <!-- Upcoming Section -->
@@ -264,14 +282,20 @@
                         </div>
 
                         <!-- New Ad Placement（Epic Upcoming 之后） -->
-                        <div class="w-full my-10">
-                            <script>
-                            (function(ltgpyf){
-                            var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                            s.settings = ltgpyf || {}; s.src = "\/\/profitable-grocery.com\/bbX\/VusQd.GilX0GYJWjcD\/deMm\/9ZufZGU\/lGkSP_TLYw5INmDVgJ2sNBj\/E\/tLN\/jKk_0qORDhYC2bNeQS";
-                            s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
-                            })({})
-                            </script>
+                        <div class="w-full my-12">
+                            <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-8 flex flex-col items-center justify-center gap-4">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="h-3 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                    <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
+                                </div>
+                                <script>
+                                (function(ltgpyf){
+                                var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+                                s.settings = ltgpyf || {}; s.src = "\/\/profitable-grocery.com\/bbX\/VusQd.GilX0GYJWjcD\/deMm\/9ZufZGU\/lGkSP_TLYw5INmDVgJ2sNBj\/E\/tLN\/jKk_0qORDhYC2bNeQS";
+                                s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+                                })({})
+                                </script>
+                            </div>
                         </div>
                     </div>
 
