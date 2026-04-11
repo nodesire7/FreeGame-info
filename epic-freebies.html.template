@@ -44,8 +44,34 @@
         }
     }
     </script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* === BASE RESET & TYPOGRAPHY === */
+        /* Tab 激活状态样式 */
+        .epic-freebies__tab.is-active {
+            background-color: rgb(220 38 38 / 1) !important;
+            color: rgb(255 255 255 / 1) !important;
+            box-shadow: 6px 6px 0 0 #fff;
+        }
+        .epic-freebies__tab.is-active .tab-badge-bg {
+            background-color: #fff !important;
+        }
+        .epic-freebies__tab.is-active .tab-badge-text {
+            color: #d10000 !important;
+        }
+        .epic-freebies__panel { display: none; }
+        .epic-freebies__panel.is-active { display: block; }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee { animation: marquee 12s linear infinite; }
+        @keyframes countdown-pulse {
+            0% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .countdown-tick { animation: countdown-pulse 0.3s ease-out; }
+        /* BASE RESET */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
