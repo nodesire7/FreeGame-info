@@ -10,9 +10,6 @@
     <link rel="alternate" type="application/rss+xml" title="白嫖游戏速报 RSS Feed" href="/feed.xml">
     <!-- ads.txt -->
     <meta name="adsense-ads.txt" content="google.com, pub-9956808351564739, DIRECT, f08c47fec0942fa0">
-    <!-- Google AdSense -->
-    <meta name="google-adsense-account" content="ca-pub-9956808351564739">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9956808351564739" crossorigin="anonymous"></script>
     <!-- 结构化数据 -->
     <script type="application/ld+json">
     {
@@ -47,44 +44,296 @@
         }
     }
     </script>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <style>
+        /* === BASE RESET & TYPOGRAPHY === */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
             background: #0a0a0a;
+            color: #fff;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
         }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        a { color: inherit; text-decoration: none; }
+        button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+        img { display: block; max-width: 100%; }
+
+        /* === LAYOUT UTILITIES === */
+        .max-w-7xl { max-width: 80rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .my-12 { margin-top: 3rem; margin-bottom: 3rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-10 { margin-bottom: 2.5rem; }
+        .mb-12 { margin-bottom: 3rem; }
+        .mb-20 { margin-bottom: 5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mr-4 { margin-right: 1rem; }
+        .mr-6 { margin-right: 1.5rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .ml-4 { margin-left: 1rem; }
+        .ml-6 { margin-left: 1.5rem; }
+        .p-1 { padding: 0.25rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+        .px-12 { padding-left: 3rem; padding-right: 3rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .pt-6 { padding-top: 1.5rem; }
+        .pb-8 { padding-bottom: 2rem; }
+        .lg\:p-12 { @media (min-width: 1024px) { padding: 3rem; } }
+        .lg\:p-10 { @media (min-width: 1024px) { padding: 2.5rem; } }
+        .lg\:w-2\/5 { @media (min-width: 1024px) { width: 40%; } }
+        .lg\:w-3\/5 { @media (min-width: 1024px) { width: 60%; } }
+        .lg\:w-1\/3 { @media (min-width: 1024px) { width: 33.333%; } }
+        .lg\:w-2\/3 { @media (min-width: 1024px) { width: 66.666%; } }
+        .w-full { width: 100%; }
+        .w-3 { width: 0.75rem; }
+        .w-6 { width: 1.5rem; }
+        .w-8 { width: 2rem; }
+        .w-12 { width: 3rem; }
+        .w-16 { width: 4rem; }
+        .w-32 { width: 8rem; }
+        .w-48 { width: 12rem; }
+        .h-3 { height: 0.75rem; }
+        .h-6 { height: 1.5rem; }
+        .h-8 { height: 2rem; }
+        .h-12 { height: 3rem; }
+        .h-16 { height: 4rem; }
+        .min-h-screen { min-height: 100vh; }
+        .aspect-video { aspect-ratio: 16 / 9; }
+
+        /* === FLEXBOX === */
+        .flex { display: flex; }
+        .inline-flex { display: inline-flex; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .items-end { align-items: flex-end; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .gap-8 { gap: 2rem; }
+        .gap-12 { gap: 3rem; }
+        .gap-x-6 { column-gap: 1.5rem; }
+        .gap-y-3 { row-gap: 0.75rem; }
+
+        /* === GRID === */
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        /* === POSITIONING === */
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .z-10 { z-index: 10; }
+        .z-20 { z-index: 20; }
+        .z-30 { z-index: 30; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .inset-y-0 { top: 0; bottom: 0; }
+        .left-0 { left: 0; }
+        .-top-4 { top: -1rem; }
+        .-right-4 { right: -1rem; }
+        .-bottom-4 { bottom: -1rem; }
+        .-left-4 { left: -1rem; }
+        .translate-x-6 { transform: translateX(1.5rem); }
+        .-translate-x-12 { transform: translateX(-3rem); }
+
+        /* === DISPLAY === */
+        .hidden { display: none; }
+        .block { display: block; }
+        .inline-block { display: inline-block; }
+        .no-underline { text-decoration: none; }
+        .overflow-hidden { overflow: hidden; }
+        .pointer-events-none { pointer-events: none; }
+
+        /* === BORDERS === */
+        .border-2 { border-width: 2px; border-style: solid; }
+        .border-4 { border-width: 4px; border-style: solid; }
+        .border-6 { border-width: 6px; border-style: solid; }
+        .border-\[6px\] { border-width: 6px; border-style: solid; }
+        .border-\[10px\] { border-width: 10px; border-style: solid; }
+        .border-t-2 { border-top-width: 2px; border-style: solid; }
+        .border-t-\[6px\] { border-top-width: 6px; border-style: solid; }
+        .border-t-\[10px\] { border-top-width: 10px; border-style: solid; }
+        .border-dashed { border-style: dashed; }
+        .border-black { border-color: #000; }
+        .border-white { border-color: #fff; }
+        .border-zinc-700 { border-color: #3f3f46; }
+        .border-zinc-800 { border-color: #27272a; }
+        .border-l-4 { border-left-width: 4px; border-style: solid; }
+        .border-l-8 { border-left-width: 8px; border-style: solid; }
+        .border-l-8.border-red-600 { border-color: #d10000; }
+        .rounded-full { border-radius: 9999px; }
+        .border-\[8px\] { border-width: 8px; border-style: solid; }
+
+        /* === COLORS === */
+        .bg-black { background-color: #000; }
+        .bg-white { background-color: #fff; }
+        .bg-red-600 { background-color: #d10000; }
+        .bg-zinc-700 { background-color: #3f3f46; }
+        .bg-zinc-800 { background-color: #27272a; }
+        .bg-zinc-900 { background-color: #161616; }
+        .bg-zinc-950 { background-color: #030303; }
+        .bg-\[\#d10000\] { background-color: #d10000; }
+        .text-white { color: #fff; }
+        .text-black { color: #000; }
+        .text-red-600 { color: #d10000; }
+        .text-zinc-400 { color: #a1a1aa; }
+        .text-zinc-500 { color: #71717a; }
+        .text-zinc-600 { color: #52525b; }
+        .text-zinc-700 { color: #3f3f46; }
+        .text-zinc-800 { color: #27272a; }
+        .selection\:bg-white::selection { background-color: #fff; }
+        .selection\:text-red-600::selection { color: #d10000; }
+
+        /* === TYPOGRAPHY === */
+        .text-\[10px\] { font-size: 10px; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-xl { font-size: 1.25rem; line-height: 2rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+        .text-5xl { font-size: 3rem; line-height: 1; }
+        .text-6xl { font-size: 3.75rem; line-height: 1; }
+        .text-7xl { font-size: 4.5rem; line-height: 1; }
+        .font-black { font-weight: 900; }
+        .font-bold { font-weight: 700; }
+        .italic { font-style: italic; }
+        .uppercase { text-transform: uppercase; }
+        .tracking-tighter { letter-spacing: -0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .tracking-\[0\.4em\] { letter-spacing: 0.4em; }
+        .leading-none { line-height: 1; }
+        .leading-relaxed { line-height: 1.625; }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* === SHADOWS === */
+        .shadow-\[20px_20px_0_0_\#fff\,_-1px_-1px_0_0_\#000\] { box-shadow: 20px 20px 0 0 #fff, -1px -1px 0 0 #000; }
+        .shadow-\[12px_12px_0_0_\#d10000\] { box-shadow: 12px 12px 0 0 #d10000; }
+        .shadow-\[8px_8px_0_0_\#000\] { box-shadow: 8px 8px 0 0 #000; }
+        .shadow-\[6px_6px_0_0_\#fff\] { box-shadow: 6px 6px 0 0 #fff; }
+        .shadow-\[4px_4px_0_0_\#d10000\] { box-shadow: 4px 4px 0 0 #d10000; }
+        .shadow-\[20px_0_0_0_\#000\] { box-shadow: 20px 0 0 0 #000; }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+        /* === TRANSFORMS === */
+        .transform { transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scale(1); }
+        .skew-x-12 { transform: skewX(-12deg); }
+        .skew-x-\[20deg\] { transform: skewX(20deg); }
+        .skew-x-\[35deg\] { transform: skewX(-35deg); }
+        .rotate-12 { transform: rotate(12deg); }
+        .-rotate-1 { transform: rotate(-1deg); }
+        .hover\:-rotate-1:hover { transform: rotate(-1deg); }
+        .hover\:rotate-1:hover { transform: rotate(1deg); }
+
+        /* === TRANSITIONS === */
+        .transition-all { transition: all 0.15s ease; }
+        .transition-colors { transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; }
+        .transition-transform { transition: transform 0.2s ease; }
+        .duration-700 { transition-duration: 0.7s; }
+
+        /* === HOVER STATES === */
+        .hover\:bg-white:hover { background-color: #fff; }
+        .hover\:bg-red-600:hover { background-color: #d10000; }
+        .hover\:text-black:hover { color: #000; }
+        .hover\:text-white:hover { color: #fff; }
+        .hover\:scale-110:hover { transform: scale(1.1); }
+        .hover\:underline:hover { text-decoration: underline; }
+
+        /* === ANIMATIONS === */
         @keyframes marquee {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-        .animate-marquee {
-            animation: marquee 12s linear infinite;
-        }
-        .countdown-tick {
-            animation: countdown-pulse 0.3s ease-out;
-        }
+        .animate-marquee { animation: marquee 12s linear infinite; }
         @keyframes countdown-pulse {
             0% { opacity: 0.6; transform: scale(0.98); }
             100% { opacity: 1; transform: scale(1); }
         }
-        /* Tab 激活状态样式：跟随 is-active class 切换 */
+        .countdown-tick { animation: countdown-pulse 0.3s ease-out; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+
+        /* === SCROLLBAR === */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* === RESPONSIVE HELPERS === */
+        @media (min-width: 768px) {
+            .md\:inline { display: inline; }
+            .md\:block { display: block; }
+            .md\:flex { display: flex; }
+            .md\:flex-row { flex-direction: row; }
+            .md\:items-center { align-items: center; }
+            .md\:text-7xl { font-size: 4.5rem; line-height: 1; }
+        }
+        @media (max-width: 767px) {
+            .md\:hidden { display: none; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:inline { display: inline; }
+            .lg\:flex { display: flex; }
+            .lg\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+            .lg\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+            .lg\:border-t-\[10px\] { border-top-width: 10px; }
+            .lg\:h-20 { height: 5rem; }
+            .lg\:mx-16 { margin-left: 4rem; margin-right: 4rem; }
+            .lg\:p-12 { padding: 3rem; }
+        }
+
+        /* === TAB SYSTEM === */
         .epic-freebies__tab.is-active {
-            background-color: rgb(220 38 38 / var(--tw-bg-opacity, 1));
-            color: rgb(255 255 255 / 1);
+            background-color: #d10000;
+            color: #fff !important;
             box-shadow: 6px 6px 0 0 #fff;
         }
-        .epic-freebies__tab.is-active .bg-white {
-            background-color: rgb(255 255 255 / 1);
+        .epic-freebies__tab.is-active .tab-badge-bg { background-color: #fff; }
+        .epic-freebies__tab.is-active .tab-badge-text { color: #d10000; }
+        .epic-freebies__tab.is-active .tab-red { color: #d10000; }
+        .epic-freebies__panel { display: none; }
+        .epic-freebies__panel.is-active { display: block; }
+
+        /* === CUSTOM PROPERTIES === */
+        :root {
+            --red: #d10000;
+            --white: #fff;
+            --black: #000;
+            --zinc-900: #161616;
+            --zinc-950: #030303;
         }
-        .epic-freebies__tab.is-active .text-red-600 {
-            color: rgb(220 38 38 / 1);
-        }
+
+        /* === OBJECT FIT === */
+        .object-cover { object-fit: cover; }
     </style>
 </head>
 <body class="m-0 min-h-screen text-white antialiased">
@@ -115,17 +364,6 @@
             <!-- 主内容区 -->
             <div class="relative z-10 p-6 lg:p-12">
 
-                <!-- AdSense: 顶部展示广告 -->
-                <div class="w-full mb-10 flex justify-center">
-                    <ins class="adsbygoogle"
-                         style="display:block; width:728px; height:90px; background:transparent;"
-                         data-ad-client="ca-pub-9956808351564739"
-                         data-ad-slot="REPLACE_WITH_YOUR_HEADER_AD_SLOT_ID"
-                         data-ad-format="horizontal"
-                         data-full-width-responsive="true"></ins>
-                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-                </div>
-
                 <!-- 标题区 -->
                 <div class="relative mb-20 transform -rotate-1 z-20">
                     <div class="bg-white text-black inline-block px-4 py-1 font-black text-[10px] uppercase tracking-widest transform translate-x-6">INTEL_MISSION</div>
@@ -148,9 +386,9 @@
                     <div class="border-2 border-zinc-800 bg-zinc-950 px-6 py-4 flex items-center justify-center">
                         <span class="text-[10px] text-zinc-600 font-bold italic mr-6 tracking-widest uppercase">AD</span>
                         <script>
-                        (function(zcbhq){
+                        (function(hwbzf){
                         var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                        s.settings = zcbhq || {}; s.src = "\/\/profitable-grocery.com\/bgX\/VgsRd.G\/lr0\/YHWaci\/Ueime9culZBUvlpkzPdTfYV5gNfDWg\/2kM\/zZMgt\/NTjek\/0eOED_YOzCNHwW";
+                        s.settings = hwbzf || {}; s.src = "\/\/baggymaintenance.com\/c.Dt9\/6zbF2\/5\/leSlWOQq9zN\/jJkg0ZO\/D_c\/4GNfSt0V2\/OeTPQS4MN\/zog\/5T";
                         s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
                         })({})
                         </script>
@@ -162,9 +400,9 @@
                     <div class="border-2 border-zinc-800 bg-zinc-950 px-4 py-3 flex items-center justify-center">
                         <span class="text-[10px] text-zinc-600 font-bold italic mr-4 tracking-widest uppercase">AD</span>
                         <script>
-                        (function(uuol){
+                        (function(hwbzf){
                         var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                        s.settings = uuol || {}; s.src = "\/\/profitable-grocery.com\/bXX\/V\/sQd.GDlC0KYMWtcI\/qePmf9\/u\/ZmU\/lGkKPXT\/YT5MNPDagh2\/NSDbkmtrNoj\/k\/0GONDvY\/1\/Mjww";
+                        s.settings = hwbzf || {}; s.src = "\/\/baggymaintenance.com\/c.Dt9\/6zbF2\/5\/leSlWOQq9zN\/jJkg0ZO\/D_c\/4GNfSt0V2\/OeTPQS4MN\/zog\/5T";
                         s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
                         })({})
                         </script>
@@ -174,16 +412,16 @@
                 <!-- Tab 导航 -->
                 <nav class="flex flex-wrap gap-4 mb-16 relative z-10" role="tablist" aria-label="限免平台切换">
                     <button class="epic-freebies__tab is-active group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="true" aria-controls="free-panel-epic" data-tab="epic">
-                        <span class="relative z-10">EPIC 限免 <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_EPIC}}</span></span>
+                        <span class="relative z-10">EPIC 限免 <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_EPIC}}</span></span>
                     </button>
                     <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-steam" data-tab="steam">
-                        <span class="relative z-10">STEAM 限免 <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_STEAM}}</span></span>
+                        <span class="relative z-10">STEAM 限免 <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_STEAM}}</span></span>
                     </button>
                     <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-psn" data-tab="psn">
-                        <span class="relative z-10">PS_PLUS <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_PSN}}</span></span>
+                        <span class="relative z-10">PS_PLUS <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_PSN}}</span></span>
                     </button>
                     <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-itad" data-tab="itad">
-                        <span class="relative z-10">ITAD <span class="bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_ITAD}}</span></span>
+                        <span class="relative z-10">ITAD <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_ITAD}}</span></span>
                     </button>
                 </nav>
 
@@ -209,29 +447,12 @@
                                     <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
                                 </div>
                                 <script>
-                                (function(cikhx){
+                                (function(hwbzf){
                                 var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                                s.settings = cikhx || {}; s.src = "\/\/baggymaintenance.com\/c.D\/9H6Ab\/2\/5Jl\/SuWlQl9\/NEjZkl0hOlDdYryDN_SS0\/2NO\/TNQN4_NJj\/I\/5Y";
+                                s.settings = hwbzf || {}; s.src = "\/\/baggymaintenance.com\/c.Dt9\/6zbF2\/5\/leSlWOQq9zN\/jJkg0ZO\/D_c\/4GNfSt0V2\/OeTPQS4MN\/zog\/5T";
                                 s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
                                 })({})
                                 </script>
-                            </div>
-                        </div>
-
-                        <!-- In-Article Ad -->
-                        <div class="w-full my-12">
-                            <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-8 flex flex-col items-center justify-center gap-4">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="h-3 w-3 bg-red-600 skew-x-[20deg]"></div>
-                                    <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
-                                </div>
-                                <ins class="adsbygoogle"
-                                     style="display:block; text-align:center; width:100%;"
-                                     data-ad-layout="in-article"
-                                     data-ad-format="fluid"
-                                     data-ad-client="ca-pub-9956808351564739"
-                                     data-ad-slot="7174132250"></ins>
-                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                             </div>
                         </div>
 
@@ -252,9 +473,9 @@
                                     <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
                                 </div>
                                 <script>
-                                (function(ltgpyf){
+                                (function(hwbzf){
                                 var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-                                s.settings = ltgpyf || {}; s.src = "\/\/profitable-grocery.com\/bbX\/VusQd.GilX0GYJWjcD\/deMm\/9ZufZGU\/lGkSP_TLYw5INmDVgJ2sNBj\/E\/tLN\/jKk_0qORDhYC2bNeQS";
+                                s.settings = hwbzf || {}; s.src = "\/\/baggymaintenance.com\/c.Dt9\/6zbF2\/5\/leSlWOQq9zN\/jJkg0ZO\/D_c\/4GNfSt0V2\/OeTPQS4MN\/zog\/5T";
                                 s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
                                 })({})
                                 </script>
