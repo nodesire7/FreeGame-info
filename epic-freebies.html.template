@@ -55,6 +55,7 @@
         }
         .epic-freebies__tab.is-active .tab-badge-bg {
             background-color: #fff !important;
+            color: #000 !important;
         }
         .epic-freebies__tab.is-active .tab-badge-text {
             color: #d10000 !important;
