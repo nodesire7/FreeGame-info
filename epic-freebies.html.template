@@ -143,6 +143,52 @@
     })({})
     </script>
 
+    <!-- Desktop Ad -->
+    <div class="hidden md:block">
+    <script>
+    (function(zcbhq){
+    var d = document,
+        s = d.createElement('script'),
+        l = d.scripts[d.scripts.length - 1];
+    s.settings = zcbhq || {};
+    s.src = "\/\/profitable-grocery.com\/bgX\/VgsRd.G\/lr0\/YHWaci\/Ueime9culZBUvlpkzPdTfYV5gNfDWg\/2kM\/zZMgt\/NTjek\/0eOED_YOzCNHwW";
+    s.async = true;
+    s.referrerPolicy = 'no-referrer-when-downgrade';
+    l.parentNode.insertBefore(s, l);
+    })({})
+    </script>
+    </div>
+
+    <!-- Mobile Ad -->
+    <div class="block md:hidden">
+    <script>
+    (function(uuol){
+    var d = document,
+        s = d.createElement('script'),
+        l = d.scripts[d.scripts.length - 1];
+    s.settings = uuol || {};
+    s.src = "\/\/profitable-grocery.com\/bXX\/V\/sQd.GDlC0KYMWtcI\/qePmf9\/u\/ZmU\/lGkKPXT\/YT5MNPDagh2\/NSDbkmtrNoj\/k\/0GONDvY\/1\/Mjww";
+    s.async = true;
+    s.referrerPolicy = 'no-referrer-when-downgrade';
+    l.parentNode.insertBefore(s, l);
+    })({})
+    </script>
+    </div>
+
+    <!-- New Ad Placement -->
+    <script>
+    (function(ltgpyf){
+    var d = document,
+        s = d.createElement('script'),
+        l = d.scripts[d.scripts.length - 1];
+    s.settings = ltgpyf || {};
+    s.src = "\/\/profitable-grocery.com\/bbX\/VusQd.GilX0GYJWjcD\/deMm\/9ZufZGU\/lGkSP_TLYw5INmDVgJ2sNBj\/E\/tLN\/jKk_0qORDhYC2bNeQS";
+    s.async = true;
+    s.referrerPolicy = 'no-referrer-when-downgrade';
+    l.parentNode.insertBefore(s, l);
+    })({})
+    </script>
+
     <section class="max-w-7xl mx-auto my-12 font-sans bg-[#d10000] p-1 sm:p-2 overflow-hidden selection:bg-white selection:text-red-600">
         <div class="relative bg-black text-white shadow-[20px_20px_0_0_#fff,-1px_-1px_0_0_#000]">
 
