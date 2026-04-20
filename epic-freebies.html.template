@@ -44,6 +44,12 @@
         }
     }
     </script>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9956808351564739"
+     crossorigin="anonymous"></script>
+    <!-- AMP Auto-Ads script -->
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -364,6 +370,8 @@
     </style>
 </head>
 <body class="m-0 min-h-screen text-white antialiased">
+    <!-- AMP Auto-Ads -->
+    <amp-auto-ads type="adsense" data-ad-client="ca-pub-9956808351564739"></amp-auto-ads>
 
     <!-- ads.txt 供爬虫索引 -->
     <pre id="ads-txt" style="display:none;">google.com, pub-9956808351564739, DIRECT, f08c47fec0942fa0</pre>
