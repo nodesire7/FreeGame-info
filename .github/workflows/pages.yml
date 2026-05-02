@@ -69,6 +69,9 @@ jobs:
           python -m playwright install --with-deps chromium
 
       - name: Generate site
+        env:
+          ITAD_API_KEY: ${{ secrets.ITAD_API_KEY }}
+          ITAD_COUNTRY: ${{ secrets.ITAD_COUNTRY || 'CN' }}
         run: |
           mkdir -p site
           python main.py site --history-dir history-wt/history
@@ -174,5 +177,4 @@ jobs:
           tags: |
             nodesire77/game_info:latest
             nodesire77/game_info:${{ steps.version.outputs.tag }}
-
 
