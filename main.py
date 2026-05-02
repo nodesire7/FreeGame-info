@@ -106,14 +106,17 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         print(f"[FAIL] STEAM 抓取失败: {e}")
         results["steam"] = []
 
-    # ITAD 100% OFF
+    # ITAD (100% OFF + bundles)
     try:
         itad_data = await fetch_itad()
         results["itad"] = itad_data
-        print("[OK] ITAD 100% OFF 抓取完成")
+        print(
+            f"[OK] ITAD 抓取完成: {len(itad_data.get('deals', []))} 个 100% OFF, "
+            f"{len(itad_data.get('bundles', []))} 个 bundle"
+        )
     except Exception as e:
-        print(f"[FAIL] ITAD 100% OFF 抓取失败: {e}")
-        results["itad"] = []
+        print(f"[FAIL] ITAD 抓取失败: {e}")
+        results["itad"] = {"deals": [], "bundles": []}
 
     epic_data = results.get("epic", {"now": [], "upcoming": []})
     steam_data = results.get("steam", [])
@@ -126,7 +129,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         "epic": epic_data,
         "steam": steam_data,
         "psn": results.get("psn", []),
-        "itad": results.get("itad", []),
+        "itad": results.get("itad", {"deals": [], "bundles": []}),
         "sources": {
             "epic": "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions",
             "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese",
@@ -152,7 +155,7 @@ def _canonicalize_for_hash(snapshot: Dict[str, Any]) -> Dict[str, Any]:
     epic = snapshot.get("epic") or {}
     steam = snapshot.get("steam") or []
     psn = snapshot.get("psn") or []
-    itad = snapshot.get("itad") or []
+    itad = snapshot.get("itad") or {}
 
     def pick_epic(item: Dict[str, Any]) -> Dict[str, Any]:
         return {
@@ -185,13 +188,20 @@ def _canonicalize_for_hash(snapshot: Dict[str, Any]) -> Dict[str, Any]:
     epic_upcoming = sorted([pick_epic(x) for x in (epic.get("upcoming") or []) if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
     steam_list = sorted([pick_simple(x) for x in steam if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
     psn_list = sorted([pick_simple(x) for x in psn if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
-    itad_list = sorted([pick_itad(x) for x in itad if isinstance(x, dict)], key=lambda x: (str(x.get("title") or ""), str(x.get("url") or "")))
+    itad_deals = sorted(
+        [pick_itad(x) for x in (itad.get("deals") or []) if isinstance(x, dict)],
+        key=lambda x: (str(x.get("title") or ""), str(x.get("url") or "")),
+    )
+    itad_bundles = sorted(
+        [pick_itad(x) for x in (itad.get("bundles") or []) if isinstance(x, dict)],
+        key=lambda x: (str(x.get("title") or ""), str(x.get("url") or "")),
+    )
 
     return {
         "epic": {"now": epic_now, "upcoming": epic_upcoming},
         "steam": steam_list,
         "psn": psn_list,
-        "itad": itad_list,
+        "itad": {"deals": itad_deals, "bundles": itad_bundles},
     }
 
 
@@ -268,10 +278,16 @@ def generate_feed(snapshot: Dict[str, Any], output_dir: str) -> None:
         items_xml.append(make_item(title, link, desc, fetched_at))
 
     # ITAD
-    for game in snapshot.get("itad", []):
-        title = game.get("title", "ITAD 礼包")
+    itad_data = snapshot.get("itad") or {}
+    for game in itad_data.get("deals", []):
+        title = game.get("title", "ITAD 免费游戏")
         link = game.get("url", "")
         desc = (game.get("description") or "")[:200]
+        items_xml.append(make_item(title, link, desc, fetched_at))
+    for game in itad_data.get("bundles", []):
+        title = game.get("title", "ITAD Bundle")
+        link = game.get("url", "")
+        desc = (game.get("description") or game.get("details") or "")[:200]
         items_xml.append(make_item(title, link, desc, fetched_at))
 
     feed_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -309,7 +325,10 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     print(f"Epic: {len(snapshot['epic'].get('now', []))} 正在免费, {len(snapshot['epic'].get('upcoming', []))} 即将免费")
     print(f"Steam: {len(snapshot['steam'])} 条")
     print(f"PSN: {len(snapshot['psn'])} 条")
-    print(f"ITAD 100% OFF: {len(snapshot['itad'])} 个")
+    itad_deals = (snapshot.get("itad") or {}).get("deals", [])
+    itad_bundles = (snapshot.get("itad") or {}).get("bundles", [])
+    print(f"ITAD 100% OFF: {len(itad_deals)} 个")
+    print(f"ITAD Bundles: {len(itad_bundles)} 个")
 
     # 输出"本次记录"的 JSON（用于 Pages 直接访问），始终覆盖为当前快照
     site_dir = Path(output_dir)

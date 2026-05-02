@@ -150,6 +150,30 @@ def convert_psn_new_format(psn_list: List[Dict[str, Any]]) -> List[Dict[str, Any
     return result
 
 
+def normalize_itad_data(itad_data: Any) -> Dict[str, List[Dict[str, Any]]]:
+    """兼容旧数组格式与新 dict 格式。"""
+    if isinstance(itad_data, dict):
+        deals = [item for item in (itad_data.get("deals") or []) if isinstance(item, dict)]
+        bundles = [item for item in (itad_data.get("bundles") or []) if isinstance(item, dict)]
+        return {"deals": deals, "bundles": bundles}
+    if isinstance(itad_data, list):
+        legacy_bundles = [item for item in itad_data if isinstance(item, dict)]
+        return {"deals": [], "bundles": legacy_bundles}
+    return {"deals": [], "bundles": []}
+
+
+def group_itad_deals(deals: List[Dict[str, Any]]) -> List[tuple[str, List[Dict[str, Any]]]]:
+    order = ["Steam", "Epic", "PlayStation", "GOG", "Xbox", "Nintendo", "Other"]
+    grouped: Dict[str, List[Dict[str, Any]]] = {key: [] for key in order}
+
+    for item in deals:
+        family = item.get("storeFamily") or item.get("store") or "Other"
+        family = family if family in grouped else "Other"
+        grouped[family].append(item)
+
+    return [(key, grouped[key]) for key in order if grouped[key]]
+
+
 def format_full_datetime(timestamp: Optional[int] = None) -> str:
     """格式化完整日期时间（中国时区）"""
     if not timestamp:
@@ -594,11 +618,10 @@ def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> 
 
 
 def render_itad_card(game: Dict[str, Any]) -> str:
-    """渲染 ITAD 100% OFF 卡片（使用与其他平台一致的横向 Featured 风格）"""
-    # 计算剩余时间
+    """渲染 ITAD 100% OFF 卡片。"""
     expiry = game.get("expiry")
     china_tz = timezone(timedelta(hours=8))
-    now_ts = int(datetime.now(china_tz).timestamp())  # Unix seconds
+    now_ts = int(datetime.now(china_tz).timestamp())
 
     if expiry:
         diff = expiry - now_ts
@@ -617,28 +640,43 @@ def render_itad_card(game: Dict[str, Any]) -> str:
             expiry_display = datetime.fromtimestamp(expiry, tz=china_tz).strftime("%m月%d日 %H:%M")
         else:
             remaining_text = "已过期"
-            expiry_display = datetime.fromtimestamp(expiry, tz=china_tz).strftime("%m月%d日 %H:%M") if expiry else "已过期"
+            expiry_display = datetime.fromtimestamp(expiry, tz=china_tz).strftime("%m月%d日 %H:%M")
     else:
         remaining_text = "时间待定"
         expiry_display = "截止时间待定"
+
+    cover = game.get("cover") or ""
+    cover_html = (
+        f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game.get("title", ""))}" class="w-full h-full object-cover" loading="lazy">'
+        if cover
+        else '<div class="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-500 text-xs uppercase tracking-[0.3em]">No Cover</div>'
+    )
 
     store = game.get("store", "ITAD")
     cut = game.get("cut", 100)
     regular_price = game.get("regularPrice")
     regular_currency = game.get("regularCurrency", "")
+    current_price = game.get("currentPrice")
+    current_currency = game.get("currentCurrency", "")
     platforms = [p for p in (game.get("platforms") or []) if p]
+    drm = [p for p in (game.get("drm") or []) if p]
+    family = game.get("storeFamily") or store
 
-    is_pending = game.get("isPending", False)
-    is_mature = game.get("isMature", False)
-
-    if is_pending:
+    if game.get("isPending", False):
         badge_text = "待生效"
-    elif is_mature:
+    elif game.get("isMature", False):
         badge_text = "MATURE"
     else:
-        badge_text = "ITAD"
+        badge_text = family
 
-    # 使用与其他平台一致的横向 Featured 风格
+    detail_bits = [f"原价 {regular_price if regular_price is not None else '待定'} {regular_currency}".strip()]
+    if current_price is not None:
+        detail_bits.append(f"现价 {current_price} {current_currency}".strip())
+    if drm:
+        detail_bits.append("DRM " + " / ".join(drm))
+    if platforms:
+        detail_bits.append("平台 " + " / ".join(platforms))
+
     countdown_target_ms = expiry * 1000 if expiry else None
     countdown_attrs = ""
     countdown_text = escape_html(remaining_text)
@@ -650,40 +688,117 @@ def render_itad_card(game: Dict[str, Any]) -> str:
         )
         countdown_text = f'<span class="countdown-tick"{countdown_attrs}>{countdown_text}</span>'
     else:
-        countdown_text = f'<span>{countdown_text}</span>'
+        countdown_text = f"<span>{countdown_text}</span>"
 
     return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
-    <!-- GET corner badge -->
-    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">{escape_html(badge_text)}</div>
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-white text-black flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">{escape_html(badge_text)}</div>
 
-    <!-- Store info (left side, replacing cover) -->
-    <div class="lg:w-2/5 flex flex-row items-center justify-center gap-3 bg-zinc-900 border-[8px] border-white shadow-2xl aspect-video">
-        <span class="text-red-600 font-black text-xl lg:text-2xl italic">{escape_html(store)}</span>
-        <span class="text-zinc-500 text-xs lg:text-sm">-{escape_html(str(cut))}% OFF</span>
-        <span class="text-[10px] text-zinc-600 font-bold italic uppercase">FROM ITAD</span>
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            {cover_html}
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-red-600 text-white px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#000]">
+            {escape_html(store)} · -{escape_html(str(cut))}% OFF
+        </div>
     </div>
 
-    <!-- Content -->
     <div class="lg:w-3/5 flex flex-col justify-between py-2">
-        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-2">ITAD 100% OFF · 原价 {escape_html(str(regular_price) if regular_price is not None else '待定')} {escape_html(regular_currency)}{' · ' + escape_html(' / '.join(platforms)) if platforms else ''}</p>
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-2">{" · ".join(escape_html(bit) for bit in detail_bits if bit)}</p>
+        </div>
         <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
             <div class="flex flex-col gap-1">
                 <span class="text-xl font-black text-red-600 italic leading-tight">{countdown_text} · 截止 {escape_html(expiry_display)}</span>
             </div>
-            <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">ITAD 查看</a>
+            <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即领取</a>
         </div>
     </div>
 </article>"""
 
 
-def render_itad_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
-    """渲染 ITAD 100% OFF 区块内容"""
-    if not items:
+def render_itad_bundle_card(bundle: Dict[str, Any]) -> str:
+    """渲染 ITAD bundle / charity 卡片。"""
+    expiry = bundle.get("expiry")
+    china_tz = timezone(timedelta(hours=8))
+    expiry_display = "截止时间待定"
+    if expiry:
+        expiry_display = datetime.fromtimestamp(expiry, tz=china_tz).strftime("%m月%d日 %H:%M")
+
+    cover = bundle.get("cover") or ""
+    cover_html = (
+        f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(bundle.get("title", ""))}" class="w-full h-full object-cover" loading="lazy">'
+        if cover
+        else '<div class="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-500 text-xs uppercase tracking-[0.3em]">Bundle</div>'
+    )
+
+    details = bundle.get("description") or bundle.get("details") or "ITAD bundle / charity 信息"
+    meta_bits = [bundle.get("store", "Bundle")]
+    if bundle.get("gameCount"):
+        meta_bits.append(f"{bundle['gameCount']} 款")
+    if bundle.get("mediaCount"):
+        meta_bits.append(f"{bundle['mediaCount']} 媒体资源")
+    if bundle.get("isPending"):
+        meta_bits.append("待上线")
+
+    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            {cover_html}
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            {escape_html(" · ".join(str(bit) for bit in meta_bits if bit))}
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(bundle["title"])}</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{escape_html(details)}</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 {escape_html(expiry_display)}</span>
+            </div>
+            <a href="{escape_attribute(bundle["url"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>"""
+
+
+def render_itad_section_content(itad_data: Dict[str, List[Dict[str, Any]]], empty_text: str) -> str:
+    """渲染 ITAD 区块内容：100% OFF 按平台分组，bundle 独立展示。"""
+    deals = itad_data.get("deals") or []
+    bundles = itad_data.get("bundles") or []
+    if not deals and not bundles:
         return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
-    # ITAD cards: 2-col at 3xl+(2000px) so common PC resolutions (1280-1920px) show full-width cards
-    cards = "\n".join(render_itad_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+
+    parts: List[str] = []
+    grouped_deals = group_itad_deals(deals)
+    if grouped_deals:
+        for group_name, group_items in grouped_deals:
+            cards = "\n".join(render_itad_card(item) for item in group_items)
+            parts.append(
+                f'<section class="mb-14 last:mb-0">'
+                f'<div class="flex items-center justify-between gap-4 mb-8"><h4 class="text-2xl lg:text-3xl font-black italic uppercase">{escape_html(group_name)} / 100% OFF</h4>'
+                f'<span class="bg-zinc-800 text-white px-4 py-2 font-black text-xs uppercase">{len(group_items)} 项</span></div>'
+                f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">{cards}</div>'
+                f'</section>'
+            )
+
+    if bundles:
+        bundle_cards = "\n".join(render_itad_bundle_card(item) for item in bundles)
+        parts.append(
+            f'<section class="mb-14 last:mb-0">'
+            f'<div class="flex items-center justify-between gap-4 mb-8"><h4 class="text-2xl lg:text-3xl font-black italic uppercase">Bundles / 慈善包与礼包</h4>'
+            f'<span class="bg-red-600 text-white px-4 py-2 font-black text-xs uppercase">{len(bundles)} 项</span></div>'
+            f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">{bundle_cards}</div>'
+            f'</section>'
+        )
+
+    return "".join(parts)
 
 
 def get_share_client_script() -> str:
@@ -1090,9 +1205,6 @@ def get_share_client_script() -> str:
   }
 
   async function drawItadCard(ctx, item, config, x, y, width) {
-    // ITAD CARD - no cover, left side store info
-    const halfWidth = width / 2;
-
     // BLACK CARD with WHITE 4px border
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(x, y, width, config.cardHeight);
@@ -1100,35 +1212,69 @@ def get_share_client_script() -> str:
     ctx.lineWidth = 4;
     ctx.strokeRect(x, y, width, config.cardHeight);
 
-    // Left side: store name in large red bold
-    ctx.fillStyle = '#d10000';
-    ctx.font = font(config.fontWeights.bold, 28, config.fontFamily);
-    ctx.fillText((item.secondary || 'ITAD').toUpperCase(), x + config.cardInset, y + config.cardInset + 28);
+    const coverX = x + config.cardInset;
+    const coverY = y + config.cardInset;
+    const coverHeight = config.cardHeight - config.cardInset * 2;
+    const coverWidth = config.coverWidth;
 
-    // Game count below
-    if (item.tertiary) {
-      ctx.fillStyle = '#888888';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(coverX, coverY, coverWidth, coverHeight);
+
+    const coverImage = await loadCover(item.coverUrl);
+    if (coverImage) {
+      const scale = Math.max(
+        coverWidth / coverImage.width,
+        coverHeight / coverImage.height,
+      );
+      const drawWidth = coverImage.width * scale;
+      const drawHeight = coverImage.height * scale;
+      const dx = coverX + (coverWidth - drawWidth) / 2;
+      const dy = coverY + (coverHeight - drawHeight) / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(coverX, coverY, coverWidth, coverHeight);
+      ctx.clip();
+      ctx.drawImage(coverImage, dx, dy, drawWidth, drawHeight);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(coverX, coverY, coverWidth, coverHeight);
+      ctx.fillStyle = '#444444';
       ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
-      ctx.fillText(item.tertiary, x + config.cardInset, y + config.cardInset + 52);
+      ctx.textAlign = 'center';
+      ctx.fillText('NO IMAGE', coverX + coverWidth / 2, coverY + coverHeight / 2);
+      ctx.textAlign = 'left';
     }
 
-    // "FROM ITAD" label
-    ctx.fillStyle = '#666666';
-    ctx.font = font(config.fontWeights.regular, 12, config.fontFamily);
-    ctx.fillText('FROM ITAD', x + config.cardInset, y + config.cardInset + 72);
+    ctx.fillStyle = '#d10000';
+    ctx.font = font(config.fontWeights.bold, 14, config.fontFamily);
+    ctx.fillRect(coverX, y + config.cardHeight - 34, coverWidth, 24);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText((item.store || 'ITAD').toUpperCase(), coverX + 8, y + config.cardHeight - 26);
 
-    // Right side: title, timer, CTA
-    const textX = x + halfWidth + config.cardInset;
-    const textWidth = halfWidth - config.cardInset * 2;
+    const textX = coverX + coverWidth + config.cardInset;
+    const textWidth = x + width - config.cardInset - textX;
     let cursorY = y + config.cardInset;
 
-    // Title: white bold uppercase
     ctx.fillStyle = '#ffffff';
     ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
     ctx.fillText(item.title.toUpperCase(), textX, cursorY);
     cursorY += 26;
 
-    // Timer: red bold italic
+    if (item.tertiary) {
+      cursorY = drawWrappedText(ctx, item.tertiary, {
+        x: textX,
+        y: cursorY,
+        width: textWidth,
+        lineHeight: 18,
+        font: font(config.fontWeights.regular, 12, config.fontFamily),
+        color: '#888888',
+        maxLines: 2,
+      });
+      cursorY += 6;
+    }
+
     if (item.primary) {
       ctx.fillStyle = '#d10000';
       ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
@@ -1136,7 +1282,19 @@ def get_share_client_script() -> str:
       cursorY += 26;
     }
 
-    // CTA button
+    if (item.description) {
+      cursorY = drawWrappedText(ctx, item.description, {
+        x: textX,
+        y: cursorY,
+        width: textWidth,
+        lineHeight: 18,
+        font: font(config.fontWeights.regular, 12, config.fontFamily),
+        color: '#777777',
+        maxLines: 2,
+      });
+      cursorY += 8;
+    }
+
     const btnText = '立即抢夺';
     ctx.fillStyle = '#ffffff';
     const btnWidth = 100;
@@ -1346,14 +1504,25 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             }
         )
 
-    itad = snapshot.get("itad", [])
-    if itad:
+    itad = normalize_itad_data(snapshot.get("itad"))
+    for group_name, group_items in group_itad_deals(itad.get("deals", [])):
+        if group_items:
+            sections.append(
+                {
+                    "title": f"ITAD {group_name} 100% OFF",
+                    "type": "itad",
+                    "items": [
+                        map_itad_share_item(item) for item in group_items[:MAX_SHARE_ITEMS]
+                    ],
+                }
+            )
+    bundles = itad.get("bundles", [])
+    if bundles:
         sections.append(
             {
-                "title": "ITAD 100% OFF",
-                "type": "itad",
+                "title": "ITAD Bundles",
                 "items": [
-                    map_itad_share_item(item) for item in itad[:MAX_SHARE_ITEMS]
+                    map_itad_share_item(item, bundle_mode=True) for item in bundles[:MAX_SHARE_ITEMS]
                 ],
             }
         )
@@ -1505,7 +1674,7 @@ def map_psn_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def map_itad_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
+def map_itad_share_item(game: Dict[str, Any], bundle_mode: bool = False) -> Dict[str, Any]:
     """映射 ITAD 分享项"""
     expiry = game.get("expiry")
     china_tz = timezone(timedelta(hours=8))
@@ -1530,13 +1699,26 @@ def map_itad_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
     else:
         primary = "时间待定"
 
+    tertiary_bits = []
+    if bundle_mode:
+        if game.get("gameCount"):
+            tertiary_bits.append(f"{game['gameCount']} 款")
+        if game.get("store"):
+            tertiary_bits.append(sanitize_text(game.get("store", "Bundle")))
+        description = sanitize_text(game.get("description") or game.get("details") or "")
+    else:
+        tertiary_bits.append(f"-{game.get('cut', 100)}% OFF")
+        if game.get("platforms"):
+            tertiary_bits.append("平台 " + sanitize_text(" / ".join(game.get("platforms") or [])))
+        description = ""
+
     return {
         "title": sanitize_text(game.get("title", "")),
         "primary": primary,
         "secondary": f"来自 {sanitize_text(game.get('store', 'ITAD'))}",
-        "tertiary": f"-{game.get('cut', 100)}% OFF",
-        "description": "",
-        "coverUrl": "",
+        "tertiary": " · ".join(tertiary_bits),
+        "description": description,
+        "coverUrl": game.get("cover", ""),
         "store": sanitize_text(game.get("store", "ITAD")),
         "gameCount": game.get("gameCount", 0),
     }
@@ -1601,13 +1783,15 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         psn = []
 
     steam = snapshot.get("steam", [])
-    itad = snapshot.get("itad", [])
+    itad = normalize_itad_data(snapshot.get("itad"))
+    itad_deals = itad.get("deals", [])
+    itad_bundles = itad.get("bundles", [])
 
     epic_now_count = len(epic_now)
     epic_upcoming_count = len(epic_upcoming)
     steam_count = len(steam)
     psn_count = len(psn)
-    itad_count = len(itad)
+    itad_count = len(itad_deals) + len(itad_bundles)
     epic_total_count = epic_now_count + epic_upcoming_count
     total_count = epic_total_count + steam_count + psn_count + itad_count
 
@@ -1654,7 +1838,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
             psn, "暂未检测到 PlayStation 公布的会员免费游戏。"
         ),
         "ITAD_CONTENT": render_itad_section_content(
-            itad, "暂未检测到 ITAD 100% OFF 游戏。"
+            itad, "暂未检测到 ITAD 免费游戏或 bundle。"
         ),
         "SHARE_BUTTON_DISABLED": (
             "" if share_ready else ' aria-disabled="true" tabindex="-1"'
@@ -1733,9 +1917,11 @@ def render_history_page(
         else:
             psn = []
 
-        itad = snap.get("itad") or []
+        itad = normalize_itad_data(snap.get("itad"))
+        itad_deals = itad.get("deals", [])
+        itad_bundles = itad.get("bundles", [])
 
-        total = len(epic_now) + len(epic_upcoming) + len(steam) + len(psn) + len(itad)
+        total = len(epic_now) + len(epic_upcoming) + len(steam) + len(psn) + len(itad_deals) + len(itad_bundles)
 
         def _subsection(title: str, count: int, body_html: str) -> str:
             return (
@@ -1779,9 +1965,9 @@ def render_history_page(
         )
         body_parts.append(
             _subsection(
-                "ITAD 100% OFF",
-                len(itad),
-                render_itad_section_content(itad, "暂未检测到 ITAD 100% OFF 游戏。"),
+                "ITAD 100% OFF / Bundles",
+                len(itad_deals) + len(itad_bundles),
+                render_itad_section_content(itad, "暂未检测到 ITAD 免费游戏或 bundle。"),
             )
         )
 

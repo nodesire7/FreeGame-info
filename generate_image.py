@@ -40,18 +40,26 @@ def build_share_html(payload: dict) -> str:
 
         for item in section.get('items', []):
             if is_itad:
+                cover_url = item.get('coverUrl', '')
+                cover_html = f'<img src="{cover_url}" class="w-full h-full object-cover" loading="lazy">' if cover_url else '<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs">暂无封面</div>'
                 items_html += f"""
-                <div class="flex flex-col gap-4 bg-zinc-950 border-4 border-zinc-800 p-4">
-                    <div class="flex items-center justify-between bg-zinc-900 border-4 border-zinc-700 px-4 py-3">
-                        <span class="text-red-600 font-black text-lg italic">{item.get('store', 'ITAD')}</span>
-                        <span class="text-zinc-500 text-xs">{item.get('gameCount', '')} 款游戏</span>
+                <div class="flex flex-col lg:flex-row gap-6 bg-zinc-950 border-4 border-zinc-800 p-4">
+                    <div class="lg:w-2/5 relative">
+                        <div class="border-4 border-white aspect-video overflow-hidden">
+                            {cover_html}
+                        </div>
+                        <div class="absolute -bottom-2 -left-2 bg-red-600 text-white px-3 py-1 font-black italic text-xs">{item.get('store', 'ITAD')}</div>
                     </div>
-                    <div class="flex flex-col gap-2">
-                        <span class="text-lg font-black text-red-600 italic">{item.get('title', '')}</span>
-                        <span class="text-lg font-black text-red-600 italic">{item.get('primary', '')}</span>
-                    </div>
-                    <div class="flex items-center gap-4 mt-2">
-                        <span class="text-zinc-500 text-xs font-bold uppercase">来自 {item.get('store', 'ITAD')}</span>
+                    <div class="lg:w-3/5 flex flex-col justify-between py-2 gap-3">
+                        <div class="flex flex-col gap-2">
+                            <span class="text-lg font-black text-red-600 italic">{item.get('title', '')}</span>
+                            <span class="text-zinc-500 text-xs font-bold uppercase">{item.get('tertiary', '')}</span>
+                            <span class="text-lg font-black text-red-600 italic">{item.get('primary', '')}</span>
+                            <p class="text-zinc-500 text-xs leading-relaxed line-clamp-2">{item.get('description', '')}</p>
+                        </div>
+                        <div class="flex items-center gap-4 mt-2">
+                            <span class="text-zinc-500 text-xs font-bold uppercase">来自 {item.get('store', 'ITAD')}</span>
+                        </div>
                     </div>
                 </div>"""
             else:
