@@ -63,6 +63,7 @@ docker compose --env-file env up -d web
 - 🎮 **Epic Games Store**：抓取官方 `freeGamesPromotions` 接口并解析限免窗口
 - 🎮 **Steam**：使用 Playwright 抓取限时免费游戏
 - 🎮 **PlayStation Plus**：抓取会员免费游戏
+- 🎮 **IsThereAnyDeal**：通过官方 API 拉取 `100% OFF` 免费游戏
 - 📄 **静态 HTML 页面**：美观的单页应用
 - 🖼️ **分享拼图生成**：使用 Canvas API 生成长图（支持 PNG/WebP）
 - 🗃️ **历史数据归档（SQLite）**：仅在数据变化时写入 `history/date.db`，图片保存到 `history/records/`
@@ -101,6 +102,8 @@ python main.py site
 python epic_fetch.py
 python psn_fetch.py
 python steam_fetch.py
+export ITAD_API_KEY=your_itad_api_key
+python itad_fetch.py
 
 # 2) 生成 HTML
 python render_html.py
@@ -188,6 +191,21 @@ https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=sc
 
 ```
 https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/
+```
+
+### IsThereAnyDeal
+
+通过官方 API 拉取 `100% OFF` 列表：
+
+```
+https://api.isthereanydeal.com/deals/v2
+```
+
+运行前需要提供环境变量：
+
+```bash
+export ITAD_API_KEY=your_itad_api_key
+export ITAD_COUNTRY=CN  # 可选，默认 CN
 ```
 
 ## 文件说明

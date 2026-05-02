@@ -594,7 +594,7 @@ def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> 
 
 
 def render_itad_card(game: Dict[str, Any]) -> str:
-    """渲染 ITAD Giveaway 卡片（使用与其他平台一致的横向 Featured 风格）"""
+    """渲染 ITAD 100% OFF 卡片（使用与其他平台一致的横向 Featured 风格）"""
     # 计算剩余时间
     expiry = game.get("expiry")
     china_tz = timezone(timedelta(hours=8))
@@ -623,8 +623,10 @@ def render_itad_card(game: Dict[str, Any]) -> str:
         expiry_display = "截止时间待定"
 
     store = game.get("store", "ITAD")
-    game_count = game.get("gameCount", 0)
-    game_count_text = f"{game_count} 款游戏" if game_count else "游戏数量待定"
+    cut = game.get("cut", 100)
+    regular_price = game.get("regularPrice")
+    regular_currency = game.get("regularCurrency", "")
+    platforms = [p for p in (game.get("platforms") or []) if p]
 
     is_pending = game.get("isPending", False)
     is_mature = game.get("isMature", False)
@@ -657,14 +659,14 @@ def render_itad_card(game: Dict[str, Any]) -> str:
     <!-- Store info (left side, replacing cover) -->
     <div class="lg:w-2/5 flex flex-row items-center justify-center gap-3 bg-zinc-900 border-[8px] border-white shadow-2xl aspect-video">
         <span class="text-red-600 font-black text-xl lg:text-2xl italic">{escape_html(store)}</span>
-        <span class="text-zinc-500 text-xs lg:text-sm">{escape_html(game_count_text)}</span>
+        <span class="text-zinc-500 text-xs lg:text-sm">-{escape_html(str(cut))}% OFF</span>
         <span class="text-[10px] text-zinc-600 font-bold italic uppercase">FROM ITAD</span>
     </div>
 
     <!-- Content -->
     <div class="lg:w-3/5 flex flex-col justify-between py-2">
         <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-2">ITAD Bundle Giveaway · {escape_html(game_count_text)}</p>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-2">ITAD 100% OFF · 原价 {escape_html(str(regular_price) if regular_price is not None else '待定')} {escape_html(regular_currency)}{' · ' + escape_html(' / '.join(platforms)) if platforms else ''}</p>
         <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
             <div class="flex flex-col gap-1">
                 <span class="text-xl font-black text-red-600 italic leading-tight">{countdown_text} · 截止 {escape_html(expiry_display)}</span>
@@ -676,7 +678,7 @@ def render_itad_card(game: Dict[str, Any]) -> str:
 
 
 def render_itad_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
-    """渲染 ITAD Giveaways 区块内容"""
+    """渲染 ITAD 100% OFF 区块内容"""
     if not items:
         return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
     # ITAD cards: 2-col at 3xl+(2000px) so common PC resolutions (1280-1920px) show full-width cards
@@ -1348,7 +1350,7 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if itad:
         sections.append(
             {
-                "title": "ITAD Bundle Giveaways",
+                "title": "ITAD 100% OFF",
                 "type": "itad",
                 "items": [
                     map_itad_share_item(item) for item in itad[:MAX_SHARE_ITEMS]
@@ -1532,7 +1534,7 @@ def map_itad_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
         "title": sanitize_text(game.get("title", "")),
         "primary": primary,
         "secondary": f"来自 {sanitize_text(game.get('store', 'ITAD'))}",
-        "tertiary": f"{game.get('gameCount', 0)} 款游戏",
+        "tertiary": f"-{game.get('cut', 100)}% OFF",
         "description": "",
         "coverUrl": "",
         "store": sanitize_text(game.get("store", "ITAD")),
@@ -1652,7 +1654,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
             psn, "暂未检测到 PlayStation 公布的会员免费游戏。"
         ),
         "ITAD_CONTENT": render_itad_section_content(
-            itad, "暂未检测到 ITAD Bundle Giveaways。"
+            itad, "暂未检测到 ITAD 100% OFF 游戏。"
         ),
         "SHARE_BUTTON_DISABLED": (
             "" if share_ready else ' aria-disabled="true" tabindex="-1"'
@@ -1777,9 +1779,9 @@ def render_history_page(
         )
         body_parts.append(
             _subsection(
-                "ITAD Bundle Giveaways",
+                "ITAD 100% OFF",
                 len(itad),
-                render_itad_section_content(itad, "暂未检测到 ITAD Bundle Giveaways。"),
+                render_itad_section_content(itad, "暂未检测到 ITAD 100% OFF 游戏。"),
             )
         )
 
@@ -1899,4 +1901,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

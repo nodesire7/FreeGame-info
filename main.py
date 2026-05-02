@@ -106,13 +106,13 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         print(f"[FAIL] STEAM 抓取失败: {e}")
         results["steam"] = []
 
-    # ITAD Giveaways
+    # ITAD 100% OFF
     try:
         itad_data = await fetch_itad()
         results["itad"] = itad_data
-        print("[OK] ITAD Giveaways 抓取完成")
+        print("[OK] ITAD 100% OFF 抓取完成")
     except Exception as e:
-        print(f"[FAIL] ITAD Giveaways 抓取失败: {e}")
+        print(f"[FAIL] ITAD 100% OFF 抓取失败: {e}")
         results["itad"] = []
 
     epic_data = results.get("epic", {"now": [], "upcoming": []})
@@ -131,7 +131,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
             "epic": "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions",
             "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese",
             "psn": "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/",
-            "itad": "https://isthereanydeal.com/giveaways/",
+            "itad": "https://api.isthereanydeal.com/deals/v2?sort=-cut",
         },
     }
     return snapshot
@@ -173,9 +173,12 @@ def _canonicalize_for_hash(snapshot: Dict[str, Any]) -> Dict[str, Any]:
 
     def pick_itad(item: Dict[str, Any]) -> Dict[str, Any]:
         return {
+            "id": item.get("id") or item.get("url") or item.get("title"),
             "title": item.get("title"),
             "url": item.get("url"),
             "expiry": item.get("expiry"),
+            "store": item.get("store"),
+            "cut": item.get("cut"),
         }
 
     epic_now = sorted([pick_epic(x) for x in (epic.get("now") or []) if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
@@ -306,7 +309,7 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     print(f"Epic: {len(snapshot['epic'].get('now', []))} 正在免费, {len(snapshot['epic'].get('upcoming', []))} 即将免费")
     print(f"Steam: {len(snapshot['steam'])} 条")
     print(f"PSN: {len(snapshot['psn'])} 条")
-    print(f"ITAD Giveaways: {len(snapshot['itad'])} 个")
+    print(f"ITAD 100% OFF: {len(snapshot['itad'])} 个")
 
     # 输出"本次记录"的 JSON（用于 Pages 直接访问），始终覆盖为当前快照
     site_dir = Path(output_dir)
@@ -410,4 +413,3 @@ def main() -> Tuple[Optional[str], Optional[str]]:
 
 if __name__ == "__main__":
     main()
-

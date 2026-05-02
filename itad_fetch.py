@@ -1,121 +1,154 @@
 #!/usr/bin/env python3
 """
-ITAD Giveaways 抓取脚本：
-- 抓取 https://isthereanydeal.com/giveaways/ 页面
-- 解析页面嵌入的 JavaScript 数据（window.page 变量）
-- 返回简化的 JSON 格式
-- 格式：title, store, expiry, gameCount, url, isPending, isMature
+ITAD 100% OFF 抓取脚本：
+- 使用官方 API: https://api.isthereanydeal.com/deals/v2
+- 按 cut 倒序分页拉取
+- 仅保留 cut == 100 的条目
+- 格式尽量兼容现有渲染层
 """
 import asyncio
 import json
 import os
-import re
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import aiohttp
 
-ITAD_GIVEAWAYS_URL = "https://isthereanydeal.com/giveaways/"
-USER_AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
-)
+ITAD_API_URL = "https://api.isthereanydeal.com/deals/v2"
+USER_AGENT = "FreeGame-info/1.0 (+https://github.com/nodesire7/FreeGame-info)"
+DEFAULT_COUNTRY = os.getenv("ITAD_COUNTRY", "CN").strip().upper() or "CN"
+PAGE_LIMIT = 200
 
 
-def parse_giveaways_page(html_content: str) -> List[Dict[str, Any]]:
-    """
-    解析 ITAD giveaways 页面
-    数据嵌入在 window.page 变量中，格式类似：
-    var page = ["Specials/GiveawayListPage",{"bundles":[...]}]
-    """
-    # 方法1: 尝试匹配 var page = [...{"bundles":[...]}]
-    pattern1 = r'var\s+page\s*=\s*\[[\s\S]*?"bundles"\s*:\s*(\[[\s\S]*?\])\s*[,}]'
-    match = re.search(pattern1, html_content)
+def _get_api_key() -> str:
+    api_key = os.getenv("ITAD_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("缺少 ITAD_API_KEY 环境变量，无法调用官方 ITAD API")
+    return api_key
 
-    if not match:
-        # 方法2: 直接搜索 bundles 数组
-        pattern2 = r'"bundles"\s*:\s*(\[[\s\S]*?\])\s*[,}]'
-        match = re.search(pattern2, html_content)
 
-    if not match:
-        return []
-
-    bundles_json = match.group(1)
-
-    # 清理 JSON（移除尾部可能多余的字符）
-    # 尝试解析
+def _parse_expiry(value: Optional[str]) -> Optional[int]:
+    """将 ISO 时间解析为 Unix seconds。"""
+    if not value:
+        return None
     try:
-        bundles = json.loads(bundles_json)
-    except json.JSONDecodeError:
-        # 尝试修复常见的 JSON 解析问题
-        # 可能尾部有多余的 ,}] 字符
-        cleaned = re.sub(r'[,}\]]+$', '', bundles_json)
-        try:
-            bundles = json.loads(cleaned)
-        except json.JSONDecodeError:
-            return []
+        return int(datetime.fromisoformat(value).timestamp())
+    except ValueError:
+        return None
 
-    if not isinstance(bundles, list):
-        return []
 
-    result: List[Dict[str, Any]] = []
-    for bundle in bundles:
-        if not isinstance(bundle, dict):
-            continue
+def _pick_cover(assets: Dict[str, Any]) -> str:
+    if not isinstance(assets, dict):
+        return ""
+    for key in ("banner600", "banner400", "banner300", "banner145", "boxart"):
+        url = assets.get(key)
+        if isinstance(url, str) and url:
+            return url
+    return ""
 
-        title = bundle.get("title", "")
-        page_info = bundle.get("page", {})
-        store_name = page_info.get("name", "") if isinstance(page_info, dict) else ""
-        url = bundle.get("url", "")
-        expiry = bundle.get("expiry")
-        counts = bundle.get("counts", {})
-        game_count = counts.get("games", 0) if isinstance(counts, dict) else 0
-        is_pending = bundle.get("isPending", False)
-        is_mature = bundle.get("isMature", False)
 
-        if not title or not url:
-            continue
+def _normalize_item(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    deal = item.get("deal")
+    if not isinstance(deal, dict):
+        return None
 
-        result.append({
-            "title": title,
-            "store": store_name,
-            "expiry": expiry,
-            "gameCount": game_count,
-            "url": url,
-            "isPending": is_pending,
-            "isMature": is_mature,
-        })
+    cut = deal.get("cut")
+    if cut != 100:
+        return None
 
-    return result
+    shop = deal.get("shop") or {}
+    price = deal.get("price") or {}
+    regular = deal.get("regular") or {}
+
+    return {
+        "id": item.get("id") or item.get("slug") or item.get("title"),
+        "title": item.get("title", ""),
+        "store": shop.get("name", "ITAD"),
+        "expiry": _parse_expiry(deal.get("expiry")),
+        "gameCount": 1,
+        "url": deal.get("url", ""),
+        "isPending": False,
+        "isMature": bool(item.get("mature", False)),
+        "cover": _pick_cover(item.get("assets") or {}),
+        "type": item.get("type") or "game",
+        "cut": cut,
+        "currentPrice": price.get("amount"),
+        "currentCurrency": price.get("currency"),
+        "regularPrice": regular.get("amount"),
+        "regularCurrency": regular.get("currency"),
+        "flag": deal.get("flag", ""),
+        "shopId": shop.get("id"),
+        "drm": [x.get("name", "") for x in (deal.get("drm") or []) if isinstance(x, dict)],
+        "platforms": [x.get("name", "") for x in (deal.get("platforms") or []) if isinstance(x, dict)],
+    }
 
 
 async def fetch_itad() -> List[Dict[str, Any]]:
     """
-    获取 ITAD Giveaways 列表
+    获取 ITAD 100% OFF 列表。
+
+    说明：
+    - 通过 sort=-cut 将 100% off 项排在最前面
+    - 分页抓取，直到当前页已不再出现 100% off 条目
     """
-    async with aiohttp.ClientSession() as session:
-        headers = {
-            "User-Agent": USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Connection": "keep-alive",
-        }
-        try:
-            async with session.get(
-                ITAD_GIVEAWAYS_URL,
-                headers=headers,
-                timeout=aiohttp.ClientTimeout(total=30)
-            ) as resp:
-                if resp.status != 200:
-                    raise RuntimeError(f"ITAD 返回状态码 {resp.status}")
-                html_content = await resp.text()
+    api_key = _get_api_key()
+    headers = {"User-Agent": USER_AGENT}
+    params = {
+        "key": api_key,
+        "country": DEFAULT_COUNTRY,
+        "limit": PAGE_LIMIT,
+        "sort": "-cut",
+    }
 
-        except asyncio.TimeoutError:
-            raise RuntimeError("ITAD 请求超时")
-        except aiohttp.ClientError as e:
-            raise RuntimeError(f"ITAD 请求失败: {str(e)}")
+    items: List[Dict[str, Any]] = []
+    offset = 0
 
-    items = parse_giveaways_page(html_content)
+    async with aiohttp.ClientSession(headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as session:
+        while True:
+            query = dict(params)
+            query["offset"] = offset
+
+            try:
+                async with session.get(ITAD_API_URL, params=query) as resp:
+                    if resp.status != 200:
+                        text = await resp.text()
+                        raise RuntimeError(f"ITAD API 返回状态码 {resp.status}: {text[:200]}")
+                    payload = await resp.json()
+            except asyncio.TimeoutError:
+                raise RuntimeError("ITAD API 请求超时")
+            except aiohttp.ClientError as e:
+                raise RuntimeError(f"ITAD API 请求失败: {str(e)}")
+
+            page_items = payload.get("list") or []
+            if not isinstance(page_items, list) or not page_items:
+                break
+
+            normalized_page = []
+            saw_lower_cut = False
+            for raw in page_items:
+                if not isinstance(raw, dict):
+                    continue
+                normalized = _normalize_item(raw)
+                if normalized:
+                    if normalized.get("title") and normalized.get("url"):
+                        normalized_page.append(normalized)
+                else:
+                    deal = raw.get("deal") or {}
+                    if isinstance(deal, dict) and isinstance(deal.get("cut"), int) and deal.get("cut", 0) < 100:
+                        saw_lower_cut = True
+
+            items.extend(normalized_page)
+
+            if saw_lower_cut:
+                break
+            if not payload.get("hasMore"):
+                break
+
+            next_offset = payload.get("nextOffset")
+            if not isinstance(next_offset, int) or next_offset <= offset:
+                break
+            offset = next_offset
+
     return items
 
 
@@ -136,12 +169,8 @@ async def main():
         data = await fetch_itad()
         save_json(data, output)
 
-        active_count = len([g for g in data if not g.get("isPending", False)])
-        pending_count = len([g for g in data if g.get("isPending", False)])
-
-        print(f"ITAD Giveaways 抓取完成！")
-        print(f"  有效 giveaway: {active_count} 个")
-        print(f"  待生效: {pending_count} 个")
+        print("ITAD 100% OFF 抓取完成！")
+        print(f"  已抓取: {len(data)} 个")
         print(f"  已写入: {output}")
 
         for i, game in enumerate(data[:10], start=1):
