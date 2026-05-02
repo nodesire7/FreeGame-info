@@ -14,12 +14,92 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 # 导入各个独立的 fetcher
-from epic_fetch import fetch_epic
+from epic_fetch import fetch_epic, fetch_epic_page_metadata
 from psn_fetch import fetch_psn
-from steam_fetch import fetch_steam
+from steam_fetch import fetch_steam, fetch_steam_game_detail_from_url
 from itad_fetch import fetch_itad
 from render_html import render_html, render_history_page
 from history_db import open_db, get_latest_meta, get_latest_image_rel, insert_record, list_snapshots
+
+
+def _norm_title(value: str) -> str:
+    return " ".join((value or "").strip().lower().split())
+
+
+async def _redistribute_itad_platform_deals(
+    epic_data: Dict[str, Any],
+    steam_data: List[Dict[str, Any]],
+    psn_data: List[Dict[str, Any]],
+    itad_data: Dict[str, Any],
+) -> Dict[str, Any]:
+    """
+    ITAD 中的平台免费信息并入对应平台：
+    - Steam/Epic/PlayStation 进入各自标签
+    - ITAD 仅保留 bundles
+    """
+    deals = [item for item in (itad_data.get("deals") or []) if isinstance(item, dict)]
+    bundles = [item for item in (itad_data.get("bundles") or []) if isinstance(item, dict)]
+
+    epic_now = epic_data.get("now") or []
+    epic_upcoming = epic_data.get("upcoming") or []
+
+    epic_keys = {_norm_title(x.get("title", "")) for x in [*epic_now, *epic_upcoming] if isinstance(x, dict)}
+    steam_keys = {_norm_title(x.get("title", "")) for x in steam_data if isinstance(x, dict)}
+    psn_keys = {_norm_title(x.get("title", "")) for x in psn_data if isinstance(x, dict)}
+
+    for deal in deals:
+        family = deal.get("storeFamily")
+        title_key = _norm_title(deal.get("title", ""))
+        link = deal.get("url", "")
+        expiry = deal.get("expiry")
+
+        if family == "Epic":
+            if title_key in epic_keys:
+                continue
+            detail = await fetch_epic_page_metadata(link, expiry_ts=expiry)
+            detail["title"] = detail.get("title") or deal.get("title", "")
+            if not detail.get("cover"):
+                detail["cover"] = deal.get("cover", "")
+            if not detail.get("originalPriceDesc") and deal.get("regularPrice") is not None:
+                detail["originalPriceDesc"] = f"{deal.get('regularPrice')} {deal.get('regularCurrency', '')}".strip()
+            epic_now.append(detail)
+            epic_keys.add(title_key)
+            continue
+
+        if family == "Steam":
+            if title_key in steam_keys:
+                continue
+            detail = await fetch_steam_game_detail_from_url(link)
+            if detail:
+                if not detail.get("title"):
+                    detail["title"] = deal.get("title", "")
+                if not detail.get("discountText"):
+                    detail["discountText"] = f"-{deal.get('cut', 100)}%"
+                if not detail.get("originalPrice") and deal.get("regularPrice") is not None:
+                    detail["originalPrice"] = f"{deal.get('regularPrice')} {deal.get('regularCurrency', '')}".strip()
+                steam_data.append(detail)
+                steam_keys.add(title_key)
+            continue
+
+        if family == "PlayStation":
+            if title_key in psn_keys:
+                continue
+            psn_data.append(
+                {
+                    "id": link or deal.get("title", ""),
+                    "title": deal.get("title", ""),
+                    "link": link,
+                    "image": deal.get("cover", ""),
+                    "description": "",
+                    "highlight": "限时免费",
+                    "platforms": ["PlayStation"],
+                    "period": "活动中" if expiry else "时间待定",
+                    "originalPrice": f"{deal.get('regularPrice')} {deal.get('regularCurrency', '')}".strip(),
+                }
+            )
+            psn_keys.add(title_key)
+
+    return {"deals": [], "bundles": bundles}
 
 
 async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
@@ -120,6 +200,15 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
 
     epic_data = results.get("epic", {"now": [], "upcoming": []})
     steam_data = results.get("steam", [])
+    psn_data = results.get("psn", [])
+    itad_data = results.get("itad", {"deals": [], "bundles": []})
+
+    itad_data = await _redistribute_itad_platform_deals(
+        epic_data,
+        steam_data,
+        psn_data,
+        itad_data,
+    )
 
     # 合并为 snapshot（不落地 JSON 文件；历史数据写入 SQLite）
     # 使用中国时区（UTC+8）
@@ -128,8 +217,8 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         "fetchedAt": datetime.now(china_tz).isoformat(),
         "epic": epic_data,
         "steam": steam_data,
-        "psn": results.get("psn", []),
-        "itad": results.get("itad", {"deals": [], "bundles": []}),
+        "psn": psn_data,
+        "itad": itad_data,
         "sources": {
             "epic": "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions",
             "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese",
@@ -295,7 +384,7 @@ def generate_feed(snapshot: Dict[str, Any], output_dir: str) -> None:
     <channel>
         <title>白嫖游戏速报 | GBTGAME</title>
         <link>https://gameinfo.gbtgame.me</link>
-        <description>聚合 EPIC | Steam | PlayStation | ITAD 限免情报</description>
+        <description>聚合 EPIC | Steam | PlayStation 限免与 ITAD Bundle / 慈善包情报</description>
         <language>zh-CN</language>
         <lastBuildDate>{fetched_at}</lastBuildDate>
         <atom:link href="https://gameinfo.gbtgame.me/feed.xml" rel="self" type="application/rss+xml"/>

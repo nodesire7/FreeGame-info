@@ -466,6 +466,80 @@ async def fetch_steam(output_path: Optional[str] = None) -> List[Dict[str, Any]]
     return items
 
 
+async def fetch_steam_game_detail_from_url(url: str) -> Optional[Dict[str, Any]]:
+    """
+    从单个 Steam 商品页 URL 获取与主列表一致的详情结构。
+    用于把 ITAD 中的 Steam 100% OFF 条目并入 Steam 选项卡。
+    """
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(url, allow_redirects=True, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                if resp.status != 200:
+                    return None
+                final_url = str(resp.url)
+        except Exception:
+            return None
+
+    app_id = _extract_app_id_from_url(final_url)
+    if not app_id:
+        return None
+
+    base_item: Dict[str, Any] = {
+        "id": final_url,
+        "appId": app_id,
+        "title": "",
+        "link": final_url,
+        "image": "",
+        "releaseDate": "",
+        "platforms": [],
+        "discountText": "-100%",
+        "originalPrice": "",
+        "finalPrice": "$0.00",
+        "reviewSummary": "",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        api_data = await _fetch_steam_api_batch([app_id], session)
+    item = _merge_api_data(base_item, api_data.get(app_id, {}))
+
+    store_meta = await _fetch_steam_store_metadata(app_id)
+    if store_meta.get("title"):
+        item["title"] = store_meta["title"]
+    if store_meta.get("price"):
+        item["price_steam"] = store_meta["price"]
+    if store_meta.get("releaseDate"):
+        item["releaseDate"] = store_meta["releaseDate"]
+    if store_meta.get("developer"):
+        item["developers"] = [store_meta["developer"]]
+    if store_meta.get("publisher"):
+        item["publishers"] = [store_meta["publisher"]]
+    if store_meta.get("reviews"):
+        item["reviews"] = store_meta["reviews"]
+        if not item.get("reviewSummary"):
+            item["reviewSummary"] = store_meta["reviews"].get("all", "")
+    if store_meta.get("tags"):
+        item["steamTags"] = store_meta["tags"]
+    if store_meta.get("features"):
+        item["features"] = store_meta["features"]
+    if store_meta.get("shortDesc"):
+        item["shortDescription"] = store_meta["shortDesc"]
+    if store_meta.get("detailedDescHTML"):
+        item["detailedDescriptionHTML"] = store_meta["detailedDescHTML"]
+    if store_meta.get("sysReq"):
+        item["sysReq"] = store_meta["sysReq"]
+    if store_meta.get("languages"):
+        item["languages"] = store_meta["languages"]
+    if store_meta.get("headerImage"):
+        item["headerImage"] = store_meta["headerImage"]
+        item["image"] = store_meta["headerImage"]
+
+    if not item.get("title"):
+        item["title"] = f"Steam App {app_id}"
+    if not item.get("image"):
+        item["image"] = item.get("headerImage", "")
+    return item
+
+
 async def main():
     items = await fetch_steam()
     with open("STEAM.json", "w", encoding="utf-8") as f:

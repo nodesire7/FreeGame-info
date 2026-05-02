@@ -17,7 +17,7 @@
         "@type": "WebSite",
         "name": "白嫖游戏速报 | GBTGAME",
         "url": "https://gameinfo.gbtgame.me",
-        "description": "聚合 EPIC、Steam、PlayStation、ITAD 免费游戏与 Bundle 情报",
+        "description": "聚合 EPIC、Steam、PlayStation 限免与 ITAD Bundle / 慈善包情报",
         "publisher": {
             "@type": "Organization",
             "name": "GBTGAME",
@@ -407,7 +407,7 @@
                             <h1 class="text-5xl md:text-7xl font-black text-white italic leading-none flex items-center gap-4">
                                 <span class="text-red-600 text-6xl">/</span>白嫖游戏速报
                             </h1>
-                            <p class="text-zinc-400 mt-4 border-l-8 border-red-600 pl-4 py-1 italic text-sm">聚合 EPIC | Steam | PlayStation | ITAD 免费游戏与 Bundle 情报</p>
+                            <p class="text-zinc-400 mt-4 border-l-8 border-red-600 pl-4 py-1 italic text-sm">聚合 EPIC | Steam | PlayStation 限免与 ITAD Bundle / 慈善包情报</p>
                         </div>
                         <a class="share-button bg-white text-black px-10 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[8px_8px_0_0_#000] text-sm whitespace-nowrap no-underline"
                            data-share-button href="{{SHARE_BUTTON_URL}}" download="{{SHARE_BUTTON_FILENAME}}">
@@ -529,7 +529,7 @@
                         <div class="mb-20">
                             <div class="flex items-center gap-4 mb-10">
                                 <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
-                                <h3 class="text-4xl font-black italic uppercase">ITAD_Freebies / 平台免费游戏与 Bundles</h3>
+                                <h3 class="text-4xl font-black italic uppercase">ITAD_Bundles / 慈善包与礼包</h3>
                             </div>
                             {{ITAD_CONTENT}}
                         </div>

@@ -8,6 +8,7 @@ Epic 限免游戏抓取脚本：
 import asyncio
 import json
 import os
+import re
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 
@@ -17,6 +18,19 @@ EPIC_API_URL = os.getenv(
     "EPIC_API_URL",
     "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=zh-CN&country=CN&allowCountries=CN",
 )
+
+
+def _extract_meta(html: str, key: str) -> str:
+    patterns = [
+        rf'<meta[^>]+property=["\']{re.escape(key)}["\'][^>]+content=["\']([^"\']+)["\']',
+        rf'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']{re.escape(key)}["\']',
+        rf'<meta[^>]+name=["\']{re.escape(key)}["\'][^>]+content=["\']([^"\']+)["\']',
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, html, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+    return ""
 
 
 def _parse_iso_to_beijing(iso_date: Optional[str]) -> str:
@@ -283,6 +297,50 @@ async def fetch_epic() -> List[Dict[str, Any]]:
                 seen.add(dedup_key)
                 result.append(game_info)
 
+    return result
+
+
+async def fetch_epic_page_metadata(url: str, expiry_ts: Optional[int] = None) -> Dict[str, Any]:
+    """
+    从 Epic 对应商店页提取基础信息。
+    用于把 ITAD 中的 Epic 100% OFF 条目并入 Epic 选项卡。
+    """
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+    }
+    defaults = {
+        "title": "",
+        "link": url,
+        "cover": "",
+        "originalPriceDesc": "",
+        "publisher": "",
+        "creator": "",
+        "description": "",
+        "isFreeNow": True,
+        "freeStartAt": None,
+        "freeEndAt": expiry_ts * 1000 if expiry_ts else None,
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        try:
+            async with session.get(url, allow_redirects=True, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                if resp.status != 200:
+                    return defaults
+                html = await resp.text()
+                final_url = str(resp.url)
+        except Exception:
+            return defaults
+
+    title = _extract_meta(html, "og:title")
+    description = _extract_meta(html, "og:description")
+    image = _extract_meta(html, "og:image")
+
+    result = dict(defaults)
+    result["title"] = title or defaults["title"]
+    result["description"] = description or defaults["description"]
+    result["cover"] = image or defaults["cover"]
+    result["link"] = final_url or url
     return result
 
 

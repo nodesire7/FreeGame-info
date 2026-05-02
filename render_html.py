@@ -769,24 +769,13 @@ def render_itad_bundle_card(bundle: Dict[str, Any]) -> str:
 
 
 def render_itad_section_content(itad_data: Dict[str, List[Dict[str, Any]]], empty_text: str) -> str:
-    """渲染 ITAD 区块内容：100% OFF 按平台分组，bundle 独立展示。"""
+    """渲染 ITAD 区块内容：仅展示 bundle / charity。"""
     deals = itad_data.get("deals") or []
     bundles = itad_data.get("bundles") or []
     if not deals and not bundles:
         return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
 
     parts: List[str] = []
-    grouped_deals = group_itad_deals(deals)
-    if grouped_deals:
-        for group_name, group_items in grouped_deals:
-            cards = "\n".join(render_itad_card(item) for item in group_items)
-            parts.append(
-                f'<section class="mb-14 last:mb-0">'
-                f'<div class="flex items-center justify-between gap-4 mb-8"><h4 class="text-2xl lg:text-3xl font-black italic uppercase">{escape_html(group_name)} / 100% OFF</h4>'
-                f'<span class="bg-zinc-800 text-white px-4 py-2 font-black text-xs uppercase">{len(group_items)} 项</span></div>'
-                f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">{cards}</div>'
-                f'</section>'
-            )
 
     if bundles:
         bundle_cards = "\n".join(render_itad_bundle_card(item) for item in bundles)
@@ -797,6 +786,10 @@ def render_itad_section_content(itad_data: Dict[str, List[Dict[str, Any]]], empt
             f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">{bundle_cards}</div>'
             f'</section>'
         )
+
+    if not parts and deals:
+        cards = "\n".join(render_itad_card(item) for item in deals)
+        parts.append(f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">{cards}</div>')
 
     return "".join(parts)
 
@@ -1838,7 +1831,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
             psn, "暂未检测到 PlayStation 公布的会员免费游戏。"
         ),
         "ITAD_CONTENT": render_itad_section_content(
-            itad, "暂未检测到 ITAD 免费游戏或 bundle。"
+            itad, "暂未检测到 ITAD bundle / 慈善包。"
         ),
         "SHARE_BUTTON_DISABLED": (
             "" if share_ready else ' aria-disabled="true" tabindex="-1"'
@@ -1965,9 +1958,9 @@ def render_history_page(
         )
         body_parts.append(
             _subsection(
-                "ITAD 100% OFF / Bundles",
+                "ITAD Bundles / 慈善包",
                 len(itad_deals) + len(itad_bundles),
-                render_itad_section_content(itad, "暂未检测到 ITAD 免费游戏或 bundle。"),
+                render_itad_section_content(itad, "暂未检测到 ITAD bundle / 慈善包。"),
             )
         )
 
