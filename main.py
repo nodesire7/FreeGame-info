@@ -26,6 +26,29 @@ def _norm_title(value: str) -> str:
     return " ".join((value or "").strip().lower().split())
 
 
+def _format_price(amount: Any, currency: str) -> str:
+    if amount is None or amount == "":
+        return ""
+    try:
+        value = float(amount)
+    except (TypeError, ValueError):
+        text = str(amount).strip()
+        return f"{currency} {text}".strip()
+
+    symbol_map = {
+        "CNY": "¥",
+        "USD": "$",
+        "EUR": "€",
+        "GBP": "£",
+        "HKD": "HK$",
+    }
+    code = (currency or "").strip().upper()
+    symbol = symbol_map.get(code)
+    if symbol:
+        return f"{symbol}{value:.2f}"
+    return f"{value:.2f} {code}".strip()
+
+
 async def _redistribute_itad_platform_deals(
     epic_data: Dict[str, Any],
     steam_data: List[Dict[str, Any]],
@@ -42,9 +65,25 @@ async def _redistribute_itad_platform_deals(
 
     epic_now = epic_data.get("now") or []
     epic_upcoming = epic_data.get("upcoming") or []
+    epic_itad_promoted: List[Dict[str, Any]] = []
 
-    epic_keys = {_norm_title(x.get("title", "")) for x in [*epic_now, *epic_upcoming] if isinstance(x, dict)}
-    steam_keys = {_norm_title(x.get("title", "")) for x in steam_data if isinstance(x, dict)}
+    epic_index = {
+        _norm_title(x.get("title", "")): ("now", idx)
+        for idx, x in enumerate(epic_now)
+        if isinstance(x, dict)
+    }
+    epic_index.update(
+        {
+            _norm_title(x.get("title", "")): ("upcoming", idx)
+            for idx, x in enumerate(epic_upcoming)
+            if isinstance(x, dict)
+        }
+    )
+    steam_index = {
+        _norm_title(x.get("title", "")): idx
+        for idx, x in enumerate(steam_data)
+        if isinstance(x, dict)
+    }
     psn_keys = {_norm_title(x.get("title", "")) for x in psn_data if isinstance(x, dict)}
 
     for deal in deals:
@@ -52,33 +91,58 @@ async def _redistribute_itad_platform_deals(
         title_key = _norm_title(deal.get("title", ""))
         link = deal.get("url", "")
         expiry = deal.get("expiry")
+        formatted_regular = _format_price(deal.get("regularPrice"), deal.get("regularCurrency", ""))
 
         if family == "Epic":
-            if title_key in epic_keys:
-                continue
-            detail = await fetch_epic_page_metadata(link, expiry_ts=expiry)
+            if title_key in epic_index:
+                location, idx = epic_index[title_key]
+                source = epic_now[idx] if location == "now" else epic_upcoming[idx]
+                detail = dict(source)
+                if location == "now":
+                    epic_now.pop(idx)
+                else:
+                    epic_upcoming.pop(idx)
+                epic_index = {
+                    _norm_title(x.get("title", "")): ("now", i)
+                    for i, x in enumerate(epic_now)
+                    if isinstance(x, dict)
+                }
+                epic_index.update(
+                    {
+                        _norm_title(x.get("title", "")): ("upcoming", i)
+                        for i, x in enumerate(epic_upcoming)
+                        if isinstance(x, dict)
+                    }
+                )
+            else:
+                detail = await fetch_epic_page_metadata(link, expiry_ts=expiry)
+
             detail["title"] = detail.get("title") or deal.get("title", "")
             if not detail.get("cover"):
                 detail["cover"] = deal.get("cover", "")
-            if not detail.get("originalPriceDesc") and deal.get("regularPrice") is not None:
-                detail["originalPriceDesc"] = f"{deal.get('regularPrice')} {deal.get('regularCurrency', '')}".strip()
-            epic_now.append(detail)
-            epic_keys.add(title_key)
+            if not detail.get("description"):
+                detail["description"] = deal.get("description", "") or "限时 100% OFF"
+            if not detail.get("originalPriceDesc") and formatted_regular:
+                detail["originalPriceDesc"] = formatted_regular
+            detail["isFreeNow"] = True
+            detail["freeEndAt"] = expiry * 1000 if expiry else detail.get("freeEndAt")
+            epic_itad_promoted.append(detail)
             continue
 
         if family == "Steam":
-            if title_key in steam_keys:
-                continue
             detail = await fetch_steam_game_detail_from_url(link)
             if detail:
                 if not detail.get("title"):
                     detail["title"] = deal.get("title", "")
                 if not detail.get("discountText"):
                     detail["discountText"] = f"-{deal.get('cut', 100)}%"
-                if not detail.get("originalPrice") and deal.get("regularPrice") is not None:
-                    detail["originalPrice"] = f"{deal.get('regularPrice')} {deal.get('regularCurrency', '')}".strip()
-                steam_data.append(detail)
-                steam_keys.add(title_key)
+                if not detail.get("originalPrice") and formatted_regular:
+                    detail["originalPrice"] = formatted_regular
+                if title_key in steam_index:
+                    steam_data[steam_index[title_key]] = detail
+                else:
+                    steam_data.append(detail)
+                    steam_index[title_key] = len(steam_data) - 1
             continue
 
         if family == "PlayStation":
@@ -94,10 +158,16 @@ async def _redistribute_itad_platform_deals(
                     "highlight": "限时免费",
                     "platforms": ["PlayStation"],
                     "period": "活动中" if expiry else "时间待定",
-                    "originalPrice": f"{deal.get('regularPrice')} {deal.get('regularCurrency', '')}".strip(),
+                    "originalPrice": formatted_regular,
                 }
             )
             psn_keys.add(title_key)
+
+    if epic_itad_promoted:
+        epic_data["now"] = epic_itad_promoted + epic_now
+    else:
+        epic_data["now"] = epic_now
+    epic_data["upcoming"] = epic_upcoming
 
     return {"deals": [], "bundles": bundles}
 

@@ -333,7 +333,11 @@ async def fetch_epic_page_metadata(url: str, expiry_ts: Optional[int] = None) ->
             return defaults
 
     title = _extract_meta(html, "og:title")
-    description = _extract_meta(html, "og:description")
+    if not title:
+        title_match = re.search(r"<title>([^<]+)</title>", html, re.IGNORECASE)
+        title = title_match.group(1).strip() if title_match else ""
+
+    description = _extract_meta(html, "og:description") or _extract_meta(html, "description")
     image = _extract_meta(html, "og:image")
 
     result = dict(defaults)
