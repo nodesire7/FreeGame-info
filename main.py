@@ -141,10 +141,12 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     epic_data = results.get("epic", {"now": [], "upcoming": []})
     steam_data = results.get("steam", [])
     psn_data = results.get("psn", [])
+    gog_data = results.get("gog", [])
+    xbox_data = results.get("xbox", [])
     itad_raw = results.get("itad", {"deals": [], "bundles": []})
 
-    # 将 ITAD deals 中属于 Epic/Steam/PSN 的条目合并到对应平台，剩余为 itad 展示数据
-    itad_data = redistribute_itad_deals(itad_raw, epic_data, steam_data, psn_data)
+    # 将 ITAD deals 中属于各平台的条目合并到对应平台，剩余为 itad 展示数据
+    itad_data = redistribute_itad_deals(itad_raw, epic_data, steam_data, psn_data, gog_data, xbox_data)
 
     # 合并为 snapshot（不落地 JSON 文件；历史数据写入 SQLite）
     # 使用中国时区（UTC+8）
@@ -154,8 +156,8 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         "epic": epic_data,
         "steam": steam_data,
         "psn": psn_data,
-        "gog": results.get("gog", []),
-        "xbox": results.get("xbox", []),
+        "gog": gog_data,
+        "xbox": xbox_data,
         "itad": itad_data,
         "sources": {
             "epic": "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions",

@@ -889,10 +889,11 @@ def render_itad_bundle_card(bundle: Dict[str, Any]) -> str:
         expiry_display = datetime.fromtimestamp(expiry, tz=china_tz).strftime("%m月%d日 %H:%M")
 
     cover = bundle.get("cover") or ""
+    store_label = escape_html(bundle.get("store", "Bundle"))
     cover_html = (
         f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(bundle.get("title", ""))}" class="w-full h-full object-cover" loading="lazy">'
         if cover
-        else '<div class="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-500 text-xs uppercase tracking-[0.3em]">Bundle</div>'
+        else f'<div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">{store_label}</span><span class="text-zinc-700 text-[10px]">无封面</span></div>'
     )
 
     details = bundle.get("description") or bundle.get("details") or "ITAD bundle / charity 信息"

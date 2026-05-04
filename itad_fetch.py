@@ -228,10 +228,27 @@ async def fetch_itad(
         # Giveaways (bundles)
         try:
             bundles = await _fetch_itad_giveaways(session)
+            # 尝试为 bundle 提取 og:image 封面
+            if bundles:
+                try:
+                    await _enrich_bundle_covers(session, bundles)
+                except Exception as e:
+                    print(f"  ⚠️ ITAD bundle 封面提取失败: {e}")
         except Exception as e:
             print(f"  ⚠️ ITAD Giveaways 失败: {e}")
 
     return {"deals": deals, "bundles": bundles}
+
+
+def _format_itad_price(d: Dict[str, Any]) -> str:
+    """格式化 ITAD deal 价格为字符串"""
+    price = d.get("regularPrice", 0)
+    currency = d.get("regularCurrency", "")
+    if price and currency:
+        return f"{price} {currency}".strip()
+    elif price:
+        return str(price)
+    return ""
 
 
 def redistribute_itad_deals(
@@ -239,15 +256,17 @@ def redistribute_itad_deals(
     epic_data: Optional[Dict[str, Any]] = None,
     steam_data: Optional[List[Dict[str, Any]]] = None,
     psn_data: Optional[List[Dict[str, Any]]] = None,
+    gog_data: Optional[List[Dict[str, Any]]] = None,
+    xbox_data: Optional[List[Dict[str, Any]]] = None,
 ) -> List[Dict[str, Any]]:
     """
-    将 ITAD deals 中属于 Epic/Steam/PSN 的条目合并到对应平台数据中。
+    将 ITAD deals 中属于 Epic/Steam/PSN/GOG/Xbox 的条目合并到对应平台数据中。
     返回仅保留"其他商店"和 bundles 的 ITAD 数据（扁平列表，供渲染层统一展示）。
     """
     deals = itad_data.get("deals", [])
     bundles = itad_data.get("bundles", [])
 
-    main_platforms = {"epic", "steam", "psn"}
+    main_platforms = {"epic", "steam", "psn", "gog", "xbox"}
     redistributed_deals: List[Dict[str, Any]] = []
     leftover_deals: List[Dict[str, Any]] = []
 
@@ -262,14 +281,7 @@ def redistribute_itad_deals(
     if epic_data is not None and isinstance(epic_data, dict):
         epic_extra = [d for d in redistributed_deals if d.get("storeFamily") == "epic"]
         for d in epic_extra:
-            formatted_price = ""
-            price = d.get("regularPrice", 0)
-            currency = d.get("regularCurrency", "")
-            if price and currency:
-                formatted_price = f"{price} {currency}".strip()
-            elif price:
-                formatted_price = str(price)
-
+            formatted_price = _format_itad_price(d)
             normalized = {
                 "title": d["title"],
                 "link": d.get("url", ""),
@@ -291,14 +303,7 @@ def redistribute_itad_deals(
     if steam_data is not None and isinstance(steam_data, list):
         steam_extra = [d for d in redistributed_deals if d.get("storeFamily") == "steam"]
         for d in steam_extra:
-            formatted_price = ""
-            price = d.get("regularPrice", 0)
-            currency = d.get("regularCurrency", "")
-            if price and currency:
-                formatted_price = f"{price} {currency}".strip()
-            elif price:
-                formatted_price = str(price)
-
+            formatted_price = _format_itad_price(d)
             normalized = {
                 "title": d["title"],
                 "id": d.get("url", d.get("plain", "")),
@@ -317,14 +322,7 @@ def redistribute_itad_deals(
     if psn_data is not None and isinstance(psn_data, list):
         psn_extra = [d for d in redistributed_deals if d.get("storeFamily") == "psn"]
         for d in psn_extra:
-            formatted_price = ""
-            price = d.get("regularPrice", 0)
-            currency = d.get("regularCurrency", "")
-            if price and currency:
-                formatted_price = f"{price} {currency}".strip()
-            elif price:
-                formatted_price = str(price)
-
+            formatted_price = _format_itad_price(d)
             psn_data.append({
                 "id": d.get("url", d.get("title", "")),
                 "title": d["title"],
@@ -341,7 +339,99 @@ def redistribute_itad_deals(
                 "source": "itad",
             })
 
+    # GOG: 追加到列表
+    if gog_data is not None and isinstance(gog_data, list):
+        gog_extra = [d for d in redistributed_deals if d.get("storeFamily") == "gog"]
+        for d in gog_extra:
+            formatted_price = _format_itad_price(d)
+            gog_data.append({
+                "title": d["title"],
+                "link": d.get("url", ""),
+                "cover": d.get("cover", ""),
+                "price": "Free",
+                "originalPrice": formatted_price,
+                "publisher": d.get("store", ""),
+                "releaseDate": "",
+                "genres": [],
+                "features": [],
+                "platforms": d.get("platforms", []),
+                "languages": "",
+                "description": f"ITAD 来源：{d['store']} 100% OFF",
+                "platform": "GOG",
+                "status": "ACTIVE",
+                "date": "",
+                "source": "itad",
+            })
+
+    # Xbox: 追加到列表
+    if xbox_data is not None and isinstance(xbox_data, list):
+        xbox_extra = [d for d in redistributed_deals if d.get("storeFamily") == "xbox"]
+        for d in xbox_extra:
+            formatted_price = _format_itad_price(d)
+            xbox_data.append({
+                "title": d["title"],
+                "link": d.get("url", ""),
+                "cover": d.get("cover", ""),
+                "price": "Free",
+                "originalPrice": formatted_price,
+                "publisher": d.get("store", ""),
+                "releaseDate": "",
+                "genres": [],
+                "features": [],
+                "platforms": d.get("platforms", ["Xbox"]),
+                "description": f"ITAD 来源：{d['store']} 100% OFF",
+                "platform": "Xbox Game Pass",
+                "status": "ACTIVE",
+                "date": "",
+                "source": "itad",
+            })
+
     return leftover_deals + bundles
+
+
+async def _enrich_bundle_covers(
+    session: aiohttp.ClientSession,
+    bundles: List[Dict[str, Any]],
+) -> None:
+    """为 bundle 从目标页面提取 og:image 封面（并发最多 4 个）"""
+    import asyncio
+    import re
+
+    semaphore = asyncio.Semaphore(4)
+
+    async def _fetch_og_image(bundle: Dict[str, Any]) -> None:
+        url = bundle.get("url", "")
+        if not url or bundle.get("cover"):
+            return
+        async with semaphore:
+            try:
+                async with session.get(
+                    url,
+                    timeout=aiohttp.ClientTimeout(total=15),
+                    headers={"User-Agent": USER_AGENT, "Accept": "text/html"},
+                    allow_redirects=True,
+                ) as resp:
+                    if resp.status != 200:
+                        return
+                    # 只读前 64KB 找 og:image
+                    html = ""
+                    chunk_count = 0
+                    async for chunk in resp.content.iter_chunked(8192):
+                        html += chunk.decode("utf-8", errors="ignore")
+                        chunk_count += 1
+                        if chunk_count >= 8 or "og:image" in html:
+                            break
+            except Exception:
+                return
+
+            # 提取 og:image content
+            m = re.search(r'<meta\s+property="og:image"\s+content="([^"]+)"', html)
+            if not m:
+                m = re.search(r'<meta\s+content="([^"]+)"\s+property="og:image"', html)
+            if m:
+                bundle["cover"] = m.group(1)
+
+    await asyncio.gather(*[_fetch_og_image(b) for b in bundles])
 
 
 def save_json(data: Dict[str, Any], path: str = "ITAD.json") -> None:
