@@ -238,10 +238,11 @@ def redistribute_itad_deals(
     itad_data: Dict[str, Any],
     epic_data: Optional[Dict[str, Any]] = None,
     steam_data: Optional[List[Dict[str, Any]]] = None,
+    psn_data: Optional[List[Dict[str, Any]]] = None,
 ) -> List[Dict[str, Any]]:
     """
     将 ITAD deals 中属于 Epic/Steam/PSN 的条目合并到对应平台数据中。
-    返回仅保留"其他商店"和 bundles 的 ITAD 数据。
+    返回仅保留"其他商店"和 bundles 的 ITAD 数据（扁平列表，供渲染层统一展示）。
     """
     deals = itad_data.get("deals", [])
     bundles = itad_data.get("bundles", [])
@@ -257,44 +258,88 @@ def redistribute_itad_deals(
         else:
             leftover_deals.append(deal)
 
-    # 将 redistributed_deals 注入到对应平台数据
+    # Epic: 合并到 now 列表
     if epic_data is not None and isinstance(epic_data, dict):
         epic_extra = [d for d in redistributed_deals if d.get("storeFamily") == "epic"]
-        if epic_extra:
-            for d in epic_extra:
-                normalized = {
-                    "title": d["title"],
-                    "link": d.get("url", ""),
-                    "cover": "",
-                    "originalPriceDesc": f"{d.get('regularPrice', 0)} {d.get('regularCurrency', '')}".strip(),
-                    "publisher": d.get("store", ""),
-                    "creator": "",
-                    "description": f"ITAD 来源：{d['store']} 100% OFF",
-                    "isFreeNow": True,
-                    "freeStartAt": None,
-                    "freeEndAt": d.get("expiry"),
-                    "source": "itad",
-                }
-                if "now" not in epic_data:
-                    epic_data["now"] = []
-                epic_data["now"].append(normalized)
+        for d in epic_extra:
+            formatted_price = ""
+            price = d.get("regularPrice", 0)
+            currency = d.get("regularCurrency", "")
+            if price and currency:
+                formatted_price = f"{price} {currency}".strip()
+            elif price:
+                formatted_price = str(price)
 
+            normalized = {
+                "title": d["title"],
+                "link": d.get("url", ""),
+                "cover": d.get("cover", ""),
+                "originalPriceDesc": formatted_price,
+                "publisher": d.get("store", ""),
+                "creator": "",
+                "description": f"ITAD 来源：{d['store']} 100% OFF",
+                "isFreeNow": True,
+                "freeStartAt": None,
+                "freeEndAt": d.get("expiry"),
+                "source": "itad",
+            }
+            if "now" not in epic_data:
+                epic_data["now"] = []
+            epic_data["now"].append(normalized)
+
+    # Steam: 追加到列表
     if steam_data is not None and isinstance(steam_data, list):
         steam_extra = [d for d in redistributed_deals if d.get("storeFamily") == "steam"]
         for d in steam_extra:
+            formatted_price = ""
+            price = d.get("regularPrice", 0)
+            currency = d.get("regularCurrency", "")
+            if price and currency:
+                formatted_price = f"{price} {currency}".strip()
+            elif price:
+                formatted_price = str(price)
+
             normalized = {
                 "title": d["title"],
                 "id": d.get("url", d.get("plain", "")),
                 "link": d.get("url", f"https://store.steampowered.com/app/{d.get('plain', '')}/"),
-                "image": "",
+                "image": d.get("cover", ""),
                 "platforms": d.get("platforms", []),
                 "discountText": "100% OFF",
-                "originalPrice": f"{d.get('regularPrice', 0)} {d.get('regularCurrency', '')}".strip(),
+                "originalPrice": formatted_price,
                 "finalPrice": "0",
                 "shortDescription": f"ITAD 来源：{d['store']} 100% OFF",
                 "source": "itad",
             }
             steam_data.append(normalized)
+
+    # PSN: 追加到列表
+    if psn_data is not None and isinstance(psn_data, list):
+        psn_extra = [d for d in redistributed_deals if d.get("storeFamily") == "psn"]
+        for d in psn_extra:
+            formatted_price = ""
+            price = d.get("regularPrice", 0)
+            currency = d.get("regularCurrency", "")
+            if price and currency:
+                formatted_price = f"{price} {currency}".strip()
+            elif price:
+                formatted_price = str(price)
+
+            psn_data.append({
+                "id": d.get("url", d.get("title", "")),
+                "title": d["title"],
+                "link": d.get("url", ""),
+                "image": d.get("cover", ""),
+                "cover": d.get("cover", ""),
+                "description": f"ITAD 来源：{d['store']} 100% OFF",
+                "publisher": d.get("store", ""),
+                "platform": "PS Plus",
+                "price": "会员免费",
+                "originalPrice": formatted_price,
+                "date": "",
+                "status": "ACTIVE",
+                "source": "itad",
+            })
 
     return leftover_deals + bundles
 

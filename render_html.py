@@ -588,6 +588,169 @@ def render_psn_card(game: Dict[str, Any]) -> str:
 </article>"""
 
 
+def render_gog_card(game: Dict[str, Any]) -> str:
+    """渲染 GOG 游戏卡片"""
+    cover = game.get("cover", "")
+    cover_html = (
+        f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"])}" loading="lazy" class="w-full h-full object-cover">'
+        if cover
+        else '<span class="w-full h-full flex items-center justify-center text-zinc-600 text-xs bg-zinc-800">暂无封面</span>'
+    )
+
+    description = game.get("description", "").strip()
+    publisher = escape_html(game.get("publisher", ""))
+    release_date = escape_html(game.get("releaseDate", ""))
+    price = escape_html(game.get("price", "Free"))
+    original_price = escape_html(game.get("originalPrice", ""))
+    genres = game.get("genres", [])
+    features = game.get("features", [])
+
+    meta_items = []
+    if publisher:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发行：{publisher}</span>')
+    if release_date:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发售：{release_date}</span>')
+    if original_price:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic line-through">{original_price}</span>')
+    meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">{price}</span>')
+    meta_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(meta_items)}</div>'
+
+    if description:
+        desc_html = f'<p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{escape_html(description)}</p>'
+    else:
+        info_parts = []
+        if publisher:
+            info_parts.append(f"发行：{publisher}")
+        if genres:
+            info_parts.append(f"类型：{' / '.join(genres[:3])}")
+        info_text = " | ".join(info_parts) if info_parts else "暂无简介信息"
+        desc_html = f'<div class="text-zinc-600 text-xs italic mb-4 border-l-4 border-zinc-800 pl-4 py-2 bg-zinc-900">{info_text}</div>'
+
+    features_html = ""
+    if features:
+        feat_tags = "".join(
+            f'<span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(f)}</span>'
+            for f in features[:4]
+        )
+        features_html = f'<div class="flex flex-wrap gap-1 mt-2">{feat_tags}</div>'
+
+    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <div class="lg:w-2/5 relative min-w-0">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            {cover_html}
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">GOG</div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
+            {desc_html}
+            {features_html}
+        </div>
+        <div class="mt-4">
+            {meta_html}
+            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
+                <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
+        </div>
+    </div>
+</article>"""
+
+
+def render_xbox_card(game: Dict[str, Any]) -> str:
+    """渲染 Xbox 游戏卡片"""
+    cover = game.get("cover", "")
+    cover_html = (
+        f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"])}" loading="lazy" class="w-full h-full object-cover">'
+        if cover
+        else '<span class="w-full h-full flex items-center justify-center text-zinc-600 text-xs bg-zinc-800">暂无封面</span>'
+    )
+
+    description = game.get("description", "").strip()
+    publisher = escape_html(game.get("publisher", ""))
+    release_date = escape_html(game.get("releaseDate", ""))
+    price = escape_html(game.get("price", "Game Pass 免费"))
+    original_price = escape_html(game.get("originalPrice", ""))
+    platforms = game.get("platforms", ["Xbox"])
+    genres = game.get("genres", [])
+    features = game.get("features", [])
+
+    meta_items = []
+    if publisher:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发行：{publisher}</span>')
+    if release_date:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发售：{release_date}</span>')
+    if platforms:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">平台：{escape_html(" / ".join(platforms))}</span>')
+    if original_price:
+        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic line-through">{original_price}</span>')
+    meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">{price}</span>')
+    meta_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(meta_items)}</div>'
+
+    if description:
+        desc_html = f'<p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{escape_html(description)}</p>'
+    else:
+        info_parts = []
+        if publisher:
+            info_parts.append(f"发行：{publisher}")
+        if genres:
+            info_parts.append(f"类型：{' / '.join(genres[:3])}")
+        info_text = " | ".join(info_parts) if info_parts else "暂无简介信息"
+        desc_html = f'<div class="text-zinc-600 text-xs italic mb-4 border-l-4 border-zinc-800 pl-4 py-2 bg-zinc-900">{info_text}</div>'
+
+    features_html = ""
+    if features:
+        feat_tags = "".join(
+            f'<span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(f)}</span>'
+            for f in features[:4]
+        )
+        features_html = f'<div class="flex flex-wrap gap-1 mt-2">{feat_tags}</div>'
+
+    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <div class="lg:w-2/5 relative min-w-0">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            {cover_html}
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">Xbox</div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
+            {desc_html}
+            {features_html}
+        </div>
+        <div class="mt-4">
+            {meta_html}
+            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
+                <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
+        </div>
+    </div>
+</article>"""
+
+
+def render_gog_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
+    """渲染 GOG 区块内容"""
+    if not items:
+        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+    cards = "\n".join(render_gog_card(item) for item in items)
+    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+
+
+def render_xbox_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
+    """渲染 Xbox 区块内容"""
+    if not items:
+        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+    cards = "\n".join(render_xbox_card(item) for item in items)
+    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+
+
 def render_epic_section_content(items: List[Dict[str, Any]], empty_text: str, variant: str) -> str:
     """渲染 Epic 区块内容"""
     if not items:
@@ -1458,6 +1621,9 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     else:
         psn = []
 
+    gog = snapshot.get("gog", [])
+    xbox = snapshot.get("xbox", [])
+
     if epic_now:
         sections.append(
             {
@@ -1516,6 +1682,25 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "title": "ITAD Bundles",
                 "items": [
                     map_itad_share_item(item, bundle_mode=True) for item in bundles[:MAX_SHARE_ITEMS]
+                ],
+            }
+        )
+
+    if gog:
+        sections.append(
+            {
+                "title": "GOG 限免",
+                "items": [
+                    map_gog_share_item(item) for item in gog[:MAX_SHARE_ITEMS]
+                ],
+            }
+        )
+    if xbox:
+        sections.append(
+            {
+                "title": "Xbox Game Pass",
+                "items": [
+                    map_xbox_share_item(item) for item in xbox[:MAX_SHARE_ITEMS]
                 ],
             }
         )
@@ -1717,6 +1902,48 @@ def map_itad_share_item(game: Dict[str, Any], bundle_mode: bool = False) -> Dict
     }
 
 
+def map_gog_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
+    """映射 GOG 分享项"""
+    tertiary_parts = []
+    if game.get("originalPrice"):
+        tertiary_parts.append(f"原价 {sanitize_text(game['originalPrice'])}")
+    if game.get("publisher"):
+        tertiary_parts.append(f"发行 {sanitize_text(game['publisher'])}")
+    genres = game.get("genres", [])
+    if genres:
+        tertiary_parts.append(f"类型 {' / '.join(sanitize_text(g) for g in genres[:3])}")
+
+    return {
+        "title": sanitize_text(game.get("title", "")),
+        "primary": sanitize_text(game.get("price", "Free")),
+        "secondary": f"平台 GOG",
+        "tertiary": " · ".join(tertiary_parts),
+        "description": sanitize_text(game.get("description", "")),
+        "coverUrl": game.get("cover", ""),
+    }
+
+
+def map_xbox_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
+    """映射 Xbox 分享项"""
+    tertiary_parts = []
+    if game.get("originalPrice"):
+        tertiary_parts.append(f"原价 {sanitize_text(game['originalPrice'])}")
+    if game.get("publisher"):
+        tertiary_parts.append(f"发行 {sanitize_text(game['publisher'])}")
+    platforms = game.get("platforms", ["Xbox"])
+    if platforms:
+        tertiary_parts.append(f"平台 {' / '.join(sanitize_text(p) for p in platforms)}")
+
+    return {
+        "title": sanitize_text(game.get("title", "")),
+        "primary": sanitize_text(game.get("price", "Game Pass 免费")),
+        "secondary": f"平台 Xbox Game Pass",
+        "tertiary": " · ".join(tertiary_parts),
+        "description": sanitize_text(game.get("description", "")),
+        "coverUrl": game.get("cover", ""),
+    }
+
+
 def serialize_for_client(payload: Optional[Dict[str, Any]]) -> str:
     """序列化分享数据为客户端 JSON"""
     if not payload:
@@ -1776,6 +2003,8 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         psn = []
 
     steam = snapshot.get("steam", [])
+    gog = snapshot.get("gog", [])
+    xbox = snapshot.get("xbox", [])
     itad = normalize_itad_data(snapshot.get("itad"))
     itad_deals = itad.get("deals", [])
     itad_bundles = itad.get("bundles", [])
@@ -1784,9 +2013,11 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
     epic_upcoming_count = len(epic_upcoming)
     steam_count = len(steam)
     psn_count = len(psn)
+    gog_count = len(gog)
+    xbox_count = len(xbox)
     itad_count = len(itad_deals) + len(itad_bundles)
     epic_total_count = epic_now_count + epic_upcoming_count
-    total_count = epic_total_count + steam_count + psn_count + itad_count
+    total_count = epic_total_count + steam_count + psn_count + gog_count + xbox_count + itad_count
 
     share_payload = build_share_payload(snapshot)
     share_ready = share_payload is not None
@@ -1812,10 +2043,14 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         "TAB_BADGE_EPIC": str(epic_total_count),
         "TAB_BADGE_STEAM": str(steam_count),
         "TAB_BADGE_PSN": str(psn_count),
+        "TAB_BADGE_GOG": str(gog_count),
+        "TAB_BADGE_XBOX": str(xbox_count),
         "EPIC_NOW_COUNT": str(epic_now_count),
         "EPIC_UPCOMING_COUNT": str(epic_upcoming_count),
         "STEAM_COUNT": str(steam_count),
         "PSN_COUNT": str(psn_count),
+        "GOG_COUNT": str(gog_count),
+        "XBOX_COUNT": str(xbox_count),
         "ITAD_COUNT": str(itad_count),
         "TAB_BADGE_ITAD": str(itad_count),
         "EPIC_NOW_CONTENT": render_epic_section_content(
@@ -1829,6 +2064,12 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         ),
         "PSN_CONTENT": render_psn_section_content(
             psn, "暂未检测到 PlayStation 公布的会员免费游戏。"
+        ),
+        "GOG_CONTENT": render_gog_section_content(
+            gog, "暂未检测到 GOG 平台限免活动。"
+        ),
+        "XBOX_CONTENT": render_xbox_section_content(
+            xbox, "暂未检测到 Xbox 平台限免活动。"
         ),
         "ITAD_CONTENT": render_itad_section_content(
             itad, "暂未检测到 ITAD bundle / 慈善包。"
@@ -1914,7 +2155,10 @@ def render_history_page(
         itad_deals = itad.get("deals", [])
         itad_bundles = itad.get("bundles", [])
 
-        total = len(epic_now) + len(epic_upcoming) + len(steam) + len(psn) + len(itad_deals) + len(itad_bundles)
+        gog = snap.get("gog") or []
+        xbox = snap.get("xbox") or []
+
+        total = len(epic_now) + len(epic_upcoming) + len(steam) + len(psn) + len(gog) + len(xbox) + len(itad_deals) + len(itad_bundles)
 
         def _subsection(title: str, count: int, body_html: str) -> str:
             return (
@@ -1961,6 +2205,20 @@ def render_history_page(
                 "ITAD Bundles / 慈善包",
                 len(itad_deals) + len(itad_bundles),
                 render_itad_section_content(itad, "暂未检测到 ITAD bundle / 慈善包。"),
+            )
+        )
+        body_parts.append(
+            _subsection(
+                "GOG 限免",
+                len(gog),
+                render_gog_section_content(gog, "暂未检测到 GOG 平台限免活动。"),
+            )
+        )
+        body_parts.append(
+            _subsection(
+                "Xbox Game Pass",
+                len(xbox),
+                render_xbox_section_content(xbox, "暂未检测到 Xbox 平台限免活动。"),
             )
         )
 

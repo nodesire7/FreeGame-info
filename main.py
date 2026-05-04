@@ -143,8 +143,8 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     psn_data = results.get("psn", [])
     itad_raw = results.get("itad", {"deals": [], "bundles": []})
 
-    # 将 ITAD deals 中属于 Epic/Steam 的条目合并到对应平台，剩余为 itad 展示数据
-    itad_data = redistribute_itad_deals(itad_raw, epic_data, steam_data)
+    # 将 ITAD deals 中属于 Epic/Steam/PSN 的条目合并到对应平台，剩余为 itad 展示数据
+    itad_data = redistribute_itad_deals(itad_raw, epic_data, steam_data, psn_data)
 
     # 合并为 snapshot（不落地 JSON 文件；历史数据写入 SQLite）
     # 使用中国时区（UTC+8）
@@ -329,7 +329,7 @@ def generate_feed(snapshot: Dict[str, Any], output_dir: str) -> None:
     <channel>
         <title>白嫖游戏速报 | GBTGAME</title>
         <link>https://gameinfo.gbtgame.me</link>
-        <description>聚合 EPIC | Steam | PlayStation | ITAD | GOG | Xbox 限免情报</description>
+        <description>聚合 EPIC | Steam | PlayStation | GOG | Xbox | ITAD 限免情报</description>
         <language>zh-CN</language>
         <lastBuildDate>{fetched_at}</lastBuildDate>
         <atom:link href="https://gameinfo.gbtgame.me/feed.xml" rel="self" type="application/rss+xml"/>

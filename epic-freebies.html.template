@@ -407,7 +407,7 @@
                             <h1 class="text-5xl md:text-7xl font-black text-white italic leading-none flex items-center gap-4">
                                 <span class="text-red-600 text-6xl">/</span>白嫖游戏速报
                             </h1>
-                            <p class="text-zinc-400 mt-4 border-l-8 border-red-600 pl-4 py-1 italic text-sm">聚合 EPIC | Steam | PlayStation 限免与 ITAD Bundle / 慈善包情报</p>
+                            <p class="text-zinc-400 mt-4 border-l-8 border-red-600 pl-4 py-1 italic text-sm">聚合 EPIC | Steam | PlayStation | GOG | Xbox 限免与 ITAD Bundle / 慈善包情报</p>
                         </div>
                         <a class="share-button bg-white text-black px-10 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[8px_8px_0_0_#000] text-sm whitespace-nowrap no-underline"
                            data-share-button href="{{SHARE_BUTTON_URL}}" download="{{SHARE_BUTTON_FILENAME}}">
@@ -457,6 +457,12 @@
                     </button>
                     <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-itad" data-tab="itad">
                         <span class="relative z-10">ITAD <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_ITAD}}</span></span>
+                    </button>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-gog" data-tab="gog">
+                        <span class="relative z-10">GOG <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_GOG}}</span></span>
+                    </button>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-xbox" data-tab="xbox">
+                        <span class="relative z-10">XBOX <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">{{TAB_BADGE_XBOX}}</span></span>
                     </button>
                 </nav>
 
@@ -532,6 +538,28 @@
                                 <h3 class="text-4xl font-black italic uppercase">ITAD_Bundles / 慈善包与礼包</h3>
                             </div>
                             {{ITAD_CONTENT}}
+                        </div>
+                    </div>
+
+                    <!-- GOG Panel -->
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-gog" data-panel="gog">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">GOG_Giveaways / GOG 限免</h3>
+                            </div>
+                            {{GOG_CONTENT}}
+                        </div>
+                    </div>
+
+                    <!-- Xbox Panel -->
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-xbox" data-panel="xbox">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">Xbox_GamePass / Xbox 游戏</h3>
+                            </div>
+                            {{XBOX_CONTENT}}
                         </div>
                     </div>
 

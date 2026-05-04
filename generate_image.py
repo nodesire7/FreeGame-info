@@ -260,8 +260,8 @@ def _playwright_screenshot(html_file: str, output_file: str) -> Optional[str]:
             temp_png = output_path.with_suffix('.png')
             temp_png.write_bytes(screenshot_bytes)
             try:
-                img = Image.open(temp_png).convert('RGBA')
-                img.save(output_file, 'PNG')
+                img = Image.open(temp_png).convert('RGB')
+                img.save(output_file, 'WEBP', quality=85)
                 temp_png.unlink()
                 img.close()
             except Exception as e:
@@ -399,9 +399,8 @@ def generate_webp_from_html(html_file: str, output_file: str, width: int = 1080,
             temp_png = output_path.with_suffix('.png')
             temp_png.write_bytes(screenshot_bytes)
             try:
-                img = Image.open(temp_png).convert('RGBA')
-                img.save(temp_png, 'PNG')
-                img.save(output_file, 'PNG')
+                img = Image.open(temp_png).convert('RGB')
+                img.save(output_file, 'WEBP', quality=85)
                 temp_png.unlink()
                 img.close()
             except Exception as e:
