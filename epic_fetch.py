@@ -135,8 +135,8 @@ def _extract_description(game: Dict[str, Any]) -> str:
     key_text = game.get("keyText")
     if key_text:
         return key_text.replace("\n", " ").strip()
-    
-        return "暂无游戏简介。"
+
+    return "暂无游戏简介。"
 
 
 def _extract_publisher(game: Dict[str, Any]) -> str:
@@ -265,10 +265,11 @@ async def fetch_epic() -> List[Dict[str, Any]]:
             status = "UPCOMING"
             target_date = upcoming_start_date
 
-        # 提取原价
+        # 提取原价（API 返回可能包含 ¥ 前缀，统一清理后由渲染层添加）
         price_data = game.get("price", {})
         total_price = price_data.get("totalPrice", {})
-        original_price = total_price.get("fmtPrice", {}).get("originalPrice", "")
+        raw_price = total_price.get("fmtPrice", {}).get("originalPrice", "")
+        original_price = raw_price.lstrip("¥") if raw_price and raw_price != "0" else (raw_price if raw_price == "0" else "")
 
         # 提取游戏简介
         description = _extract_description(game)

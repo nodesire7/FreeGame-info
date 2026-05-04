@@ -14,173 +14,25 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 # 导入各个独立的 fetcher
-from epic_fetch import fetch_epic, fetch_epic_page_metadata
+from epic_fetch import fetch_epic
 from psn_fetch import fetch_psn
-from steam_fetch import fetch_steam, fetch_steam_game_detail_from_url
-from itad_fetch import fetch_itad
+from steam_fetch import fetch_steam
+from itad_fetch import fetch_itad, redistribute_itad_deals
+from gog_fetch import fetch_gog
+from xbox_fetch import fetch_xbox
 from render_html import render_html, render_history_page
 from history_db import open_db, get_latest_meta, get_latest_image_rel, insert_record, list_snapshots
-
-
-def _norm_title(value: str) -> str:
-    return " ".join((value or "").strip().lower().split())
-
-
-def _format_price(amount: Any, currency: str) -> str:
-    if amount is None or amount == "":
-        return ""
-    try:
-        value = float(amount)
-    except (TypeError, ValueError):
-        text = str(amount).strip()
-        return f"{currency} {text}".strip()
-
-    symbol_map = {
-        "CNY": "¥",
-        "USD": "$",
-        "EUR": "€",
-        "GBP": "£",
-        "HKD": "HK$",
-    }
-    code = (currency or "").strip().upper()
-    symbol = symbol_map.get(code)
-    if symbol:
-        return f"{symbol}{value:.2f}"
-    return f"{value:.2f} {code}".strip()
-
-
-async def _redistribute_itad_platform_deals(
-    epic_data: Dict[str, Any],
-    steam_data: List[Dict[str, Any]],
-    psn_data: List[Dict[str, Any]],
-    itad_data: Dict[str, Any],
-) -> Dict[str, Any]:
-    """
-    ITAD 中的平台免费信息并入对应平台：
-    - Steam/Epic/PlayStation 进入各自标签
-    - ITAD 仅保留 bundles
-    """
-    deals = [item for item in (itad_data.get("deals") or []) if isinstance(item, dict)]
-    bundles = [item for item in (itad_data.get("bundles") or []) if isinstance(item, dict)]
-
-    epic_now = epic_data.get("now") or []
-    epic_upcoming = epic_data.get("upcoming") or []
-    epic_itad_promoted: List[Dict[str, Any]] = []
-
-    epic_index = {
-        _norm_title(x.get("title", "")): ("now", idx)
-        for idx, x in enumerate(epic_now)
-        if isinstance(x, dict)
-    }
-    epic_index.update(
-        {
-            _norm_title(x.get("title", "")): ("upcoming", idx)
-            for idx, x in enumerate(epic_upcoming)
-            if isinstance(x, dict)
-        }
-    )
-    steam_index = {
-        _norm_title(x.get("title", "")): idx
-        for idx, x in enumerate(steam_data)
-        if isinstance(x, dict)
-    }
-    psn_keys = {_norm_title(x.get("title", "")) for x in psn_data if isinstance(x, dict)}
-
-    for deal in deals:
-        family = deal.get("storeFamily")
-        title_key = _norm_title(deal.get("title", ""))
-        link = deal.get("url", "")
-        expiry = deal.get("expiry")
-        formatted_regular = _format_price(deal.get("regularPrice"), deal.get("regularCurrency", ""))
-
-        if family == "Epic":
-            if title_key in epic_index:
-                location, idx = epic_index[title_key]
-                source = epic_now[idx] if location == "now" else epic_upcoming[idx]
-                detail = dict(source)
-                if location == "now":
-                    epic_now.pop(idx)
-                else:
-                    epic_upcoming.pop(idx)
-                epic_index = {
-                    _norm_title(x.get("title", "")): ("now", i)
-                    for i, x in enumerate(epic_now)
-                    if isinstance(x, dict)
-                }
-                epic_index.update(
-                    {
-                        _norm_title(x.get("title", "")): ("upcoming", i)
-                        for i, x in enumerate(epic_upcoming)
-                        if isinstance(x, dict)
-                    }
-                )
-            else:
-                detail = await fetch_epic_page_metadata(link, expiry_ts=expiry)
-
-            detail["title"] = detail.get("title") or deal.get("title", "")
-            if not detail.get("cover"):
-                detail["cover"] = deal.get("cover", "")
-            if not detail.get("description"):
-                detail["description"] = deal.get("description", "") or "限时 100% OFF"
-            if not detail.get("originalPriceDesc") and formatted_regular:
-                detail["originalPriceDesc"] = formatted_regular
-            detail["isFreeNow"] = True
-            detail["freeEndAt"] = expiry * 1000 if expiry else detail.get("freeEndAt")
-            epic_itad_promoted.append(detail)
-            continue
-
-        if family == "Steam":
-            detail = await fetch_steam_game_detail_from_url(link)
-            if detail:
-                if not detail.get("title"):
-                    detail["title"] = deal.get("title", "")
-                if not detail.get("discountText"):
-                    detail["discountText"] = f"-{deal.get('cut', 100)}%"
-                if not detail.get("originalPrice") and formatted_regular:
-                    detail["originalPrice"] = formatted_regular
-                if title_key in steam_index:
-                    steam_data[steam_index[title_key]] = detail
-                else:
-                    steam_data.append(detail)
-                    steam_index[title_key] = len(steam_data) - 1
-            continue
-
-        if family == "PlayStation":
-            if title_key in psn_keys:
-                continue
-            psn_data.append(
-                {
-                    "id": link or deal.get("title", ""),
-                    "title": deal.get("title", ""),
-                    "link": link,
-                    "image": deal.get("cover", ""),
-                    "description": "",
-                    "highlight": "限时免费",
-                    "platforms": ["PlayStation"],
-                    "period": "活动中" if expiry else "时间待定",
-                    "originalPrice": formatted_regular,
-                }
-            )
-            psn_keys.add(title_key)
-
-    if epic_itad_promoted:
-        epic_data["now"] = epic_itad_promoted + epic_now
-    else:
-        epic_data["now"] = epic_now
-    epic_data["upcoming"] = epic_upcoming
-
-    return {"deals": [], "bundles": bundles}
 
 
 async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     """抓取所有平台的限免数据"""
     print("开始抓取限免数据...")
-    
+
     os.makedirs(output_dir, exist_ok=True)
 
     # 并行抓取各平台数据
     results = {}
-    
+
     # Epic
     try:
         epic_data = await fetch_epic()
@@ -193,7 +45,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
                 date_str = game.get("date", "")
                 free_start_at_ms = None
                 free_end_at_ms = None
-                
+
                 if date_str:
                     try:
                         # 解析日期
@@ -205,14 +57,14 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
                             dt = dt.replace(second=0)
                         # 转换为 UTC 时间戳（毫秒）
                         timestamp_ms = int(dt.timestamp() * 1000)
-                        
+
                         if game.get("status") == "ACTIVE":
                             free_end_at_ms = timestamp_ms
                         else:
                             free_start_at_ms = timestamp_ms
                     except Exception:
                         pass
-                
+
                 # 构建转换后的游戏对象
                 converted_game = {
                     "title": game.get("title", ""),
@@ -226,7 +78,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
                     "freeStartAt": free_start_at_ms,
                     "freeEndAt": free_end_at_ms,
                 }
-                
+
                 if game.get("status") == "ACTIVE":
                     results["epic"]["now"].append(converted_game)
                 else:
@@ -237,7 +89,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     except Exception as e:
         print(f"[FAIL] EPIC 抓取失败: {e}")
         results["epic"] = {"now": [], "upcoming": []}
-    
+
     # PSN
     try:
         psn_data = await fetch_psn()
@@ -246,7 +98,7 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
     except Exception as e:
         print(f"[FAIL] PSN 抓取失败: {e}")
         results["psn"] = []
-    
+
     # Steam
     try:
         steam_data = await fetch_steam(None)
@@ -268,17 +120,31 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         print(f"[FAIL] ITAD 抓取失败: {e}")
         results["itad"] = {"deals": [], "bundles": []}
 
+    # GOG
+    try:
+        gog_data = await fetch_gog()
+        results["gog"] = gog_data
+        print("[OK] GOG 抓取完成")
+    except Exception as e:
+        print(f"[FAIL] GOG 抓取失败: {e}")
+        results["gog"] = []
+
+    # Xbox
+    try:
+        xbox_data = await fetch_xbox()
+        results["xbox"] = xbox_data
+        print("[OK] Xbox 抓取完成")
+    except Exception as e:
+        print(f"[FAIL] Xbox 抓取失败: {e}")
+        results["xbox"] = []
+
     epic_data = results.get("epic", {"now": [], "upcoming": []})
     steam_data = results.get("steam", [])
     psn_data = results.get("psn", [])
-    itad_data = results.get("itad", {"deals": [], "bundles": []})
+    itad_raw = results.get("itad", {"deals": [], "bundles": []})
 
-    itad_data = await _redistribute_itad_platform_deals(
-        epic_data,
-        steam_data,
-        psn_data,
-        itad_data,
-    )
+    # 将 ITAD deals 中属于 Epic/Steam 的条目合并到对应平台，剩余为 itad 展示数据
+    itad_data = redistribute_itad_deals(itad_raw, epic_data, steam_data)
 
     # 合并为 snapshot（不落地 JSON 文件；历史数据写入 SQLite）
     # 使用中国时区（UTC+8）
@@ -288,12 +154,16 @@ async def fetch_all(output_dir: str = "site") -> Dict[str, Any]:
         "epic": epic_data,
         "steam": steam_data,
         "psn": psn_data,
+        "gog": results.get("gog", []),
+        "xbox": results.get("xbox", []),
         "itad": itad_data,
         "sources": {
             "epic": "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions",
-            "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese",
+            "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese",
             "psn": "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/",
             "itad": "https://api.isthereanydeal.com/deals/v2?sort=-cut",
+            "gog": "https://www.gog.com/en/games?price=free",
+            "xbox": "https://www.xbox.com/zh-hk/xbox-game-pass/games",
         },
     }
     return snapshot
@@ -314,7 +184,9 @@ def _canonicalize_for_hash(snapshot: Dict[str, Any]) -> Dict[str, Any]:
     epic = snapshot.get("epic") or {}
     steam = snapshot.get("steam") or []
     psn = snapshot.get("psn") or []
-    itad = snapshot.get("itad") or {}
+    itad = snapshot.get("itad") or []
+    gog = snapshot.get("gog") or []
+    xbox = snapshot.get("xbox") or []
 
     def pick_epic(item: Dict[str, Any]) -> Dict[str, Any]:
         return {
@@ -335,32 +207,27 @@ def _canonicalize_for_hash(snapshot: Dict[str, Any]) -> Dict[str, Any]:
 
     def pick_itad(item: Dict[str, Any]) -> Dict[str, Any]:
         return {
-            "id": item.get("id") or item.get("url") or item.get("title"),
             "title": item.get("title"),
             "url": item.get("url"),
             "expiry": item.get("expiry"),
             "store": item.get("store"),
-            "cut": item.get("cut"),
         }
 
     epic_now = sorted([pick_epic(x) for x in (epic.get("now") or []) if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
     epic_upcoming = sorted([pick_epic(x) for x in (epic.get("upcoming") or []) if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
     steam_list = sorted([pick_simple(x) for x in steam if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
     psn_list = sorted([pick_simple(x) for x in psn if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
-    itad_deals = sorted(
-        [pick_itad(x) for x in (itad.get("deals") or []) if isinstance(x, dict)],
-        key=lambda x: (str(x.get("title") or ""), str(x.get("url") or "")),
-    )
-    itad_bundles = sorted(
-        [pick_itad(x) for x in (itad.get("bundles") or []) if isinstance(x, dict)],
-        key=lambda x: (str(x.get("title") or ""), str(x.get("url") or "")),
-    )
+    itad_list = sorted([pick_itad(x) for x in itad if isinstance(x, dict)], key=lambda x: (str(x.get("title") or ""), str(x.get("url") or "")))
+    gog_list = sorted([pick_simple(x) for x in gog if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
+    xbox_list = sorted([pick_simple(x) for x in xbox if isinstance(x, dict)], key=lambda x: (str(x.get("id") or ""), str(x.get("title") or "")))
 
     return {
         "epic": {"now": epic_now, "upcoming": epic_upcoming},
         "steam": steam_list,
         "psn": psn_list,
-        "itad": {"deals": itad_deals, "bundles": itad_bundles},
+        "itad": itad_list,
+        "gog": gog_list,
+        "xbox": xbox_list,
     }
 
 
@@ -437,16 +304,24 @@ def generate_feed(snapshot: Dict[str, Any], output_dir: str) -> None:
         items_xml.append(make_item(title, link, desc, fetched_at))
 
     # ITAD
-    itad_data = snapshot.get("itad") or {}
-    for game in itad_data.get("deals", []):
-        title = game.get("title", "ITAD 免费游戏")
-        link = game.get("url", "")
-        desc = (game.get("description") or "")[:200]
-        items_xml.append(make_item(title, link, desc, fetched_at))
-    for game in itad_data.get("bundles", []):
-        title = game.get("title", "ITAD Bundle")
+    for game in snapshot.get("itad", []):
+        title = game.get("title", "ITAD 礼包")
         link = game.get("url", "")
         desc = (game.get("description") or game.get("details") or "")[:200]
+        items_xml.append(make_item(title, link, desc, fetched_at))
+
+    # GOG
+    for game in snapshot.get("gog", []):
+        title = game.get("title", "GOG 免费游戏")
+        link = game.get("link", "")
+        desc = (game.get("description") or "")[:200]
+        items_xml.append(make_item(title, link, desc, fetched_at))
+
+    # Xbox
+    for game in snapshot.get("xbox", []):
+        title = game.get("title", "Xbox 免费游戏")
+        link = game.get("link", "")
+        desc = (game.get("description") or "")[:200]
         items_xml.append(make_item(title, link, desc, fetched_at))
 
     feed_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -454,7 +329,7 @@ def generate_feed(snapshot: Dict[str, Any], output_dir: str) -> None:
     <channel>
         <title>白嫖游戏速报 | GBTGAME</title>
         <link>https://gameinfo.gbtgame.me</link>
-        <description>聚合 EPIC | Steam | PlayStation 限免与 ITAD Bundle / 慈善包情报</description>
+        <description>聚合 EPIC | Steam | PlayStation | ITAD | GOG | Xbox 限免情报</description>
         <language>zh-CN</language>
         <lastBuildDate>{fetched_at}</lastBuildDate>
         <atom:link href="https://gameinfo.gbtgame.me/feed.xml" rel="self" type="application/rss+xml"/>
@@ -484,10 +359,10 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     print(f"Epic: {len(snapshot['epic'].get('now', []))} 正在免费, {len(snapshot['epic'].get('upcoming', []))} 即将免费")
     print(f"Steam: {len(snapshot['steam'])} 条")
     print(f"PSN: {len(snapshot['psn'])} 条")
-    itad_deals = (snapshot.get("itad") or {}).get("deals", [])
-    itad_bundles = (snapshot.get("itad") or {}).get("bundles", [])
-    print(f"ITAD 100% OFF: {len(itad_deals)} 个")
-    print(f"ITAD Bundles: {len(itad_bundles)} 个")
+    print(f"GOG: {len(snapshot['gog'])} 条")
+    print(f"Xbox: {len(snapshot['xbox'])} 条")
+    itad_list = snapshot.get("itad") or []
+    print(f"ITAD Giveaways: {len(itad_list)} 个")
 
     # 输出"本次记录"的 JSON（用于 Pages 直接访问），始终覆盖为当前快照
     site_dir = Path(output_dir)

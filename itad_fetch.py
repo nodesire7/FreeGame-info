@@ -1,357 +1,305 @@
 #!/usr/bin/env python3
 """
-ITAD 抓取脚本：
-- 使用官方 API: https://api.isthereanydeal.com/deals/v2 获取 100% OFF 游戏
-- 使用网页 SSR 数据: https://isthereanydeal.com/bundles/ 获取 bundle / charity 列表
-- 对 bundle 目标页补抓 og:image / description，补全封面与详情
+ITAD 数据抓取脚本：
+- Deals API：获取全平台 100% OFF 折扣游戏（需要 ITAD_API_KEY）
+- Giveaways 页面：解析 giveaways 页面的 bundle/礼包数据
+- 商店归类：将 deals 按平台家族分类，供渲染时再分配到对应 Tab
 """
 import asyncio
 import json
 import os
 import re
-from urllib.parse import parse_qs, unquote, urlparse
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import datetime, timezone, timedelta
+from typing import Any, Dict, List, Optional
 
 import aiohttp
 
-ITAD_API_URL = "https://api.isthereanydeal.com/deals/v2"
-ITAD_BUNDLES_URL = "https://isthereanydeal.com/bundles/"
-USER_AGENT = "FreeGame-info/1.0 (+https://github.com/nodesire7/FreeGame-info)"
-DEFAULT_COUNTRY = os.getenv("ITAD_COUNTRY", "CN").strip().upper() or "CN"
-PAGE_LIMIT = 200
-BUNDLE_DETAIL_LIMIT = 24
-BUNDLE_DETAIL_CONCURRENCY = 4
+ITAD_DEALS_API = "https://api.isthereanydeal.com/deals/v2"
+ITAD_GIVEAWAYS_URL = "https://isthereanydeal.com/giveaways/"
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+)
+
+# 商店 → 平台家族映射
+STORE_FAMILY = {
+    "steam": "steam",
+    "epicgames": "epic",
+    "epic": "epic",
+    "playstation": "psn",
+    "psn": "psn",
+    "gog": "gog",
+    "xbox": "xbox",
+    "microsoft": "xbox",
+    "nintendo": "nintendo",
+    "itchio": "itchio",
+    "humble": "humble",
+    "fanatical": "fanatical",
+    "indiegala": "indiegala",
+}
 
 
-def _get_api_key() -> str:
-    api_key = os.getenv("ITAD_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("缺少 ITAD_API_KEY 环境变量，无法调用官方 ITAD API")
-    return api_key
+def _classify_store(store_name: str) -> str:
+    """将商店名称归类到平台家族"""
+    key = store_name.lower().replace(" ", "").replace("-", "")
+    for k, v in STORE_FAMILY.items():
+        if k in key:
+            return v
+    return "other"
 
 
-def _parse_expiry(value: Any) -> Optional[int]:
-    """将 ISO 时间或 Unix 时间解析为 Unix seconds。"""
-    if not value:
-        return None
-    if isinstance(value, (int, float)):
-        return int(value)
-    try:
-        return int(datetime.fromisoformat(value).timestamp())
-    except (ValueError, TypeError):
-        return None
+# ============== Deals API (100% OFF) ==============
 
 
-def _pick_cover(assets: Dict[str, Any]) -> str:
-    if not isinstance(assets, dict):
-        return ""
-    for key in ("banner600", "banner400", "banner300", "banner145", "boxart"):
-        url = assets.get(key)
-        if isinstance(url, str) and url:
-            return url
-    return ""
-
-
-def _normalize_item(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    deal = item.get("deal")
-    if not isinstance(deal, dict):
-        return None
-
-    cut = deal.get("cut")
-    if cut != 100:
-        return None
-
-    shop = deal.get("shop") or {}
-    price = deal.get("price") or {}
-    regular = deal.get("regular") or {}
-
-    return {
-        "id": item.get("id") or item.get("slug") or item.get("title"),
-        "title": item.get("title", ""),
-        "store": shop.get("name", "ITAD"),
-        "storeFamily": _classify_store(shop.get("name", ""), shop.get("id")),
-        "expiry": _parse_expiry(deal.get("expiry")),
-        "gameCount": 1,
-        "url": deal.get("url", ""),
-        "isPending": False,
-        "isMature": bool(item.get("mature", False)),
-        "cover": _pick_cover(item.get("assets") or {}),
-        "type": item.get("type") or "game",
-        "cut": cut,
-        "currentPrice": price.get("amount"),
-        "currentCurrency": price.get("currency"),
-        "regularPrice": regular.get("amount"),
-        "regularCurrency": regular.get("currency"),
-        "flag": deal.get("flag", ""),
-        "shopId": shop.get("id"),
-        "drm": [x.get("name", "") for x in (deal.get("drm") or []) if isinstance(x, dict)],
-        "platforms": [x.get("name", "") for x in (deal.get("platforms") or []) if isinstance(x, dict)],
-    }
-
-
-def _classify_store(store_name: str, shop_id: Any = None) -> str:
-    name = (store_name or "").strip().lower()
-    if "steam" in name:
-        return "Steam"
-    if "epic" in name:
-        return "Epic"
-    if "playstation" in name or "psn" in name:
-        return "PlayStation"
-    if "gog" in name:
-        return "GOG"
-    if "xbox" in name or "microsoft" in name:
-        return "Xbox"
-    if "nintendo" in name:
-        return "Nintendo"
-    if shop_id == 61:
-        return "Steam"
-    return "Other"
-
-
-def _unwrap_affiliate_url(url: str) -> str:
-    if not url:
-        return ""
-    parsed = urlparse(url)
-    query = parse_qs(parsed.query)
-    for key in ("u", "url", "target"):
-        if key in query and query[key]:
-            return unquote(query[key][0])
-    return url
-
-
-def _clean_text(value: str) -> str:
-    return re.sub(r"\s+", " ", (value or "")).strip()
-
-
-def _pick_meta_image(html: str) -> str:
-    patterns = [
-        r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']',
-        r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']',
-        r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']',
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, html, re.IGNORECASE)
-        if match:
-            return match.group(1).strip()
-    return ""
-
-
-def _pick_meta_description(html: str) -> str:
-    patterns = [
-        r'<meta[^>]+property=["\']og:description["\'][^>]+content=["\']([^"\']+)["\']',
-        r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']+)["\']',
-        r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']description["\']',
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, html, re.IGNORECASE)
-        if match:
-            return _clean_text(match.group(1))
-    return ""
-
-
-def _extract_bundles_payload(html: str) -> List[Dict[str, Any]]:
-    match = re.search(r"var\s+page\s*=\s*(\[[\s\S]*?\]);", html)
-    if not match:
-        raise RuntimeError("未能从 ITAD bundles 页面提取 SSR 数据")
-
-    payload = json.loads(match.group(1))
-    if not isinstance(payload, list) or len(payload) < 2 or not isinstance(payload[1], dict):
-        raise RuntimeError("ITAD bundles SSR 数据结构不符合预期")
-
-    data = payload[1]
-    merged: List[Dict[str, Any]] = []
-    for key in ("expiring", "updated", "pending"):
-        items = data.get(key) or []
-        if isinstance(items, list):
-            merged.extend([item for item in items if isinstance(item, dict)])
-    return merged
-
-
-def _normalize_bundle(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    title = item.get("title")
-    url = item.get("url")
-    page = item.get("page") or {}
-    counts = item.get("counts") or {}
-    if not title or not url:
-        return None
-
-    details = _clean_text(item.get("details") or item.get("note") or "")
-    return {
-        "id": item.get("id") or url or title,
-        "title": title,
-        "store": page.get("name", "Bundle"),
-        "storeFamily": "Bundle",
-        "url": url,
-        "sourceUrl": _unwrap_affiliate_url(url),
-        "expiry": _parse_expiry(item.get("expiry")),
-        "publishedAt": _parse_expiry(item.get("publish")),
-        "isPending": bool(item.get("isPending", False)),
-        "isMature": bool(item.get("isMature", False)),
-        "gameCount": counts.get("games") or 0,
-        "mediaCount": counts.get("media") or 0,
-        "details": details,
-        "description": details,
-        "cover": _pick_cover(item.get("assets") or {}),
-        "shopId": page.get("shopId"),
-    }
-
-
-async def _enrich_bundle_details(
-    session: aiohttp.ClientSession, bundle: Dict[str, Any], semaphore: asyncio.Semaphore
-) -> Dict[str, Any]:
-    target_url = bundle.get("sourceUrl") or bundle.get("url")
-    if not target_url:
-        return bundle
-
-    async with semaphore:
-        try:
-            async with session.get(target_url, allow_redirects=True) as resp:
-                if resp.status != 200:
-                    return bundle
-                html = await resp.text()
-        except Exception:
-            return bundle
-
-    cover = bundle.get("cover") or _pick_meta_image(html)
-    description = bundle.get("description") or _pick_meta_description(html)
-    bundle["cover"] = cover
-    bundle["description"] = description or bundle.get("details") or ""
-    return bundle
-
-
-async def fetch_itad_deals() -> List[Dict[str, Any]]:
-    """
-    获取 ITAD 100% OFF 列表。
-
-    说明：
-    - 通过 sort=-cut 将 100% off 项排在最前面
-    - 分页抓取，直到当前页已不再出现 100% off 条目
-    """
-    api_key = _get_api_key()
-    headers = {"User-Agent": USER_AGENT}
-    params = {
-        "key": api_key,
-        "country": DEFAULT_COUNTRY,
-        "limit": PAGE_LIMIT,
-        "sort": "-cut",
-    }
-
-    items: List[Dict[str, Any]] = []
+async def _fetch_itad_deals(
+    session: aiohttp.ClientSession,
+    api_key: str,
+    country: str = "CN",
+    limit: int = 200,
+) -> List[Dict[str, Any]]:
+    """从 ITAD Deals API 拉取 100% OFF 折扣，分页直到 cut < 100"""
+    all_deals: List[Dict[str, Any]] = []
     offset = 0
+    max_pages = 5
 
-    async with aiohttp.ClientSession(headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as session:
-        while True:
-            query = dict(params)
-            query["offset"] = offset
-
-            try:
-                async with session.get(ITAD_API_URL, params=query) as resp:
-                    if resp.status != 200:
-                        text = await resp.text()
-                        raise RuntimeError(f"ITAD API 返回状态码 {resp.status}: {text[:200]}")
-                    payload = await resp.json()
-            except asyncio.TimeoutError:
-                raise RuntimeError("ITAD API 请求超时")
-            except aiohttp.ClientError as e:
-                raise RuntimeError(f"ITAD API 请求失败: {str(e)}")
-
-            page_items = payload.get("list") or []
-            if not isinstance(page_items, list) or not page_items:
-                break
-
-            normalized_page = []
-            saw_lower_cut = False
-            for raw in page_items:
-                if not isinstance(raw, dict):
-                    continue
-                normalized = _normalize_item(raw)
-                if normalized:
-                    if normalized.get("title") and normalized.get("url"):
-                        normalized_page.append(normalized)
-                else:
-                    deal = raw.get("deal") or {}
-                    if isinstance(deal, dict) and isinstance(deal.get("cut"), int) and deal.get("cut", 0) < 100:
-                        saw_lower_cut = True
-
-            items.extend(normalized_page)
-
-            if saw_lower_cut:
-                break
-            if not payload.get("hasMore"):
-                break
-
-            next_offset = payload.get("nextOffset")
-            if not isinstance(next_offset, int) or next_offset <= offset:
-                break
-            offset = next_offset
-
-    return items
-
-
-async def fetch_itad_bundles() -> List[Dict[str, Any]]:
-    headers = {"User-Agent": USER_AGENT}
-    timeout = aiohttp.ClientTimeout(total=30)
-
-    async with aiohttp.ClientSession(headers=headers, timeout=timeout) as session:
+    for _ in range(max_pages):
+        params = {
+            "key": api_key,
+            "country": country,
+            "limit": limit,
+            "offset": offset,
+            "sort": "-cut",
+        }
         try:
-            async with session.get(ITAD_BUNDLES_URL) as resp:
+            async with session.get(
+                ITAD_DEALS_API,
+                params=params,
+                timeout=aiohttp.ClientTimeout(total=30),
+            ) as resp:
                 if resp.status != 200:
-                    text = await resp.text()
-                    raise RuntimeError(f"ITAD bundles 页面返回状态码 {resp.status}: {text[:200]}")
-                html = await resp.text()
-        except asyncio.TimeoutError:
-            raise RuntimeError("ITAD bundles 页面请求超时")
-        except aiohttp.ClientError as e:
-            raise RuntimeError(f"ITAD bundles 页面请求失败: {str(e)}")
+                    break
+                data = await resp.json()
+        except Exception:
+            break
 
-        raw_items = _extract_bundles_payload(html)
-        bundles = [item for item in (_normalize_bundle(raw) for raw in raw_items) if item]
+        deals = data.get("list") if isinstance(data, dict) else []
+        if not deals:
+            break
 
-        # 仅对前若干条补抓封面和详情，控制时延。
-        semaphore = asyncio.Semaphore(BUNDLE_DETAIL_CONCURRENCY)
-        tasks = [
-            _enrich_bundle_details(session, bundle, semaphore)
-            for bundle in bundles[:BUNDLE_DETAIL_LIMIT]
-        ]
-        if tasks:
-            enriched = await asyncio.gather(*tasks)
-            bundles[: len(enriched)] = enriched
-        bundles.sort(
-            key=lambda item: (
-                0 if item.get("cover") else 1,
-                0 if item.get("description") else 1,
-                item.get("expiry") or 2**31,
-            )
-        )
-        return bundles
+        all_deals.extend(deals)
+        offset += limit
+
+        # 最后一批的 cut 值 < 100 则停止
+        if deals[-1].get("cut", 0) < 100:
+            break
+
+    # 规范化 deals 字段
+    result: List[Dict[str, Any]] = []
+    for deal in all_deals:
+        cut = deal.get("cut", 0)
+        if cut < 100:
+            continue
+
+        shop_info = deal.get("shop", {})
+        shop_name = shop_info.get("name", "") if isinstance(shop_info, dict) else ""
+        plain = deal.get("plain", "")
+
+        price_info = deal.get("price", {}) if isinstance(deal.get("price"), dict) else {}
+        regular_info = deal.get("regular", {}) if isinstance(deal.get("regular"), dict) else {}
+
+        result.append({
+            "id": deal.get("id", plain),
+            "plain": plain,
+            "title": deal.get("title", ""),
+            "store": shop_name,
+            "cut": cut,
+            "price": price_info.get("amount", 0),
+            "priceCurrency": price_info.get("currency", ""),
+            "regularPrice": regular_info.get("amount", 0),
+            "regularCurrency": regular_info.get("currency", ""),
+            "url": deal.get("urls", {}).get("game", ""),
+            "platforms": deal.get("platforms", []),
+            "expiry": deal.get("expiry"),
+            "storeFamily": _classify_store(shop_name),
+        })
+    return result
 
 
-async def fetch_itad() -> Dict[str, List[Dict[str, Any]]]:
-    deals: List[Dict[str, Any]] = []
-    bundles: List[Dict[str, Any]] = []
-    errors: List[str] = []
+# ============== Giveaways 页面 (Bundles) ==============
 
+
+def _parse_giveaways_page(html_content: str) -> List[Dict[str, Any]]:
+    """解析 ITAD giveaways 页面，提取 bundle 数据"""
+    # 匹配 var page = [...{"bundles":[...]}]
+    pattern = r'"bundles"\s*:\s*(\[[\s\S]*?\])\s*[,}]'
+    match = re.search(pattern, html_content)
+    if not match:
+        return []
+
+    bundles_json = match.group(1)
     try:
-        deals = await fetch_itad_deals()
-    except Exception as e:
-        errors.append(f"deals: {e}")
+        bundles = json.loads(bundles_json)
+    except json.JSONDecodeError:
+        cleaned = re.sub(r'[,}\]]+$', '', bundles_json)
+        try:
+            bundles = json.loads(cleaned)
+        except json.JSONDecodeError:
+            return []
 
-    try:
-        bundles = await fetch_itad_bundles()
-    except Exception as e:
-        errors.append(f"bundles: {e}")
+    if not isinstance(bundles, list):
+        return []
 
-    if not deals and not bundles and errors:
-        raise RuntimeError(" ; ".join(errors))
+    result: List[Dict[str, Any]] = []
+    for bundle in bundles:
+        if not isinstance(bundle, dict):
+            continue
+        title = bundle.get("title", "")
+        page_info = bundle.get("page", {})
+        store_name = page_info.get("name", "") if isinstance(page_info, dict) else ""
+        url = bundle.get("url", "")
+        expiry = bundle.get("expiry")
+        counts = bundle.get("counts", {})
+        game_count = counts.get("games", 0) if isinstance(counts, dict) else 0
+        is_pending = bundle.get("isPending", False)
+        is_mature = bundle.get("isMature", False)
 
-    return {
-        "deals": deals,
-        "bundles": bundles,
+        if not title or not url:
+            continue
+
+        result.append({
+            "title": title,
+            "store": store_name,
+            "expiry": expiry,
+            "gameCount": game_count,
+            "url": url,
+            "isPending": is_pending,
+            "isMature": is_mature,
+            "storeFamily": _classify_store(store_name),
+        })
+    return result
+
+
+async def _fetch_itad_giveaways(session: aiohttp.ClientSession) -> List[Dict[str, Any]]:
+    """抓取 ITAD Giveaways 页面"""
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
     }
+    try:
+        async with session.get(
+            ITAD_GIVEAWAYS_URL,
+            headers=headers,
+            timeout=aiohttp.ClientTimeout(total=30),
+        ) as resp:
+            if resp.status != 200:
+                return []
+            html_content = await resp.text()
+    except Exception:
+        return []
+
+    return _parse_giveaways_page(html_content)
 
 
-def save_json(data: Dict[str, List[Dict[str, Any]]], path: str = "ITAD.json") -> None:
+# ============== 主入口 ==============
+
+
+async def fetch_itad(
+    api_key: Optional[str] = None,
+    country: str = "CN",
+) -> Dict[str, Any]:
+    """
+    获取 ITAD 全平台数据
+    返回: {"deals": [...], "bundles": [...]}
+    """
+    itad_key = api_key or os.getenv("ITAD_API_KEY", "")
+
+    async with aiohttp.ClientSession() as session:
+        deals: List[Dict[str, Any]] = []
+        bundles: List[Dict[str, Any]] = []
+
+        # Deals API
+        if itad_key:
+            try:
+                deals = await _fetch_itad_deals(session, itad_key, country)
+            except Exception as e:
+                print(f"  ⚠️ ITAD Deals API 失败: {e}")
+
+        # Giveaways (bundles)
+        try:
+            bundles = await _fetch_itad_giveaways(session)
+        except Exception as e:
+            print(f"  ⚠️ ITAD Giveaways 失败: {e}")
+
+    return {"deals": deals, "bundles": bundles}
+
+
+def redistribute_itad_deals(
+    itad_data: Dict[str, Any],
+    epic_data: Optional[Dict[str, Any]] = None,
+    steam_data: Optional[List[Dict[str, Any]]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    将 ITAD deals 中属于 Epic/Steam/PSN 的条目合并到对应平台数据中。
+    返回仅保留"其他商店"和 bundles 的 ITAD 数据。
+    """
+    deals = itad_data.get("deals", [])
+    bundles = itad_data.get("bundles", [])
+
+    main_platforms = {"epic", "steam", "psn"}
+    redistributed_deals: List[Dict[str, Any]] = []
+    leftover_deals: List[Dict[str, Any]] = []
+
+    for deal in deals:
+        family = deal.get("storeFamily", "other")
+        if family in main_platforms:
+            redistributed_deals.append(deal)
+        else:
+            leftover_deals.append(deal)
+
+    # 将 redistributed_deals 注入到对应平台数据
+    if epic_data is not None and isinstance(epic_data, dict):
+        epic_extra = [d for d in redistributed_deals if d.get("storeFamily") == "epic"]
+        if epic_extra:
+            for d in epic_extra:
+                normalized = {
+                    "title": d["title"],
+                    "link": d.get("url", ""),
+                    "cover": "",
+                    "originalPriceDesc": f"{d.get('regularPrice', 0)} {d.get('regularCurrency', '')}".strip(),
+                    "publisher": d.get("store", ""),
+                    "creator": "",
+                    "description": f"ITAD 来源：{d['store']} 100% OFF",
+                    "isFreeNow": True,
+                    "freeStartAt": None,
+                    "freeEndAt": d.get("expiry"),
+                    "source": "itad",
+                }
+                if "now" not in epic_data:
+                    epic_data["now"] = []
+                epic_data["now"].append(normalized)
+
+    if steam_data is not None and isinstance(steam_data, list):
+        steam_extra = [d for d in redistributed_deals if d.get("storeFamily") == "steam"]
+        for d in steam_extra:
+            normalized = {
+                "title": d["title"],
+                "id": d.get("url", d.get("plain", "")),
+                "link": d.get("url", f"https://store.steampowered.com/app/{d.get('plain', '')}/"),
+                "image": "",
+                "platforms": d.get("platforms", []),
+                "discountText": "100% OFF",
+                "originalPrice": f"{d.get('regularPrice', 0)} {d.get('regularCurrency', '')}".strip(),
+                "finalPrice": "0",
+                "shortDescription": f"ITAD 来源：{d['store']} 100% OFF",
+                "source": "itad",
+            }
+            steam_data.append(normalized)
+
+    return leftover_deals + bundles
+
+
+def save_json(data: Dict[str, Any], path: str = "ITAD.json") -> None:
     """保存数据到 JSON 文件"""
     os.makedirs(os.path.dirname(path) if os.path.dirname(path) else ".", exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
@@ -359,26 +307,18 @@ def save_json(data: Dict[str, List[Dict[str, Any]]], path: str = "ITAD.json") ->
 
 
 async def main():
-    """主函数"""
     import sys
-
     output = sys.argv[1] if len(sys.argv) > 1 else "ITAD.json"
-
     try:
         data = await fetch_itad()
         save_json(data, output)
 
-        deals = data.get("deals", [])
-        bundles = data.get("bundles", [])
-        print("ITAD 数据抓取完成！")
-        print(f"  100% OFF: {len(deals)} 个")
-        print(f"  Bundles: {len(bundles)} 个")
+        deal_count = len(data.get("deals", []))
+        bundle_count = len(data.get("bundles", []))
+        print(f"ITAD 抓取完成！")
+        print(f"  100% OFF deals: {deal_count} 个")
+        print(f"  Bundles/Giveaways: {bundle_count} 个")
         print(f"  已写入: {output}")
-
-        for i, game in enumerate(deals[:5], start=1):
-            print(f"  [DEAL {i}] {game.get('title', 'Unknown')} ({game.get('store', '')})")
-        for i, bundle in enumerate(bundles[:5], start=1):
-            print(f"  [BUNDLE {i}] {bundle.get('title', 'Unknown')} ({bundle.get('store', '')})")
 
     except Exception as e:
         print(f"错误: {str(e)}")

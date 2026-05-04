@@ -122,21 +122,7 @@ def _parse_listing(html: str) -> List[Dict[str, Any]]:
     return items
 
 
-async def _fetch_store_metadata(link: str) -> Dict[str, Any]:
-    """
-    使用 Playwright 访问商店页，通过执行 JS 提取：
-    - title, publisher, releaseDate, price, originalPrice, currency
-    - features (兼容性说明等)
-    """
-    defaults = {
-        "publisher": "", "platform": "", "releaseDate": "",
-        "price": "", "originalPrice": "", "currency": "",
-        "features": [], "supportedLanguages": "",
-    }
-    if not link:
-        return defaults
-
-    js_code = """
+_PSN_STORE_JS = """
 () => {
     const results = {};
     results.title = document.querySelector('h1[data-qa*="name"], h1.game-title')?.innerText.trim() || '';
@@ -174,38 +160,40 @@ async def _fetch_store_metadata(link: str) -> Dict[str, Any]:
 }
 """
 
+_PSN_DEFAULTS = {
+    "publisher": "", "platform": "", "releaseDate": "",
+    "price": "", "originalPrice": "", "currency": "",
+    "features": [], "supportedLanguages": "",
+}
+
+
+async def _fetch_store_metadata(link: str, context) -> Dict[str, Any]:
+    """使用共享 Playwright context 访问商店页"""
+    if not link:
+        return _PSN_DEFAULTS
+
     try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(
-                headless=True,
-                args=["--disable-blink-features=AutomationControlled"],
-            )
-            context = await browser.new_context(
-                user_agent=USER_AGENT,
-                viewport={"width": 1920, "height": 1080},
-                locale="zh-CN",
-            )
-            page = await context.new_page()
-            page.set_default_timeout(60_000)
+        page = await context.new_page()
+        page.set_default_timeout(60_000)
 
-            await page.goto(link, wait_until="load", timeout=60_000)
-            await page.wait_for_timeout(5_000)
+        await page.goto(link, wait_until="load", timeout=60_000)
+        await page.wait_for_timeout(4_000)
 
-            metadata = await page.evaluate(js_code)
-            await browser.close()
+        metadata = await page.evaluate(_PSN_STORE_JS)
+        await page.close()
 
-            result = dict(defaults)
-            result["publisher"] = metadata.get("publisher", "")
-            result["releaseDate"] = metadata.get("releaseDate", "")
-            result["price"] = metadata.get("price", "")
-            result["originalPrice"] = metadata.get("originalPrice", "")
-            result["currency"] = metadata.get("currency", "")
-            result["features"] = metadata.get("features", [])
-            result["supportedLanguages"] = metadata.get("supportedLanguages", "")
-            return result
+        result = dict(_PSN_DEFAULTS)
+        result["publisher"] = metadata.get("publisher", "")
+        result["releaseDate"] = metadata.get("releaseDate", "")
+        result["price"] = metadata.get("price", "")
+        result["originalPrice"] = metadata.get("originalPrice", "")
+        result["currency"] = metadata.get("currency", "")
+        result["features"] = metadata.get("features", [])
+        result["supportedLanguages"] = metadata.get("supportedLanguages", "")
+        return result
     except Exception as e:
         print(f"  ⚠️ 商店页元数据获取失败 {link}: {e}")
-        return defaults
+        return _PSN_DEFAULTS
 
 
 async def fetch_psn() -> List[Dict[str, Any]]:
@@ -220,38 +208,57 @@ async def fetch_psn() -> List[Dict[str, Any]]:
 
     print(f"PSN: 解析到 {len(items)} 款游戏，正在获取商店页元数据...")
 
-    for i, item in enumerate(items):
-        link = item.get("link", "")
-        title_short = item["title"][:20]
-        print(f"  PSN: [{i+1}/{len(items)}] {title_short}...")
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled"],
+        )
+        context = await browser.new_context(
+            user_agent=USER_AGENT,
+            viewport={"width": 1920, "height": 1080},
+            locale="zh-CN",
+        )
 
-        metadata = await _fetch_store_metadata(link)
+        for i, item in enumerate(items):
+            link = item.get("link", "")
+            title_short = item["title"][:20]
+            print(f"  PSN: [{i+1}/{len(items)}] {title_short}...")
 
-        # 优先用列表页简介，其次用发行商+平台拼接
-        description = item.get("description", "")
-        if not description and (metadata["publisher"] or metadata["releaseDate"]):
-            parts = []
-            if metadata["publisher"]:
-                parts.append(f"发行商：{metadata['publisher']}")
-            if metadata["releaseDate"]:
-                parts.append(f"发行日期：{metadata['releaseDate']}")
-            if metadata["supportedLanguages"]:
-                parts.append(f"版本：{metadata['supportedLanguages']}")
-            description = " | ".join(parts)
+            metadata = await _fetch_store_metadata(link, context)
 
-        item["description"] = description
-        item["publisher"] = metadata["publisher"]
-        item["releaseDate"] = metadata["releaseDate"]
-        item["price"] = metadata["price"]
-        item["originalPrice"] = metadata["originalPrice"]
-        item["currency"] = metadata["currency"]
-        item["features"] = metadata["features"]
-        item["platform"] = "PS Plus"
-        item["originalPrice2"] = "会员免费"
-        item["date"] = "本月有效"
-        item["status"] = "ACTIVE"
+            # 优先用列表页简介，其次用发行商+平台拼接
+            description = item.get("description", "")
+            if not description and (metadata["publisher"] or metadata["releaseDate"]):
+                parts = []
+                if metadata["publisher"]:
+                    parts.append(f"发行商：{metadata['publisher']}")
+                if metadata["releaseDate"]:
+                    parts.append(f"发行日期：{metadata['releaseDate']}")
+                if metadata["supportedLanguages"]:
+                    parts.append(f"版本：{metadata['supportedLanguages']}")
+                description = " | ".join(parts)
 
-        await asyncio.sleep(0.3)
+            item["description"] = description
+            item["publisher"] = metadata["publisher"] or "未知发行商"
+            item["releaseDate"] = metadata.get("releaseDate", "")
+            item["price"] = metadata.get("price", "")
+            item["originalPrice"] = metadata.get("originalPrice", "")
+            item["currency"] = metadata.get("currency", "")
+            item["features"] = metadata.get("features", [])
+            item["platform"] = "PS Plus"
+            # 使用实际抓取的价格信息，避免硬编码
+            if not item.get("originalPrice") and metadata.get("originalPrice"):
+                item["originalPrice"] = metadata["originalPrice"]
+            if not item.get("price"):
+                item["price"] = "会员免费"
+            # 日期：优先用发行日期，没有则留空由渲染层兜底
+            item["date"] = metadata.get("releaseDate", "")
+            item["status"] = "ACTIVE"
+
+            await asyncio.sleep(0.3)
+
+        await context.close()
+        await browser.close()
 
     print(f"PSN: 完成，共 {len(items)} 款")
     return items
