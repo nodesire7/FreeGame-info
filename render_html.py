@@ -27,7 +27,7 @@ SHARE_FONT_FAMILY = "Noto Sans SC"
 
 def escape_html(text: str) -> str:
     """转义 HTML 特殊字符"""
-    return html.escape(text)
+    return html.escape(text or "")
 
 
 def escape_attribute(text: str) -> str:
