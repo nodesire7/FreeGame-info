@@ -22,6 +22,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
+  # ── 所有触发都运行：抓取最新限免数据并部署到 GitHub Pages ──────────────────
   pages:
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +38,6 @@ jobs:
           if git ls-remote --exit-code origin history >/dev/null 2>&1; then
             git fetch origin history:history
           else
-            # first run: create local history branch from current HEAD
             git branch history
           fi
           git worktree add history-wt history
@@ -65,8 +65,7 @@ jobs:
             playwright-
 
       - name: Install Playwright (Chromium)
-        run: |
-          python -m playwright install --with-deps chromium
+        run: python -m playwright install --with-deps chromium
 
       - name: Generate site
         env:
@@ -109,9 +108,17 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      # Releases: only on manual merge/push to main (NOT on schedule)
+  # ── 仅代码 push 时运行：构建 Docker 镜像并创建 GitHub Release ─────────────
+  release:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Compute next version tag
-        if: github.event_name == 'push'
         id: version
         shell: bash
         run: |
@@ -131,21 +138,17 @@ jobs:
           echo "tag=$next" >> "$GITHUB_OUTPUT"
           echo "Next release tag: $next"
 
-      - name: Package site for Release assets
-        if: github.event_name == 'push'
+      - name: Package deploy scripts for Release
         shell: bash
         run: |
-          # Releases 用于“快速部署”，不打包最终生成页面
           rm -f deploy.zip deploy.tar.gz || true
           rm -f deploy/env || true
           cp deploy/env.example deploy/env
-          # 写入本次版本号，用户开箱即用
           sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=${{ steps.version.outputs.tag }}/" deploy/env
           zip -r deploy.zip deploy
           tar -czf deploy.tar.gz deploy
 
-      - name: Create GitHub Release (merge builds only)
-        if: github.event_name == 'push'
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
@@ -156,20 +159,16 @@ jobs:
             deploy.zip
             deploy.tar.gz
 
-      # Docker: only on merge/push to main
       - name: Set up Docker Buildx
-        if: github.event_name == 'push'
         uses: docker/setup-buildx-action@v3
 
       - name: Login to DockerHub
-        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build & Push Docker image
-        if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -177,4 +176,3 @@ jobs:
           tags: |
             nodesire77/game_info:latest
             nodesire77/game_info:${{ steps.version.outputs.tag }}
-

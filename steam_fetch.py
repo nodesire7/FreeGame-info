@@ -173,19 +173,17 @@ def parse_steam_freebies(html_content: str) -> List[Dict[str, Any]]:
 async def _fetch_steam_api_batch(
     app_ids: List[int], session: aiohttp.ClientSession
 ) -> Dict[int, Dict[str, Any]]:
-    """批量获取 Steam API 详情（最多同时请求 1 个批次）"""
+    """逐个请求 Steam API 详情（批量请求多 appid 不稳定且易 400，改为一次一个）"""
     if not app_ids:
         return {}
 
-    ids_param = ",".join(str(aid) for aid in app_ids)
-    url = f"{STEAM_API_BASE}?appids={ids_param}&cc=cn&l=schinese&euro=1"
-
-    try:
-        text = await _fetch_with_aiohttp(url, session, timeout=20)
-        data = json.loads(text)
-        result = {}
-        for app_id_str, app_data in data.items():
-            app_id = int(app_id_str)
+    result: Dict[int, Dict[str, Any]] = {}
+    for app_id in app_ids:
+        url = f"{STEAM_API_BASE}?appids={app_id}&cc=cn&l=schinese"
+        try:
+            text = await _fetch_with_aiohttp(url, session, timeout=20)
+            data = json.loads(text)
+            app_data = data.get(str(app_id), {})
             if app_data.get("success"):
                 d = app_data.get("data", {})
                 result[app_id] = {
@@ -203,10 +201,11 @@ async def _fetch_steam_api_batch(
                 }
             else:
                 result[app_id] = {}
-        return result
-    except Exception as e:
-        print(f"  ⚠️  API 批次请求失败 {app_ids}: {e}")
-        return {aid: {} for aid in app_ids}
+        except Exception as e:
+            print(f"  ⚠️  API 请求失败 [{app_id}]: {e}")
+            result[app_id] = {}
+        await asyncio.sleep(0.5)
+    return result
 
 
 def _merge_api_data(
