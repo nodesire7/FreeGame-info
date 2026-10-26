@@ -320,8 +320,8 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
 
     summary_html = ""
     if summary:
-        summary_inner = escape_html("</span><span class=\"bg-zinc-800 px-3 py-1\">".join(summary))
-        summary_html = f'<div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">{summary_inner}</span></div>'
+        summary_inner = '</span><span class="pill">'.join(escape_html(item) for item in summary)
+        summary_html = f'<div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="pill">{summary_inner}</span></div>'
 
     # 倒计时：默认使用截止时间（freeEndAt），没有则退化为 freeStartAt（仅用于展示）
     countdown_target_ms: Optional[int] = None
@@ -344,29 +344,29 @@ def render_epic_card(game: Dict[str, Any], variant: str) -> str:
     else:
         countdown_text = f'<span>{countdown_text}</span>'
 
-    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    return f"""<article class="game-card">
     <!-- GET corner badge -->
-    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+    <div class="game-card__badge">GET</div>
 
     <!-- Cover image -->
-    <div class="lg:w-2/5 relative">
-        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+    <div class="game-card__media">
+        <div class="game-card__visual">
             {cover_html}
         </div>
-        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 {escape_html(price_label)}</div>
+        <div class="game-card__caption">原价 {escape_html(price_label)}</div>
     </div>
 
     <!-- Content -->
-    <div class="lg:w-3/5 flex flex-col justify-between py-2">
-        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">{escape_html(description)}</p>
+    <div class="game-card__content">
+        <h4 class="game-card__title">{escape_html(game["title"])}</h4>
+        <p class="game-card__description">{escape_html(description)}</p>
         {summary_html}
-        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+        <div class="game-card__footer">
             <div class="flex flex-col gap-1">
-                <span class="text-2xl font-black text-red-600 italic">{countdown_text}</span>
+                <span class="game-card__price">{countdown_text}</span>
                 <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(deadline_text)}</span>
             </div>
-            <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">{link_text}</a>
+            <a href="{escape_attribute(game["link"])}" class="action game-card__cta" target="_blank" rel="noopener noreferrer">{link_text}</a>
         </div>
     </div>
 </article>"""
@@ -418,7 +418,7 @@ def render_steam_card(game: Dict[str, Any]) -> str:
     if summary:
         summary_html_parts = []
         for item in summary:
-            summary_html_parts.append(f'<span class="bg-zinc-800 px-3 py-1">{item}</span>')
+            summary_html_parts.append(f'<span class="pill">{item}</span>')
         summary_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(summary_html_parts)}</div>'
     else:
         summary_html = ""
@@ -428,7 +428,7 @@ def render_steam_card(game: Dict[str, Any]) -> str:
     tags_html = ""
     if tags:
         tags_str = "".join(
-            f'<span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(t)}</span>'
+            f'<span class="pill">{escape_html(t)}</span>'
             for t in tags[:6]
         )
         tags_html = f'<div class="flex flex-wrap gap-1 mt-2">{tags_str}</div>'
@@ -459,30 +459,30 @@ def render_steam_card(game: Dict[str, Any]) -> str:
         )
         features_html = f'<div class="flex flex-wrap gap-1 mt-2">{feat_tags}</div>'
 
-    cover = game.get("image", "") or game.get("headerImage", "")
+    cover = game.get("headerImage", "") or game.get("image", "")
     cover_html = (
         f'<img src="{escape_attribute(cover)}" alt="{escape_attribute(game["title"] + " 封面")}" loading="lazy" class="w-full h-full object-cover">'
         if cover
         else '<span class="w-full h-full flex items-center justify-center text-zinc-600 text-xs bg-zinc-800">暂无封面</span>'
     )
 
-    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    return f"""<article class="game-card">
     <!-- GET corner badge -->
-    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+    <div class="game-card__badge">GET</div>
 
     <!-- Cover image -->
-    <div class="lg:w-2/5 relative min-w-0">
-        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+    <div class="game-card__media">
+        <div class="game-card__visual">
             {cover_html}
         </div>
-        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">Steam 限免</div>
+        <div class="game-card__caption">Steam 限免</div>
     </div>
 
     <!-- Content -->
-    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+    <div class="game-card__content">
         <div>
-            <h4 class="text-3xl font-black italic mb-3 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
-            <p class="text-zinc-500 text-sm leading-relaxed mb-3 border-l-4 border-zinc-800 pl-4 line-clamp-3">{description}</p>
+            <h4 class="game-card__title">{escape_html(game["title"])}</h4>
+            <p class="game-card__description line-clamp-3">{description}</p>
             {tags_html}
             {reviews_html}
             {languages_html}
@@ -490,12 +490,12 @@ def render_steam_card(game: Dict[str, Any]) -> str:
         </div>
         <div class="mt-4">
             {summary_html}
-            <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="game-card__footer">
                 <div class="flex flex-col gap-1">
-                    <span class="text-2xl font-black text-red-600 italic">{escape_html(price_display)}</span>
+                    <span class="game-card__price">{escape_html(price_display)}</span>
                     <span class="text-[10px] text-zinc-500 font-bold uppercase">{escape_html(game.get("originalPrice", ""))}</span>
                 </div>
-                <a href="{escape_attribute(game['link'])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+                <a href="{escape_attribute(game['link'])}" class="action game-card__cta" target="_blank" rel="noopener noreferrer">立即抢夺</a>
             </div>
         </div>
     </div>
@@ -522,21 +522,21 @@ def render_psn_card(game: Dict[str, Any]) -> str:
     # 构建 meta 行
     meta_items = []
     if publisher:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发行：{publisher}</span>')
+        meta_items.append(f'<span class="pill">发行：{publisher}</span>')
     if release_date:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发售：{release_date}</span>')
+        meta_items.append(f'<span class="pill">发售：{release_date}</span>')
     if price and original_price and original_price != price:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic line-through">{original_price}</span>')
-        meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">{price}</span>')
+        meta_items.append(f'<span class="pill line-through">{original_price}</span>')
+        meta_items.append(f'<span class="pill pill--accent">{price}</span>')
     elif price:
-        meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">PS Plus 会员免费</span>')
+        meta_items.append(f'<span class="pill pill--accent">PS Plus 会员免费</span>')
     else:
-        meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">PS Plus 会员免费</span>')
+        meta_items.append(f'<span class="pill pill--accent">PS Plus 会员免费</span>')
     meta_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(meta_items)}</div>'
 
     # 描述区（无论有无 description 都显示内容块）
     if description:
-        desc_html = f'<p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{escape_html(description)}</p>'
+        desc_html = f'<p class="game-card__description line-clamp-3">{escape_html(description)}</p>'
     else:
         # 无简介时用 info 行代替
         info_parts = []
@@ -554,34 +554,34 @@ def render_psn_card(game: Dict[str, Any]) -> str:
     features_html = ""
     if features:
         feat_tags = "".join(
-            f'<span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(f)}</span>'
+            f'<span class="pill">{escape_html(f)}</span>'
             for f in features[:4]
         )
         features_html = f'<div class="flex flex-wrap gap-1 mt-2">{feat_tags}</div>'
 
-    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    return f"""<article class="game-card">
     <!-- GET corner badge -->
-    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+    <div class="game-card__badge">GET</div>
 
     <!-- Cover image -->
-    <div class="lg:w-2/5 relative min-w-0">
-        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+    <div class="game-card__media">
+        <div class="game-card__visual">
             {cover_html}
         </div>
-        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">PlayStation</div>
+        <div class="game-card__caption">PlayStation</div>
     </div>
 
     <!-- Content -->
-    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+    <div class="game-card__content">
         <div>
-            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
+            <h4 class="game-card__title">{escape_html(game["title"])}</h4>
             {desc_html}
             {features_html}
         </div>
         <div class="mt-4">
             {meta_html}
-            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
-                <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            <div class="game-card__footer">
+                <a href="{escape_attribute(game["link"])}" class="action game-card__cta" target="_blank" rel="noopener noreferrer">立即抢夺</a>
             </div>
         </div>
     </div>
@@ -607,16 +607,16 @@ def render_gog_card(game: Dict[str, Any]) -> str:
 
     meta_items = []
     if publisher:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发行：{publisher}</span>')
+        meta_items.append(f'<span class="pill">发行：{publisher}</span>')
     if release_date:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发售：{release_date}</span>')
+        meta_items.append(f'<span class="pill">发售：{release_date}</span>')
     if original_price:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic line-through">{original_price}</span>')
-    meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">{price}</span>')
+        meta_items.append(f'<span class="pill line-through">{original_price}</span>')
+    meta_items.append(f'<span class="pill pill--accent">{price}</span>')
     meta_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(meta_items)}</div>'
 
     if description:
-        desc_html = f'<p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{escape_html(description)}</p>'
+        desc_html = f'<p class="game-card__description line-clamp-3">{escape_html(description)}</p>'
     else:
         info_parts = []
         if publisher:
@@ -629,31 +629,31 @@ def render_gog_card(game: Dict[str, Any]) -> str:
     features_html = ""
     if features:
         feat_tags = "".join(
-            f'<span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(f)}</span>'
+            f'<span class="pill">{escape_html(f)}</span>'
             for f in features[:4]
         )
         features_html = f'<div class="flex flex-wrap gap-1 mt-2">{feat_tags}</div>'
 
-    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
-    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+    return f"""<article class="game-card">
+    <div class="game-card__badge">GET</div>
 
-    <div class="lg:w-2/5 relative min-w-0">
-        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+    <div class="game-card__media">
+        <div class="game-card__visual">
             {cover_html}
         </div>
-        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">GOG</div>
+        <div class="game-card__caption">GOG</div>
     </div>
 
-    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+    <div class="game-card__content">
         <div>
-            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
+            <h4 class="game-card__title">{escape_html(game["title"])}</h4>
             {desc_html}
             {features_html}
         </div>
         <div class="mt-4">
             {meta_html}
-            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
-                <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            <div class="game-card__footer">
+                <a href="{escape_attribute(game["link"])}" class="action game-card__cta" target="_blank" rel="noopener noreferrer">立即抢夺</a>
             </div>
         </div>
     </div>
@@ -680,18 +680,18 @@ def render_xbox_card(game: Dict[str, Any]) -> str:
 
     meta_items = []
     if publisher:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发行：{publisher}</span>')
+        meta_items.append(f'<span class="pill">发行：{publisher}</span>')
     if release_date:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">发售：{release_date}</span>')
+        meta_items.append(f'<span class="pill">发售：{release_date}</span>')
     if platforms:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic">平台：{escape_html(" / ".join(platforms))}</span>')
+        meta_items.append(f'<span class="pill">平台：{escape_html(" / ".join(platforms))}</span>')
     if original_price:
-        meta_items.append(f'<span class="bg-zinc-800 px-3 py-1 text-[10px] font-bold text-zinc-400 italic line-through">{original_price}</span>')
-    meta_items.append(f'<span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">{price}</span>')
+        meta_items.append(f'<span class="pill line-through">{original_price}</span>')
+    meta_items.append(f'<span class="pill pill--accent">{price}</span>')
     meta_html = f'<div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic">{"".join(meta_items)}</div>'
 
     if description:
-        desc_html = f'<p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{escape_html(description)}</p>'
+        desc_html = f'<p class="game-card__description line-clamp-3">{escape_html(description)}</p>'
     else:
         info_parts = []
         if publisher:
@@ -704,31 +704,31 @@ def render_xbox_card(game: Dict[str, Any]) -> str:
     features_html = ""
     if features:
         feat_tags = "".join(
-            f'<span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">{escape_html(f)}</span>'
+            f'<span class="pill">{escape_html(f)}</span>'
             for f in features[:4]
         )
         features_html = f'<div class="flex flex-wrap gap-1 mt-2">{feat_tags}</div>'
 
-    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
-    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+    return f"""<article class="game-card">
+    <div class="game-card__badge">GET</div>
 
-    <div class="lg:w-2/5 relative min-w-0">
-        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+    <div class="game-card__media">
+        <div class="game-card__visual">
             {cover_html}
         </div>
-        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">Xbox</div>
+        <div class="game-card__caption">Xbox</div>
     </div>
 
-    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+    <div class="game-card__content">
         <div>
-            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">{escape_html(game["title"])}</h4>
+            <h4 class="game-card__title">{escape_html(game["title"])}</h4>
             {desc_html}
             {features_html}
         </div>
         <div class="mt-4">
             {meta_html}
-            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
-                <a href="{escape_attribute(game["link"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            <div class="game-card__footer">
+                <a href="{escape_attribute(game["link"])}" class="action game-card__cta" target="_blank" rel="noopener noreferrer">立即抢夺</a>
             </div>
         </div>
     </div>
@@ -738,26 +738,26 @@ def render_xbox_card(game: Dict[str, Any]) -> str:
 def render_gog_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 GOG 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="empty-state">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_gog_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+    return f'<div class="game-grid">\n{cards}\n</div>'
 
 
 def render_xbox_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 Xbox 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="empty-state">{escape_html(empty_text)}</div>'
     cards = "\n".join(render_xbox_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+    return f'<div class="game-grid">\n{cards}\n</div>'
 
 
 def render_epic_section_content(items: List[Dict[str, Any]], empty_text: str, variant: str) -> str:
     """渲染 Epic 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="empty-state">{escape_html(empty_text)}</div>'
     # All epic cards use the same featured horizontal style for desktop readability
     # variant controls layout: "now"=1-col featured, "upcoming"=2-col featured at 3xl+(2000px)
-    grid_class = "grid grid-cols-1 gap-12" if variant == "now" else "grid grid-cols-1 3xl:grid-cols-2 gap-10"
+    grid_class = "game-grid game-grid--featured" if variant == "now" else "game-grid"
     cards = "\n".join(render_epic_card(item, variant) for item in items)
     return f'<div class="{grid_class}">\n{cards}\n</div>'
 
@@ -765,19 +765,19 @@ def render_epic_section_content(items: List[Dict[str, Any]], empty_text: str, va
 def render_steam_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 Steam 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="empty-state">{escape_html(empty_text)}</div>'
     # Steam cards: 2-col at 3xl+(2000px) so common PC resolutions (1280-1920px) show full-width cards
     cards = "\n".join(render_steam_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+    return f'<div class="game-grid">\n{cards}\n</div>'
 
 
 def render_psn_section_content(items: List[Dict[str, Any]], empty_text: str) -> str:
     """渲染 PlayStation 区块内容"""
     if not items:
-        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="empty-state">{escape_html(empty_text)}</div>'
     # PSN cards: 2-col at 3xl+(2000px) so common PC resolutions (1280-1920px) show full-width cards
     cards = "\n".join(render_psn_card(item) for item in items)
-    return f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">\n{cards}\n</div>'
+    return f'<div class="game-grid">\n{cards}\n</div>'
 
 
 def render_itad_card(game: Dict[str, Any]) -> str:
@@ -853,28 +853,28 @@ def render_itad_card(game: Dict[str, Any]) -> str:
     else:
         countdown_text = f"<span>{countdown_text}</span>"
 
-    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
-    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-white text-black flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">{escape_html(badge_text)}</div>
+    return f"""<article class="game-card">
+    <div class="game-card__badge">{escape_html(badge_text)}</div>
 
-    <div class="lg:w-2/5 relative">
-        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+    <div class="game-card__media">
+        <div class="game-card__visual">
             {cover_html}
         </div>
-        <div class="absolute -bottom-3 left-4 bg-red-600 text-white px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#000]">
+        <div class="game-card__caption">
             {escape_html(store)} · -{escape_html(str(cut))}% OFF
         </div>
     </div>
 
-    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+    <div class="game-card__content">
         <div>
-            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(game["title"])}</h4>
-            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-2">{" · ".join(escape_html(bit) for bit in detail_bits if bit)}</p>
+            <h4 class="game-card__title">{escape_html(game["title"])}</h4>
+            <p class="game-card__description line-clamp-2">{" · ".join(escape_html(bit) for bit in detail_bits if bit)}</p>
         </div>
-        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+        <div class="game-card__footer">
             <div class="flex flex-col gap-1">
-                <span class="text-xl font-black text-red-600 italic leading-tight">{countdown_text} · 截止 {escape_html(expiry_display)}</span>
+                <span class="game-card__price">{countdown_text} · 截止 {escape_html(expiry_display)}</span>
             </div>
-            <a href="{escape_attribute(game["url"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即领取</a>
+            <a href="{escape_attribute(game["url"])}" class="action game-card__cta" target="_blank" rel="noopener noreferrer">立即领取</a>
         </div>
     </div>
 </article>"""
@@ -905,28 +905,28 @@ def render_itad_bundle_card(bundle: Dict[str, Any]) -> str:
     if bundle.get("isPending"):
         meta_bits.append("待上线")
 
-    return f"""<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
-    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+    return f"""<article class="game-card">
+    <div class="game-card__badge">BUNDLE</div>
 
-    <div class="lg:w-2/5 relative">
-        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+    <div class="game-card__media">
+        <div class="game-card__visual">
             {cover_html}
         </div>
-        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+        <div class="game-card__caption">
             {escape_html(" · ".join(str(bit) for bit in meta_bits if bit))}
         </div>
     </div>
 
-    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+    <div class="game-card__content">
         <div>
-            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">{escape_html(bundle["title"])}</h4>
-            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">{escape_html(details)}</p>
+            <h4 class="game-card__title">{escape_html(bundle["title"])}</h4>
+            <p class="game-card__description line-clamp-3">{escape_html(details)}</p>
         </div>
-        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+        <div class="game-card__footer">
             <div class="flex flex-col gap-1">
-                <span class="text-xl font-black text-red-600 italic leading-tight">截止 {escape_html(expiry_display)}</span>
+                <span class="game-card__price">截止 {escape_html(expiry_display)}</span>
             </div>
-            <a href="{escape_attribute(bundle["url"])}" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+            <a href="{escape_attribute(bundle["url"])}" class="action game-card__cta" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
         </div>
     </div>
 </article>"""
@@ -937,7 +937,7 @@ def render_itad_section_content(itad_data: Dict[str, List[Dict[str, Any]]], empt
     deals = itad_data.get("deals") or []
     bundles = itad_data.get("bundles") or []
     if not deals and not bundles:
-        return f'<div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">{escape_html(empty_text)}</div>'
+        return f'<div class="empty-state">{escape_html(empty_text)}</div>'
 
     parts: List[str] = []
 
@@ -945,15 +945,15 @@ def render_itad_section_content(itad_data: Dict[str, List[Dict[str, Any]]], empt
         bundle_cards = "\n".join(render_itad_bundle_card(item) for item in bundles)
         parts.append(
             f'<section class="mb-14 last:mb-0">'
-            f'<div class="flex items-center justify-between gap-4 mb-8"><h4 class="text-2xl lg:text-3xl font-black italic uppercase">Bundles / 慈善包与礼包</h4>'
-            f'<span class="bg-red-600 text-white px-4 py-2 font-black text-xs uppercase">{len(bundles)} 项</span></div>'
-            f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">{bundle_cards}</div>'
+            f'<div class="flex items-center justify-between gap-4 mb-8"><h4 class="game-card__title">Bundles / 慈善包与礼包</h4>'
+            f'<span class="pill pill--accent">{len(bundles)} 项</span></div>'
+            f'<div class="game-grid">{bundle_cards}</div>'
             f'</section>'
         )
 
     if not parts and deals:
         cards = "\n".join(render_itad_card(item) for item in deals)
-        parts.append(f'<div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">{cards}</div>')
+        parts.append(f'<div class="game-grid">{cards}</div>')
 
     return "".join(parts)
 
@@ -1002,9 +1002,7 @@ def get_share_client_script() -> str:
       }
       const body = formatCountdown(diff);
       node.textContent = body ? `${prefix} ${body}` : finished;
-      node.classList.remove('countdown-tick');
-      void node.offsetWidth;
-      node.classList.add('countdown-tick');
+
     });
   };
 
@@ -1028,7 +1026,9 @@ def get_share_client_script() -> str:
     }
   }
 
-  if (sharePayload && shareButton) {
+  const hasShareDownload = Boolean(shareButton && shareButton.getAttribute('href') && shareButton.getAttribute('href') !== '#');
+
+  if (sharePayload && shareButton && !hasShareDownload) {
     shareButton.setAttribute('download', sharePayload.suggestedFileName || 'GBTGame限免拼图.png');
   }
 
@@ -1042,10 +1042,11 @@ def get_share_client_script() -> str:
         sharePayload.sections.length > 0,
     );
 
-    if (!hasSections) {
+    if (!hasSections && !hasShareDownload) {
       shareButton.setAttribute('aria-disabled', 'true');
       shareButton.setAttribute('tabindex', '-1');
-    } else {
+      shareButton.addEventListener('click', function(event) { event.preventDefault(); });
+    } else if (hasSections) {
       shareButton.addEventListener('click', function(event) {
         event.preventDefault();
         if (shareButton.dataset.generating === 'true') {
@@ -1086,7 +1087,7 @@ def get_share_client_script() -> str:
       }, 2000);
     } finally {
       button.dataset.generating = 'false';
-      button.blur();
+
     }
   }
 
@@ -1571,6 +1572,7 @@ def get_share_client_script() -> str:
       const isActive = tab.getAttribute('data-tab') === targetKey;
       tab.classList.toggle('is-active', isActive);
       tab.setAttribute('aria-selected', String(isActive));
+      tab.tabIndex = isActive ? 0 : -1;
     });
     panels.forEach(function(panel) {
       const isActive = panel.getAttribute('data-panel') === targetKey;
@@ -1579,7 +1581,18 @@ def get_share_client_script() -> str:
     });
   }
 
-  tabs.forEach(function(tab) {
+  tabs.forEach(function(tab, index) {
+    tab.addEventListener('keydown', function(event) {
+      let next;
+      if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+      else if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      switchTab(tabs[next].getAttribute('data-tab'));
+      tabs[next].focus();
+    });
     tab.addEventListener('click', function() {
       const key = tab.getAttribute('data-tab');
       if (!key || tab.classList.contains('is-active')) {
@@ -1962,6 +1975,10 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
     with open(template_path, "r", encoding="utf-8") as f:
         template = f.read()
 
+    # Stored image paths are relative to history/, while the page is at site root.
+    if share_webp_url and share_webp_url.startswith("records/"):
+        share_webp_url = f"history/{share_webp_url}"
+
     fetched_at = snapshot.get("fetchedAt")
     if fetched_at:
         try:
@@ -2076,7 +2093,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
             itad, "暂未检测到 ITAD bundle / 慈善包。"
         ),
         "SHARE_BUTTON_DISABLED": (
-            "" if share_ready else ' aria-disabled="true" tabindex="-1"'
+            "" if share_ready or share_webp_url else ' aria-disabled="true" tabindex="-1"'
         ),
         "SHARE_BUTTON_LABEL": "下载分享图片" if share_webp_url else ("生成分享拼图" if share_ready else "分享数据未就绪"),
         "SHARE_BUTTON_FILENAME": escape_attribute(
@@ -2163,13 +2180,13 @@ def render_history_page(
 
         def _subsection(title: str, count: int, body_html: str) -> str:
             return (
-                '<div class="p-4 lg:p-6 rounded-steam-lg bg-steam-card border border-steam-accent/15 shadow-steam-card mb-4 last:mb-0">'
-                '<header class="flex items-center justify-between gap-3 mb-4">'
-                f'<h4 class="text-sm lg:text-base font-semibold tracking-wide m-0 text-steam-text">{escape_html(title)}</h4>'
-                f'<span class="px-3 py-1 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-wide">{count}</span>'
+                '<section class="history-section">'
+                '<header class="section-heading">'
+                f'<h3>{escape_html(title)}</h3>'
+                f'<span class="section-heading__count">{count}</span>'
                 "</header>"
                 f'<div class="epic-freebies__section-body">{body_html}</div>'
-                "</div>"
+                "</section>"
             )
 
         body_parts: list[str] = []
@@ -2224,16 +2241,16 @@ def render_history_page(
         )
 
         blocks.append(
-            '<div class="mb-8 last:mb-0">'
-            '<header class="flex items-center justify-between gap-4 mb-5 p-4 lg:p-6 rounded-steam-lg bg-steam-section border border-steam-accent/15">'
-            f'<h3 class="text-base lg:text-lg font-bold tracking-wide m-0 text-steam-text">{escape_html(fetched_at_display)}</h3>'
-            f'<span class="px-3 py-1 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-wide">{total}</span>'
+            '<section class="history-record">'
+            '<header class="history-record__header">'
+            f'<h2>{escape_html(fetched_at_display)}</h2>'
+            f'<span class="section-heading__count">{total}</span>'
             "</header>"
             f'<div class="epic-freebies__section-body">{"".join(body_parts)}</div>'
-            "</div>"
+            "</section>"
         )
 
-    content_html = "".join(blocks) if blocks else '<div class="py-16 lg:py-20 px-10 rounded-steam-lg border border-dashed border-steam-accent/30 text-center text-steam-text-muted bg-steam-bg/60 leading-relaxed">暂无历史记录</div>'
+    content_html = "".join(blocks) if blocks else '<div class="empty-state">暂无历史记录</div>'
 
     # history 页 favicon 相对路径不同
     favicon_href = "../logo.png"
@@ -2245,62 +2262,17 @@ def render_history_page(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{escape_html(base_title)}</title>
   <link rel="icon" type="image/png" href="{favicon_href}">
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-  <script>
-    tailwind.config = {{
-      theme: {{
-        extend: {{
-          colors: {{
-            'steam-bg': '#0a151f',
-            'steam-text': '#f3f6fb',
-            'steam-text-muted': '#9bb5d0',
-            'steam-accent': '#66c0f4',
-            'steam-accent-strong': '#1994d6',
-          }},
-          borderRadius: {{
-            'steam-xl': '28px',
-            'steam-lg': '20px',
-          }},
-          backgroundImage: {{
-            'steam-section': 'linear-gradient(145deg, rgba(10, 19, 29, 0.92), rgba(6, 12, 21, 0.9))',
-          }},
-          boxShadow: {{
-            'steam-card': '0 24px 45px rgba(4, 8, 16, 0.55)',
-          }},
-        }},
-      }},
-    }}
-  </script>
-  <style>
-    body {{
-      font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
-      background: radial-gradient(45% 60% at 10% 10%, rgba(102, 192, 244, 0.18), transparent 60%),
-                  radial-gradient(30% 40% at 80% 0%, rgba(19, 126, 207, 0.18), transparent 70%),
-                  linear-gradient(160deg, #060e17 0%, #0b1826 40%, #02070d 100%);
-      -webkit-font-smoothing: antialiased;
-    }}
-    .line-clamp-3 {{ display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }}
-  </style>
+  {style_block}
 </head>
-<body class="m-0 min-h-screen text-steam-text antialiased">
-  <div class="relative min-h-screen py-10 lg:py-14">
-    <div class="mx-auto max-w-[1180px] px-4 lg:px-8">
-      <header class="relative overflow-hidden rounded-steam-xl bg-gradient-to-br from-[rgba(17,28,42,0.95)] to-[rgba(9,15,24,0.9)] border border-steam-accent/20 shadow-steam-hero flex flex-col gap-4 p-8 lg:p-14 mb-10">
-        <div class="absolute inset-0 -z-10 opacity-60 bg-[radial-gradient(145deg,rgba(19,126,207,0.22),transparent_65%)]"></div>
-        <div class="relative z-10 flex flex-col gap-3 max-w-xl">
-          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-steam-accent/20 text-steam-accent text-xs tracking-widest uppercase">Game Freebie Radar</span>
-          <h1 class="text-2xl lg:text-[36px] font-bold tracking-wide m-0">历史记录</h1>
-          <p class="text-steam-text-muted text-sm leading-relaxed max-w-lg m-0">仅当抓取结果与上次不同才会新增一条历史记录。</p>
-          <div class="flex items-center gap-3">
-            <a href="../" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-steam-md bg-steam-bg/80 border border-steam-accent/20 text-steam-text-muted text-xs tracking-wide no-underline hover:border-steam-accent/40 transition-colors">返回主页</a>
-          </div>
-        </div>
-      </header>
-      <section class="p-6 lg:p-10 xl:p-12 rounded-steam-xl bg-steam-section border border-steam-accent/15 shadow-steam-section" role="main">
-        {content_html}
-      </section>
-    </div>
+<body>
+  <a class="skip-link" href="#history-content">跳到历史记录</a>
+  <div class="site-shell">
+    <header>
+      <div class="site-topbar"><a class="site-brand" href="../">GBTGAME / FREEBIE RADAR</a><a class="action action--secondary" href="../">返回主页</a></div>
+      <div class="site-hero"><div class="site-hero__copy"><h1><span aria-hidden="true">/</span>历史记录</h1><p>仅当抓取结果与上次不同才会新增一条历史记录。</p></div></div>
+    </header>
+    <main id="history-content" tabindex="-1">{content_html}</main>
+    <footer class="site-footer"><a href="../">返回白嫖游戏速报</a></footer>
   </div>
 </body>
 </html>"""
