@@ -21,3 +21,8 @@
 - Browser checks: 320, 375, 759, 760, 1024 and 1440px iframe viewports; no horizontal overflow; platform buttons are 44px high. Additional 320px long-title and 375px empty/history fixtures pass.
 - All six platform panels switch correctly; ArrowRight moves selected/focused tab together and leaves one active panel and one tab stop.
 - The preview uses the unchanged public site snapshot (last synced 2026-10-04); ad scripts are excluded from localhost previews only. External provider overlays and stale data classification are outside this style-only change.
+
+## Follow-up: preserve original identity
+
+- Restore original typography, red, texture, borders, angled controls, GET badges, offset shadows, horizontal desktop cards and marquee.
+- Re-run regression tests and viewport checks, including transformed decoration overflow; update the existing PR rather than replacing it.

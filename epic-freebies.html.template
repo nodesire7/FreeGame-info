@@ -54,14 +54,14 @@
 
         :root {
             color-scheme: dark;
-            --page: #0c0c0f;
-            --surface: #141417;
-            --raised: #202025;
-            --line: #35353d;
-            --text: #f5f5f7;
-            --muted: #b1b1bd;
-            --red: #e23b3b;
-            --red-strong: #b92328;
+            --page: #0a0a0a;
+            --surface: #030303;
+            --raised: #27272a;
+            --line: #27272a;
+            --text: #ffffff;
+            --muted: #a1a1aa;
+            --red: #d10000;
+            --red-strong: #d10000;
             --focus: #ffb7b7;
         }
         *, *::before, *::after { box-sizing: border-box; }
@@ -74,69 +74,69 @@
         ::selection { background: var(--red-strong); color: #fff; }
         :focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
         html { scrollbar-color: #64646f var(--page); }
-        .site-shell { width: min(100% - 64px, 1200px); margin-inline: auto; }
+        .site-shell { width: min(calc(100% - 48px), 1280px); margin: 40px auto 32px; border: 6px solid var(--red); background-color: #000; background-image: radial-gradient(#ffffff26 1.5px, transparent 1.5px); background-size: 28px 28px; box-shadow: 8px 8px 0 #fff; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif; }
         .skip-link { position: fixed; top: 8px; left: 16px; z-index: 100; padding: 10px 18px; background: #fff; color: #111; transform: translateY(-150%); }
         .skip-link:focus { transform: translateY(0); }
-        .site-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; min-height: 64px; padding-block: 12px; border-bottom: 1px solid var(--line); }
-        .site-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; letter-spacing: .08em; }
-        .site-brand svg { width: 22px; height: 22px; color: var(--red); }
-        .site-sync { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-        .site-hero { display: flex; justify-content: space-between; align-items: center; gap: 20px 32px; padding-block: 34px 28px; }
+        .site-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; min-height: 64px; padding: 16px 24px; border-bottom: 8px solid #fff; background: #030303; }
+        .site-brand { display: inline-flex; align-items: center; gap: 20px; font-size: 12px; font-weight: 900; font-style: italic; letter-spacing: .32em; overflow-wrap: anywhere; }
+        .site-brand svg { width: 24px; height: 24px; color: var(--red); flex-shrink: 0; }
+        .site-sync { font-size: 10px; font-weight: 700; font-style: italic; color: var(--muted); font-variant-numeric: tabular-nums; }
+        .site-hero { position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin: 58px 36px 44px; padding: 24px; border: 6px solid #fff; background: #000; box-shadow: 12px 12px 0 var(--red); transform: rotate(-1deg); }
         .site-hero__copy { min-width: 0; }
-        .site-hero h1 { font-size: clamp(28px, 4.1vw, 48px); line-height: 1.2; letter-spacing: -.03em; font-weight: 900; font-style: italic; }
-        .site-hero h1 span { color: var(--red); margin-right: 10px; }
-        .site-hero p { margin-top: 12px; max-width: 68ch; color: var(--muted); font-size: 13px; }
-        .action { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; padding: 10px 20px; border: 1px solid transparent; background: var(--red-strong); color: #fff; font-size: 13px; font-weight: 750; line-height: 1.5; text-align: center; transition: background-color .16s ease, border-color .16s ease; }
-        .action:hover { background: #cf2b31; }
-        .action--secondary { background: transparent; border-color: #62626e; }
-        .action--secondary:hover { background: var(--raised); border-color: var(--text); }
+        .site-hero h1 { font-size: clamp(40px, 5.4vw, 72px); line-height: 1.08; letter-spacing: -.035em; font-weight: 900; font-style: italic; }
+        .site-hero h1 span { color: var(--red); margin-right: 12px; }
+        .site-hero p { margin-top: 16px; padding-left: 16px; border-left: 8px solid var(--red); max-width: 72ch; color: var(--muted); font-size: 14px; font-style: italic; }
+        .action { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 48px; padding: 12px 30px; border: 0; background: #fff; color: #000; box-shadow: 6px 6px 0 var(--red); transform: skewX(-12deg); font-size: 14px; font-weight: 900; line-height: 1.5; text-align: center; transition: background-color .16s ease, color .16s ease; }
+        .action:hover { background: var(--red); color: #fff; }
+        .action--secondary { background: #fff; color: #000; box-shadow: 6px 6px 0 #000; }
+        .action--secondary:hover { background: var(--red); color: #fff; }
         .action[aria-disabled="true"], .action[data-generating="true"] { opacity: .55; cursor: default; }
-        .share-button { flex-shrink: 0; }
-        .platform-nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 20px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
-        .epic-freebies__tab { display: inline-flex; justify-content: center; align-items: center; gap: 10px; min-height: 44px; padding: 10px 17px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 13px; font-weight: 750; transition: background-color .16s ease, color .16s ease, border-color .16s ease; }
-        .epic-freebies__tab:hover { border-color: #72727e; color: #fff; }
-        .epic-freebies__tab.is-active { background: var(--red-strong); border-color: var(--red-strong); color: #fff; }
-        .tab-count { display: inline-flex; align-items: center; justify-content: center; min-width: 23px; padding: 0 5px; background: #fff; color: #202025; font-size: 11px; font-variant-numeric: tabular-nums; }
+        .share-button { flex-shrink: 0; font-style: italic; }
+        .platform-nav { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 36px 36px; padding: 4px 6px 8px; }
+        .epic-freebies__tab { display: inline-flex; justify-content: center; align-items: center; gap: 10px; min-height: 48px; padding: 12px 24px; border: 0; background: #161616; color: var(--muted); transform: skewX(-12deg); font-size: 14px; font-style: italic; font-weight: 900; transition: background-color .16s ease, color .16s ease; }
+        .epic-freebies__tab:hover { background: #fff; color: #000; }
+        .epic-freebies__tab.is-active { background: var(--red); color: #fff; box-shadow: 6px 6px 0 #fff; }
+        .tab-count { display: inline-flex; align-items: center; justify-content: center; min-width: 23px; padding: 0 5px; background: #3f3f46; color: #fff; font-size: 12px; font-style: normal; font-variant-numeric: tabular-nums; }
         .epic-freebies__panel { display: none; }
         .epic-freebies__panel.is-active { display: block; }
         .epic-freebies__panel:focus-visible { outline-offset: 8px; }
-        .game-section { margin-bottom: 36px; }
-        .section-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 16px; }
-        .section-heading h2, .section-heading h3, .section-heading h4 { font-size: clamp(18px, 2.4vw, 24px); font-weight: 800; line-height: 1.4; }
+        .game-section { margin-bottom: 48px; }
+        .section-heading { display: flex; align-items: center; gap: 12px 16px; margin-bottom: 24px; }
+        .section-heading h2, .section-heading h3, .section-heading h4 { flex: 1; min-width: 0; font-size: clamp(22px, 3vw, 36px); font-weight: 900; font-style: italic; text-transform: uppercase; line-height: 1.3; }
         .section-heading small { color: var(--muted); font-size: 11px; letter-spacing: .06em; }
-        .section-heading__count { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
-        .game-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+        .section-heading__count { margin-left: auto; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+        .game-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; }
         .game-grid--featured { grid-template-columns: minmax(0, 1fr); }
-        .game-card { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; position: relative; min-width: 0; background: var(--surface); border: 1px solid var(--line); }
-        .game-card__badge { position: absolute; top: 10px; right: 10px; z-index: 1; max-width: calc(100% - 20px); padding: 4px 9px; background: #f5f5f7; color: #151518; font-size: 11px; font-weight: 850; overflow-wrap: anywhere; }
-        .game-card__media { position: relative; min-width: 0; align-self: start; }
-        .game-card__visual { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; overflow: hidden; background: var(--raised); color: var(--muted); font-size: 13px; }
+        .game-card { display: grid; grid-template-columns: minmax(0, 1fr); position: relative; min-width: 0; padding: 24px; background: var(--surface); border: 6px solid var(--line); }
+        .game-card__badge { position: absolute; top: -14px; right: -10px; z-index: 1; display: flex; align-items: center; justify-content: center; min-width: 60px; min-height: 60px; max-width: calc(100% - 16px); padding: 8px; background: #fff; color: #000; font-size: 18px; font-weight: 900; box-shadow: 4px 4px 0 var(--red); transform: rotate(12deg); overflow-wrap: anywhere; }
+        .game-card__media { position: relative; min-width: 0; align-self: start; margin-bottom: 12px; }
+        .game-card__visual { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; overflow: hidden; border: 8px solid #fff; background: #161616; color: var(--muted); font-size: 13px; }
         .game-card__visual img { width: 100%; height: 100%; object-fit: contain; }
-        .game-card__caption { position: absolute; bottom: 10px; left: 10px; max-width: calc(100% - 20px); padding: 4px 10px; background: var(--red-strong); color: #fff; font-size: 11px; font-weight: 750; overflow-wrap: anywhere; }
-        .game-card__content { display: flex; flex-direction: column; justify-content: space-between; gap: 12px; min-width: 0; padding: 22px; overflow-wrap: anywhere; }
+        .game-card__caption { position: absolute; bottom: -12px; left: -12px; max-width: calc(100% + 8px); padding: 8px 16px; background: var(--red); color: #fff; box-shadow: 6px 6px 0 #fff; font-size: 13px; font-weight: 900; font-style: italic; overflow-wrap: anywhere; }
+        .game-card__content { display: flex; flex-direction: column; justify-content: space-between; gap: 14px; min-width: 0; padding: 0; overflow-wrap: anywhere; }
         .game-card__content > div { min-width: 0; }
-        .game-card__title { font-size: 23px; line-height: 1.35; font-weight: 800; letter-spacing: -.02em; margin-bottom: 10px; overflow-wrap: anywhere; }
-        .game-card__description { color: var(--muted); font-size: 14px; line-height: 1.75; margin-bottom: 12px; max-width: 72ch; overflow-wrap: anywhere; }
+        .game-card__title { font-size: 30px; line-height: 1.25; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -.03em; margin-bottom: 12px; padding-right: 10px; overflow-wrap: anywhere; }
+        .game-card__description { color: #a1a1aa; font-size: 14px; line-height: 1.7; margin-bottom: 12px; padding-left: 14px; border-left: 4px solid #27272a; max-width: 72ch; overflow-wrap: anywhere; }
         .game-card__description.line-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
         .game-card__description.line-clamp-2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-        .game-card__footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
-        .game-card__price { display: block; color: #ff9292; font-size: 17px; line-height: 1.5; font-weight: 750; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+        .game-card__footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 16px; padding-top: 20px; border-top: 2px dashed var(--line); }
+        .game-card__price { display: block; color: var(--red); font-size: 24px; line-height: 1.4; font-weight: 900; font-style: italic; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
         .game-card__cta { flex-shrink: 0; margin-left: auto; }
         .pill { display: inline-block; max-width: 100%; padding: 3px 8px; background: var(--raised); color: var(--muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
         .pill--accent { background: var(--red-strong); color: #fff; }
         [data-countdown-target] { font-variant-numeric: tabular-nums; }
-        .empty-state { padding: 36px 20px; background: var(--surface); border: 1px dashed #54545f; text-align: center; color: var(--muted); font-size: 14px; }
-        .ad-slot { max-width: 100%; min-width: 0; margin-block: 28px; padding: 12px; border: 1px dashed var(--line); color: var(--muted); text-align: center; overflow: hidden; }
+        .empty-state { padding: 40px 20px; background: var(--surface); border: 2px dashed #3f3f46; text-align: center; color: var(--muted); font-size: 14px; }
+        .ad-slot { max-width: 100%; min-width: 0; margin: 28px 36px; padding: 16px; border: 3px dashed #3f3f46; background: #030303; color: var(--muted); text-align: center; overflow: hidden; }
         .ad-slot__label { display: block; margin-bottom: 6px; font-size: 10px; letter-spacing: .08em; }
         .ad-slot--mobile { display: none; }
-        .site-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px 32px; padding-block: 24px 32px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-        .site-footer a { color: #ff9292; text-decoration: underline; }
+        .site-footer { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px 24px; padding: 28px 24px; background: #0a0a0a; color: var(--muted); font-size: 12px; }
+        .site-footer a { color: #ff6767; text-decoration: underline; }
         .site-footer a:hover { color: #fff; }
         .site-footer__author, .site-footer__links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 18px; min-width: 0; overflow-wrap: anywhere; }
         .site-footer img { width: 28px; height: 28px; border-radius: 50%; }
         .history-record { margin-bottom: 48px; }
-        .history-record__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 16px; margin-bottom: 24px; border-bottom: 2px solid var(--red-strong); }
-        .history-record__header h2 { font-size: 20px; font-variant-numeric: tabular-nums; }
+        .history-record__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; margin-bottom: 28px; border: 3px solid #fff; background: #000; box-shadow: 6px 6px 0 var(--red); }
+        .history-record__header h2 { font-size: 24px; font-weight: 900; font-style: italic; font-variant-numeric: tabular-nums; }
         .history-section { margin-bottom: 32px; }
         .history-section .section-heading h3 { font-size: 18px; }
         /* Small shared helpers for existing metadata markup. */
@@ -150,36 +150,78 @@
         .text-xs, .text-\[10px\] { font-size: 12px; line-height: 1.6; }
         .text-zinc-400, .text-zinc-500, .text-zinc-600, .text-zinc-700 { color: var(--muted); }
         .text-2xl, .lg\:text-3xl { font-size: 20px; }
-        .font-black { font-weight: 800; }
+        .font-black { font-weight: 900; }
         .bg-zinc-800, .bg-zinc-900 { background: var(--raised); }
         .px-2 { padding-inline: 6px; } .px-3 { padding-inline: 8px; } .px-4 { padding-inline: 12px; }
         .py-1 { padding-block: 4px; } .py-2 { padding-block: 6px; } .py-0\.5 { padding-block: 2px; }
         .border { border: 1px solid var(--line); } .bg-red-600 { background: var(--red-strong); } .text-white { color: #fff; }
         .w-full { width: 100%; } .h-full { height: 100%; } .line-through { text-decoration: line-through; }
-        @media (min-width: 760px) {
-            .game-grid--featured .game-card { grid-template-columns: minmax(0, 38fr) minmax(0, 62fr); grid-template-rows: 1fr; }
-            .game-grid--featured .game-card__media { margin: 20px 0 20px 20px; }
+        .site-status { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; min-width: 0; }
+        .site-status__badge { padding: 4px 20px; background: var(--red); color: #fff; font-size: 12px; font-weight: 900; font-style: italic; transform: skewX(-12deg); box-shadow: 4px 4px 0 #fff; }
+        .site-hero::before { content: "INTEL_MISSION"; position: absolute; top: -28px; left: 18px; padding: 3px 16px; background: #fff; color: #000; font-size: 10px; font-weight: 900; letter-spacing: .1em; }
+        main { margin-inline: 36px; }
+        .epic-freebies__tab.is-active .tab-count { background: #fff; color: #000; }
+        .section-heading::before { content: ""; flex: 0 0 9px; height: 36px; background: var(--red); transform: skewX(20deg); }
+        .brand-ribbon { position: relative; height: 64px; overflow: hidden; display: flex; align-items: center; background: #fff; color: #000; border-top: 6px solid #000; }
+        .brand-ribbon::before { content: ""; position: absolute; inset: 0 auto 0 -30px; width: 170px; background: var(--red); transform: skewX(-35deg); box-shadow: 16px 0 0 #000; z-index: 1; }
+        .brand-ribbon__track { display: flex; width: max-content; animation: brand-marquee 16s linear infinite; }
+        .brand-ribbon__group { display: flex; flex-shrink: 0; }
+        .brand-ribbon span { flex-shrink: 0; margin-inline: 32px; font-size: 32px; font-weight: 900; font-style: italic; white-space: nowrap; }
+        .brand-ribbon span:nth-child(even) { color: var(--red); }
+        .brand-ribbon:hover .brand-ribbon__track, .site-shell:focus-within .brand-ribbon__track { animation-play-state: paused; }
+        @keyframes brand-marquee { to { transform: translateX(-50%); } }
+        @media (min-width: 1024px) {
+            .game-card { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 32px; padding: 32px; }
+            .game-card__media { margin: 0 0 12px; }
+        }
+        @media (max-width: 1023px) {
+            .site-hero { align-items: flex-start; flex-direction: column; }
+            .site-hero h1 { font-size: clamp(38px, 7vw, 64px); }
+            .game-card__content { margin-top: 16px; }
+            .game-card__title { font-size: 28px; }
         }
         @media (max-width: 759px) {
-            .site-shell { width: calc(100% - 32px); }
-            .site-hero { align-items: flex-start; flex-direction: column; gap: 18px; padding-block: 26px 24px; }
-            .site-hero h1 { font-size: clamp(28px, 6.6vw, 42px); }
-            .platform-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-            .epic-freebies__tab { padding: 10px 7px; gap: 6px; font-size: 12px; }
-            .game-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-            .game-card__content { padding: 18px; }
-            .game-card__title { font-size: 21px; }
+            .site-shell { width: calc(100% - 32px); margin-block: 16px 24px; border-width: 4px; box-shadow: 6px 6px 0 #fff; }
+            .site-topbar { padding: 12px 14px; gap: 14px; border-bottom-width: 6px; }
+            .site-brand { font-size: 10px; letter-spacing: .12em; gap: 10px; }
+            .site-status { justify-content: space-between; width: 100%; gap: 8px; }
+            .site-status__badge { padding-inline: 12px; font-size: 10px; }
+            .site-hero { margin: 44px 18px 36px; padding: 18px 14px; border-width: 4px; gap: 20px; box-shadow: 7px 7px 0 var(--red); }
+            .site-hero h1 { font-size: clamp(27px, 6.6vw, 46px); }
+            .site-hero h1 span { margin-right: 6px; }
+            .site-hero p { font-size: 12px; padding-left: 10px; border-left-width: 4px; }
+            .share-button { padding: 10px 18px; font-size: 12px; }
+            main { margin-inline: 16px; }
+            .platform-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 16px 28px; gap: 12px; padding-inline: 4px; }
+            .epic-freebies__tab { min-width: 0; min-height: 44px; padding: 10px 5px; gap: 5px; font-size: 11px; }
+            .tab-count { min-width: 18px; padding-inline: 3px; font-size: 10px; }
+            .section-heading { gap: 10px; margin-bottom: 20px; }
+            .section-heading h2 { font-size: 23px; }
+            .section-heading::before { flex-basis: 6px; height: 28px; }
+            .game-grid { gap: 28px; }
+            .game-card { padding: 18px 14px; border-width: 4px; }
+            .game-card__badge { min-width: 44px; min-height: 44px; top: -10px; right: -6px; font-size: 13px; }
+            .game-card__visual { border-width: 5px; }
+            .game-card__caption { padding: 6px 10px; left: -8px; bottom: -8px; font-size: 11px; box-shadow: 4px 4px 0 #fff; }
+            .game-card__title { font-size: 23px; }
+            .game-card__description { font-size: 13px; padding-left: 10px; }
+            .game-card__price { font-size: 21px; }
             .game-card__footer { align-items: stretch; }
-            .game-card__cta { width: 100%; margin-left: 0; }
+            .game-card__cta { width: calc(100% - 8px); margin: 0 4px 4px; min-height: 44px; font-size: 13px; }
+            .ad-slot { margin-inline: 16px; }
             .ad-slot--desktop { display: none; }
             .ad-slot--mobile { display: block; }
-            .site-footer { flex-direction: column; }
+            .site-footer { padding: 24px 16px; }
+            .brand-ribbon { height: 48px; }
+            .brand-ribbon::before { width: 100px; }
+            .brand-ribbon span { margin-inline: 22px; font-size: 24px; }
+        }
+        @media (max-width: 419px) {
+            .platform-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (prefers-reduced-motion: reduce) {
             .action, .epic-freebies__tab { transition: none; }
-        }
-        @media (max-width: 359px) {
-            .platform-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .brand-ribbon__track { animation: none; }
         }
     </style>
 </head>
@@ -189,8 +231,8 @@
     <div class="site-shell">
         <header>
             <div class="site-topbar">
-                <a class="site-brand" href="./" aria-label="GBTGAME 白嫖游戏速报首页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3L2 21H22L12 3Z" /></svg>GBTGAME / FREEBIE RADAR</a>
-                <span class="site-sync">最近同步：{{FETCHED_AT}}</span>
+                <a class="site-brand" href="./" aria-label="GBTGAME 白嫖游戏速报首页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3L2 21H22L12 3Z" /></svg>GBTGAME_FREEBIE_RADAR_V3</a>
+                <div class="site-status"><span class="site-sync">LAST_SYNC: {{FETCHED_AT}}</span><span class="site-status__badge">限免情报</span></div>
             </div>
             <div class="site-hero">
                 <div class="site-hero__copy"><h1><span aria-hidden="true">/</span>白嫖游戏速报</h1><p>聚合 EPIC | Steam | PlayStation | GOG | Xbox 限免与 ITAD Bundle / 慈善包情报</p></div>
@@ -200,7 +242,7 @@
         <nav class="platform-nav" role="tablist" aria-label="限免平台切换">
                 <button class="epic-freebies__tab is-active" role="tab" id="free-tab-epic" aria-selected="true" aria-controls="free-panel-epic" tabindex="0" data-tab="epic">EPIC 限免 <span class="tab-count">{{TAB_BADGE_EPIC}}</span></button>
                 <button class="epic-freebies__tab" role="tab" id="free-tab-steam" aria-selected="false" aria-controls="free-panel-steam" tabindex="-1" data-tab="steam">STEAM 限免 <span class="tab-count">{{TAB_BADGE_STEAM}}</span></button>
-                <button class="epic-freebies__tab" role="tab" id="free-tab-psn" aria-selected="false" aria-controls="free-panel-psn" tabindex="-1" data-tab="psn">PS PLUS <span class="tab-count">{{TAB_BADGE_PSN}}</span></button>
+                <button class="epic-freebies__tab" role="tab" id="free-tab-psn" aria-selected="false" aria-controls="free-panel-psn" tabindex="-1" data-tab="psn">PS_PLUS <span class="tab-count">{{TAB_BADGE_PSN}}</span></button>
                 <button class="epic-freebies__tab" role="tab" id="free-tab-itad" aria-selected="false" aria-controls="free-panel-itad" tabindex="-1" data-tab="itad">ITAD <span class="tab-count">{{TAB_BADGE_ITAD}}</span></button>
                 <button class="epic-freebies__tab" role="tab" id="free-tab-gog" aria-selected="false" aria-controls="free-panel-gog" tabindex="-1" data-tab="gog">GOG <span class="tab-count">{{TAB_BADGE_GOG}}</span></button>
                 <button class="epic-freebies__tab" role="tab" id="free-tab-xbox" aria-selected="false" aria-controls="free-panel-xbox" tabindex="-1" data-tab="xbox">XBOX <span class="tab-count">{{TAB_BADGE_XBOX}}</span></button>
@@ -208,7 +250,7 @@
         <main id="game-content" tabindex="-1">
             <div class="epic-freebies__panel is-active" role="tabpanel" id="free-panel-epic" aria-labelledby="free-tab-epic" tabindex="0" data-panel="epic">
                 <section class="game-section">
-                    <div class="section-heading"><h2>正在免费</h2><small>NOW AVAILABLE</small></div>
+                    <div class="section-heading"><h2>Now_Available / 正在免费</h2></div>
                     {{EPIC_NOW_CONTENT}}
                 </section>
                 <aside class="ad-slot" aria-label="推广内容"><span class="ad-slot__label">SPONSORED / 推广内容</span><script>
@@ -219,37 +261,37 @@
                                 })({})
                                 </script></aside>
                 <section class="game-section">
-                    <div class="section-heading"><h2>即将免费</h2><small>UPCOMING</small></div>
+                    <div class="section-heading"><h2>Upcoming_Missions / 预告</h2></div>
                     {{EPIC_UPCOMING_CONTENT}}
                 </section>
             </div>
             <div class="epic-freebies__panel" role="tabpanel" id="free-panel-steam" aria-labelledby="free-tab-steam" tabindex="0" data-panel="steam">
                 <section class="game-section">
-                    <div class="section-heading"><h2>Steam 限免</h2><small>STEAM DEALS</small></div>
+                    <div class="section-heading"><h2>Steam_Deals / Steam 限免</h2></div>
                     {{STEAM_CONTENT}}
                 </section>
             </div>
             <div class="epic-freebies__panel" role="tabpanel" id="free-panel-psn" aria-labelledby="free-tab-psn" tabindex="0" data-panel="psn">
                 <section class="game-section">
-                    <div class="section-heading"><h2>PlayStation 会员福利</h2><small>PS PLUS</small></div>
+                    <div class="section-heading"><h2>PS_Plus / PlayStation 会员福利</h2></div>
                     {{PSN_CONTENT}}
                 </section>
             </div>
             <div class="epic-freebies__panel" role="tabpanel" id="free-panel-itad" aria-labelledby="free-tab-itad" tabindex="0" data-panel="itad">
                 <section class="game-section">
-                    <div class="section-heading"><h2>ITAD 礼包与慈善包</h2><small>BUNDLES / CHARITY</small></div>
+                    <div class="section-heading"><h2>ITAD / 礼包与慈善包</h2></div>
                     {{ITAD_CONTENT}}
                 </section>
             </div>
             <div class="epic-freebies__panel" role="tabpanel" id="free-panel-gog" aria-labelledby="free-tab-gog" tabindex="0" data-panel="gog">
                 <section class="game-section">
-                    <div class="section-heading"><h2>GOG 限免</h2><small>GOG DEALS</small></div>
+                    <div class="section-heading"><h2>GOG / GOG 限免</h2></div>
                     {{GOG_CONTENT}}
                 </section>
             </div>
             <div class="epic-freebies__panel" role="tabpanel" id="free-panel-xbox" aria-labelledby="free-tab-xbox" tabindex="0" data-panel="xbox">
                 <section class="game-section">
-                    <div class="section-heading"><h2>Xbox Game Pass</h2><small>XBOX</small></div>
+                    <div class="section-heading"><h2>Xbox / Game Pass</h2></div>
                     {{XBOX_CONTENT}}
                 </section>
             </div>
@@ -270,6 +312,7 @@ if (!window.matchMedia("(max-width: 759px)").matches) return;
                         s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
                         })({})
                         </script></aside>
+        <div class="brand-ribbon" aria-hidden="true"><div class="brand-ribbon__track"><div class="brand-ribbon__group"><span>GBTGAME.ME</span><span>GBTGAME.ME</span><span>GBTGAME.ME</span><span>GBTGAME.ME</span><span>GBTGAME.ME</span><span>GBTGAME.ME</span></div><div class="brand-ribbon__group"><span>GBTGAME.ME</span><span>GBTGAME.ME</span><span>GBTGAME.ME</span><span>GBTGAME.ME</span><span>GBTGAME.ME</span><span>GBTGAME.ME</span></div></div></div>
         <footer class="site-footer">
             <div class="site-footer__author"><img src="https://avatars.githubusercontent.com/u/63827263?v=4" alt="Nodesire7 头像" width="28" height="28" loading="lazy"><span>作者：<a href="https://github.com/nodesire7/" target="_blank" rel="noopener noreferrer">Nodesire7</a></span><a href="mailto:amocnfk@gmail.com">amocnfk@gmail.com</a><a href="https://github.com/nodesire7/FreeGame-info" target="_blank" rel="noopener noreferrer">FreeGame-info</a></div>
             <div class="site-footer__links">{{ARCHIVE_LINKS}}</div>
