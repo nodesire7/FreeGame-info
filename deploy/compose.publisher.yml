@@ -1,0 +1,24 @@
+services:
+  publisher:
+    build:
+      context: ..
+      dockerfile: deploy/publisher.Dockerfile
+    container_name: freegame-publisher
+    init: true
+    restart: unless-stopped
+    shm_size: 256m
+    mem_limit: 1400m
+    cpus: 1.5
+    environment:
+      TZ: Asia/Shanghai
+      PYTHONUNBUFFERED: "1"
+      FETCH_INTERVAL: "10800"
+      POLL_INTERVAL: "60"
+    volumes:
+      - ${PUBLISH_DIR:-/opt/freegame-publisher}/state:/state
+      - ${PUBLISH_DIR:-/opt/freegame-publisher}/keys:/keys:ro
+      - ${PUBLISH_DIR:-/opt/freegame-publisher}/itad_api_key:/run/secrets/itad_api_key:ro
+    logging:
+      options:
+        max-size: 8m
+        max-file: "3"
