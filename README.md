@@ -1,14 +1,14 @@
 # FreeGame-info
 
-Free games radar: 抓取 Epic/Steam/PlayStation 限免游戏信息并生成静态页面
+追踪游戏限免、会员游戏、跨平台赠送与组合包。
 
 [![Build & Deploy](https://github.com/nodesire7/FreeGame-info/actions/workflows/pages.yml/badge.svg)](https://github.com/nodesire7/FreeGame-info/actions/workflows/pages.yml)
 
 ## 在线站点
 
-**主页**: https://nodesire7.github.io/FreeGame-info/
+**项目站** [gameinfo.gbtgame.me](https://gameinfo.gbtgame.me/) · **账号根站** [nodesire7.github.io](https://nodesire7.github.io/)
 
-每 3 小时自动更新一次限免数据。
+每 3 小时抓取一次，也可在源码更新后直接发布。两个域名使用同一次构建的公开数据、首页、历史页、RSS 和分享图片。
 
 ### 历史数据访问（SQLite）
 
@@ -118,7 +118,7 @@ python generate_image.py site/index.html site/history/records/时间戳白嫖信
 
 - **定时运行**：每 3 小时抓取一次（UTC 时间：0:00、3:00、6:00...）
 - **手动触发**：在 Actions 页面点击 "Run workflow"
-- **自动部署**：生成 `site/index.html`、历史 JSON 和图片，并发布到 GitHub Pages
+- **双站发布**：先发布项目站，再使用仅授权账号根站仓库的部署密钥（Actions secret `ROOT_PAGES_DEPLOY_KEY`），推送同一份静态产物，并核验两个公网地址。自定义域名配置和第三方域名验证文件属于项目站。
 - **历史归档**：仅在数据变化时写入 SQLite，并生成历史列表页与图片
 - **Release**：仅 `push(main)` 触发，自动创建版本号 Release 并上传 `deploy.zip` / `deploy.tar.gz`
 - **Docker**：仅 `push(main)` 触发，推送镜像到 Docker Hub：`nodesire77/game_info`
@@ -182,7 +182,7 @@ https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?loca
 抓取 Steam 商店的"限时特惠 + 免费"搜索结果页：
 
 ```
-https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1?cc=cn&l=schinese
+https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese
 ```
 
 ### PlayStation Plus
@@ -207,6 +207,12 @@ https://api.isthereanydeal.com/deals/v2
 export ITAD_API_KEY=your_itad_api_key
 export ITAD_COUNTRY=CN  # 可选，默认 CN
 ```
+
+### GOG、Xbox 和跨平台赠送
+
+GOG 查询中国区目录里有原价、现价为零的促销。Xbox 从微软香港区的 Game Pass「最近加入」目录获取订阅条目。GamerPower 补充跨商店的完整游戏赠送与兑换码活动，保留适用平台、领取条件、截止信息和活动原文链接。[GamerPower 数据接口](https://www.gamerpower.com/api-read)
+
+公开 JSON 中的 `sourceStatus` 记录各来源最近一次检查和成功取数的时间。来源请求失败时页面会标明使用上次结果或暂时无法获取。ITAD 的折扣和组合包独立更新。
 
 ## 文件说明
 

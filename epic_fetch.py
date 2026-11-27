@@ -214,56 +214,32 @@ async def fetch_epic() -> List[Dict[str, Any]]:
         if not isinstance(promotions, dict):
             continue
 
-        # 获取促销活动信息
-        active_offers = promotions.get("promotionalOffers")
-        upcoming_offers = promotions.get("upcomingPromotionalOffers")
-        
-        # 检查是否有当前免费
-        has_active = False
-        active_end_date = None
-        
-        if isinstance(active_offers, list) and active_offers:
-            for offer_group in active_offers:
-                if isinstance(offer_group, dict):
-                    offers = offer_group.get("promotionalOffers")
-                    if isinstance(offers, list):
-                        for offer in offers:
-                            if isinstance(offer, dict):
-                                # 检查是否免费（discountPrice 为 0）
-                                price_data = game.get("price", {}).get("totalPrice", {})
-                                discount_price = price_data.get("discountPrice")
-                                
-                                if discount_price == 0:
-                                    has_active = True
-                                    active_end_date = offer.get("endDate")
-                                    break
-                if has_active:
-                    break
-        
-        # 检查是否有即将免费（重要：采用 JS 逻辑，排除已在促销中的）
-        has_upcoming = False
-        upcoming_start_date = None
-        
-        if not has_active and isinstance(upcoming_offers, list) and upcoming_offers:
-            for offer_group in upcoming_offers:
-                if isinstance(offer_group, dict):
-                    offers = offer_group.get("promotionalOffers")
-                    if isinstance(offers, list) and offers:
-                        has_upcoming = True
-                        upcoming_start_date = offers[0].get("startDate")
-                        break
 
-        # 如果既没有当前免费也没有即将免费，跳过
-        if not has_active and not has_upcoming:
+        total = game.get("price", {}).get("totalPrice", {})
+        # A percentage of zero is the amount payable in Epic's promotion schema.
+        candidates = []
+        for group_key in ("promotionalOffers", "upcomingPromotionalOffers"):
+            for group in promotions.get(group_key) or []:
+                for offer in group.get("promotionalOffers") or []:
+                    setting = offer.get("discountSetting") or {}
+                    if setting.get("discountType") != "PERCENTAGE" or setting.get("discountPercentage") != 0:
+                        continue
+                    start = datetime.fromisoformat(offer["startDate"].replace("Z", "+00:00"))
+                    end = datetime.fromisoformat(offer["endDate"].replace("Z", "+00:00"))
+                    start_ms, end_ms = int(start.timestamp() * 1000), int(end.timestamp() * 1000)
+                    if end_ms <= now_ms or end_ms <= start_ms:
+                        continue
+                    if start_ms <= now_ms:
+                        if total.get("discountPrice") != 0 or not total.get("originalPrice"):
+                            continue
+                    elif total.get("originalPrice") == 0 and game.get("offerType") == "BASE_GAME":
+                        continue
+                    candidates.append((start_ms, end_ms, offer))
+        if not candidates:
             continue
-
-        # 根据状态确定目标日期
-        if has_active:
-            status = "ACTIVE"
-            target_date = active_end_date
-        else:
-            status = "UPCOMING"
-            target_date = upcoming_start_date
+        start_ms, end_ms, offer = min(candidates, key=lambda period: period[0])
+        status = "ACTIVE" if start_ms <= now_ms else "UPCOMING"
+        target_date = offer["endDate"] if status == "ACTIVE" else offer["startDate"]
 
         # 提取原价（API 返回可能包含 ¥ 前缀，统一清理后由渲染层添加）
         price_data = game.get("price", {})
@@ -281,6 +257,8 @@ async def fetch_epic() -> List[Dict[str, Any]]:
         game_info = {
             "title": game.get("title", ""),
             "status": status,
+            "freeStartAt": start_ms, "freeEndAt": end_ms,
+            "offerType": "giveaway", "region": "CN", "source": "epic",
             "publisher": publisher,
             "creator": creator,
             "description": description,

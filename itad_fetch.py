@@ -9,7 +9,7 @@ import asyncio
 import json
 import os
 import re
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import aiohttp
@@ -57,72 +57,44 @@ async def _fetch_itad_deals(
     country: str = "CN",
     limit: int = 200,
 ) -> List[Dict[str, Any]]:
-    """从 ITAD Deals API 拉取 100% OFF 折扣，分页直到 cut < 100"""
-    all_deals: List[Dict[str, Any]] = []
+    """读取 ITAD v2 的 game.deal 和分页游标。"""
+    result = []
     offset = 0
-    max_pages = 5
-
-    for _ in range(max_pages):
+    while True:
         params = {
-            "key": api_key,
-            "country": country,
-            "limit": limit,
-            "offset": offset,
-            "sort": "-cut",
+            "country": country, "limit": limit, "offset": offset, "sort": "-cut",
+            "filter": '{"cut":{"min":100,"max":100}}',
         }
-        try:
-            async with session.get(
-                ITAD_DEALS_API,
-                params=params,
-                timeout=aiohttp.ClientTimeout(total=30),
-            ) as resp:
-                if resp.status != 200:
-                    break
-                data = await resp.json()
-        except Exception:
-            break
-
-        deals = data.get("list") if isinstance(data, dict) else []
-        if not deals:
-            break
-
-        all_deals.extend(deals)
-        offset += limit
-
-        # 最后一批的 cut 值 < 100 则停止
-        if deals[-1].get("cut", 0) < 100:
-            break
-
-    # 规范化 deals 字段
-    result: List[Dict[str, Any]] = []
-    for deal in all_deals:
-        cut = deal.get("cut", 0)
-        if cut < 100:
-            continue
-
-        shop_info = deal.get("shop", {})
-        shop_name = shop_info.get("name", "") if isinstance(shop_info, dict) else ""
-        plain = deal.get("plain", "")
-
-        price_info = deal.get("price", {}) if isinstance(deal.get("price"), dict) else {}
-        regular_info = deal.get("regular", {}) if isinstance(deal.get("regular"), dict) else {}
-
-        result.append({
-            "id": deal.get("id", plain),
-            "plain": plain,
-            "title": deal.get("title", ""),
-            "store": shop_name,
-            "cut": cut,
-            "price": price_info.get("amount", 0),
-            "priceCurrency": price_info.get("currency", ""),
-            "regularPrice": regular_info.get("amount", 0),
-            "regularCurrency": regular_info.get("currency", ""),
-            "url": deal.get("urls", {}).get("game", ""),
-            "platforms": deal.get("platforms", []),
-            "expiry": deal.get("expiry"),
-            "storeFamily": _classify_store(shop_name),
-        })
-    return result
+        async with session.get(
+            ITAD_DEALS_API, params=params, headers={"ITAD-API-Key": api_key},
+            timeout=aiohttp.ClientTimeout(total=30),
+        ) as resp:
+            resp.raise_for_status()
+            data = await resp.json()
+        for game in data["list"]:
+            deal = game["deal"]
+            price, regular = deal["price"], deal["regular"]
+            if deal["cut"] != 100 or price["amount"] != 0 or regular["amount"] <= 0:
+                continue
+            end = deal.get("expiry")
+            expiry = int(datetime.fromisoformat(end.replace("Z", "+00:00")).timestamp()) if end else None
+            if expiry is not None and expiry <= datetime.now(timezone.utc).timestamp():
+                continue
+            shop = deal["shop"]["name"]
+            assets = game.get("assets") or {}
+            result.append({
+                "id": game["id"], "plain": game["slug"], "title": game["title"], "store": shop,
+                "cut": deal["cut"], "price": price["amount"], "priceCurrency": price["currency"],
+                "regularPrice": regular["amount"], "regularCurrency": regular["currency"],
+                "url": deal["url"], "voucher": deal.get("voucher"), "platforms": [platform["name"] for platform in deal.get("platforms", [])],
+                "cover": assets.get("banner600") or assets.get("boxart", ""), "expiry": expiry,
+                "storeFamily": _classify_store(shop), "offerType": "giveaway", "region": country,
+            })
+        if not data["hasMore"]:
+            return result
+        if data["nextOffset"] <= offset:
+            raise ValueError("ITAD 分页游标异常")
+        offset = data["nextOffset"]
 
 
 # ============== Giveaways 页面 (Bundles) ==============
@@ -130,24 +102,13 @@ async def _fetch_itad_deals(
 
 def _parse_giveaways_page(html_content: str) -> List[Dict[str, Any]]:
     """解析 ITAD giveaways 页面，提取 bundle 数据"""
-    # 匹配 var page = [...{"bundles":[...]}]
-    pattern = r'"bundles"\s*:\s*(\[[\s\S]*?\])\s*[,}]'
-    match = re.search(pattern, html_content)
-    if not match:
-        return []
-
-    bundles_json = match.group(1)
-    try:
-        bundles = json.loads(bundles_json)
-    except json.JSONDecodeError:
-        cleaned = re.sub(r'[,}\]]+$', '', bundles_json)
-        try:
-            bundles = json.loads(cleaned)
-        except json.JSONDecodeError:
-            return []
-
+    marker = re.search(r"\bvar\s+page\s*=\s*", html_content)
+    if not marker:
+        raise ValueError("ITAD 页面缺少数据")
+    page, _ = json.JSONDecoder().raw_decode(html_content[marker.end():])
+    bundles = page[1]["bundles"]
     if not isinstance(bundles, list):
-        return []
+        raise ValueError("ITAD 组合包格式异常")
 
     result: List[Dict[str, Any]] = []
     for bundle in bundles:
@@ -163,7 +124,7 @@ def _parse_giveaways_page(html_content: str) -> List[Dict[str, Any]]:
         is_pending = bundle.get("isPending", False)
         is_mature = bundle.get("isMature", False)
 
-        if not title or not url:
+        if not title or not url or (expiry and expiry <= datetime.now(timezone.utc).timestamp()):
             continue
 
         result.append({
@@ -171,6 +132,7 @@ def _parse_giveaways_page(html_content: str) -> List[Dict[str, Any]]:
             "store": store_name,
             "expiry": expiry,
             "gameCount": game_count,
+            "offerType": "bundle",
             "url": url,
             "isPending": is_pending,
             "isMature": is_mature,
@@ -186,18 +148,9 @@ async def _fetch_itad_giveaways(session: aiohttp.ClientSession) -> List[Dict[str
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
     }
-    try:
-        async with session.get(
-            ITAD_GIVEAWAYS_URL,
-            headers=headers,
-            timeout=aiohttp.ClientTimeout(total=30),
-        ) as resp:
-            if resp.status != 200:
-                return []
-            html_content = await resp.text()
-    except Exception:
-        return []
-
+    async with session.get(ITAD_GIVEAWAYS_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+        resp.raise_for_status()
+        html_content = await resp.text()
     return _parse_giveaways_page(html_content)
 
 
@@ -214,7 +167,8 @@ async def fetch_itad(
     """
     itad_key = api_key or os.getenv("ITAD_API_KEY", "")
 
-    async with aiohttp.ClientSession() as session:
+    errors = {}
+    async with aiohttp.ClientSession(trust_env=True) as session:
         deals: List[Dict[str, Any]] = []
         bundles: List[Dict[str, Any]] = []
 
@@ -223,7 +177,10 @@ async def fetch_itad(
             try:
                 deals = await _fetch_itad_deals(session, itad_key, country)
             except Exception as e:
-                print(f"  ⚠️ ITAD Deals API 失败: {e}")
+                errors["deals"] = type(e).__name__
+                print(f"ITAD Deals API 请求失败: {type(e).__name__}")
+        else:
+            errors["deals"] = "ITAD_API_KEY 未配置"
 
         # Giveaways (bundles)
         try:
@@ -235,9 +192,10 @@ async def fetch_itad(
                 except Exception as e:
                     print(f"  ⚠️ ITAD bundle 封面提取失败: {e}")
         except Exception as e:
-            print(f"  ⚠️ ITAD Giveaways 失败: {e}")
+            errors["bundles"] = type(e).__name__
+            print(f"ITAD 组合包请求失败: {type(e).__name__}")
 
-    return {"deals": deals, "bundles": bundles}
+    return {"deals": deals, "bundles": bundles, "errors": errors}
 
 
 def _format_itad_price(d: Dict[str, Any]) -> str:
@@ -266,125 +224,42 @@ def redistribute_itad_deals(
     deals = itad_data.get("deals", [])
     bundles = itad_data.get("bundles", [])
 
-    main_platforms = {"epic", "steam", "psn", "gog", "xbox"}
-    redistributed_deals: List[Dict[str, Any]] = []
-    leftover_deals: List[Dict[str, Any]] = []
-
+    targets = {
+        "epic": epic_data.setdefault("now", []) if epic_data is not None else None,
+        "steam": steam_data, "psn": psn_data, "gog": gog_data, "xbox": xbox_data,
+    }
+    leftover_deals = []
     for deal in deals:
-        family = deal.get("storeFamily", "other")
-        if family in main_platforms:
-            redistributed_deals.append(deal)
-        else:
+        family = deal.get("storeFamily")
+        target = targets.get(family)
+        if target is None:
             leftover_deals.append(deal)
-
-    # Epic: 合并到 now 列表
-    if epic_data is not None and isinstance(epic_data, dict):
-        epic_extra = [d for d in redistributed_deals if d.get("storeFamily") == "epic"]
-        for d in epic_extra:
-            formatted_price = _format_itad_price(d)
-            normalized = {
-                "title": d["title"],
-                "link": d.get("url", ""),
-                "cover": d.get("cover", ""),
-                "originalPriceDesc": formatted_price,
-                "publisher": d.get("store", ""),
-                "creator": "",
-                "description": f"ITAD 来源：{d['store']} 100% OFF",
-                "isFreeNow": True,
-                "freeStartAt": None,
-                "freeEndAt": d.get("expiry"),
-                "source": "itad",
-            }
-            if "now" not in epic_data:
-                epic_data["now"] = []
-            epic_data["now"].append(normalized)
-
-    # Steam: 追加到列表
-    if steam_data is not None and isinstance(steam_data, list):
-        steam_extra = [d for d in redistributed_deals if d.get("storeFamily") == "steam"]
-        for d in steam_extra:
-            formatted_price = _format_itad_price(d)
-            normalized = {
-                "title": d["title"],
-                "id": d.get("url", d.get("plain", "")),
-                "link": d.get("url", f"https://store.steampowered.com/app/{d.get('plain', '')}/"),
-                "image": d.get("cover", ""),
-                "platforms": d.get("platforms", []),
-                "discountText": "100% OFF",
-                "originalPrice": formatted_price,
-                "finalPrice": "0",
-                "shortDescription": f"ITAD 来源：{d['store']} 100% OFF",
-                "source": "itad",
-            }
-            steam_data.append(normalized)
-
-    # PSN: 追加到列表
-    if psn_data is not None and isinstance(psn_data, list):
-        psn_extra = [d for d in redistributed_deals if d.get("storeFamily") == "psn"]
-        for d in psn_extra:
-            formatted_price = _format_itad_price(d)
-            psn_data.append({
-                "id": d.get("url", d.get("title", "")),
-                "title": d["title"],
-                "link": d.get("url", ""),
-                "image": d.get("cover", ""),
-                "cover": d.get("cover", ""),
-                "description": f"ITAD 来源：{d['store']} 100% OFF",
-                "publisher": d.get("store", ""),
-                "platform": "PS Plus",
-                "price": "会员免费",
-                "originalPrice": formatted_price,
-                "date": "",
-                "status": "ACTIVE",
-                "source": "itad",
-            })
-
-    # GOG: 追加到列表
-    if gog_data is not None and isinstance(gog_data, list):
-        gog_extra = [d for d in redistributed_deals if d.get("storeFamily") == "gog"]
-        for d in gog_extra:
-            formatted_price = _format_itad_price(d)
-            gog_data.append({
-                "title": d["title"],
-                "link": d.get("url", ""),
-                "cover": d.get("cover", ""),
-                "price": "Free",
-                "originalPrice": formatted_price,
-                "publisher": d.get("store", ""),
-                "releaseDate": "",
-                "genres": [],
-                "features": [],
-                "platforms": d.get("platforms", []),
-                "languages": "",
-                "description": f"ITAD 来源：{d['store']} 100% OFF",
-                "platform": "GOG",
-                "status": "ACTIVE",
-                "date": "",
-                "source": "itad",
-            })
-
-    # Xbox: 追加到列表
-    if xbox_data is not None and isinstance(xbox_data, list):
-        xbox_extra = [d for d in redistributed_deals if d.get("storeFamily") == "xbox"]
-        for d in xbox_extra:
-            formatted_price = _format_itad_price(d)
-            xbox_data.append({
-                "title": d["title"],
-                "link": d.get("url", ""),
-                "cover": d.get("cover", ""),
-                "price": "Free",
-                "originalPrice": formatted_price,
-                "publisher": d.get("store", ""),
-                "releaseDate": "",
-                "genres": [],
-                "features": [],
-                "platforms": d.get("platforms", ["Xbox"]),
-                "description": f"ITAD 来源：{d['store']} 100% OFF",
-                "platform": "Xbox Game Pass",
-                "status": "ACTIVE",
-                "date": "",
-                "source": "itad",
-            })
+            continue
+        title = deal["title"]
+        if any(row.get("title", "").strip().casefold() == title.strip().casefold()
+               and row.get("offerType") != "subscription" for row in target):
+            continue
+        expiry = deal.get("expiry")
+        regular_price = _format_itad_price(deal)
+        row = {
+            "id": deal.get("id") or deal["url"], "title": title, "link": deal["url"],
+            "cover": deal.get("cover", ""), "originalPrice": regular_price, "price": "免费",
+            "description": f"{deal['store']} 限时免费", "platforms": deal.get("platforms", []),
+            "freeEndAt": expiry * 1000 if expiry else None, "expiry": expiry, "status": "ACTIVE",
+            "date": "", "source": "itad", "offerType": "giveaway", "region": deal.get("region", ""),
+        }
+        if deal.get("voucher"):
+            row["description"] += f"，结算时使用优惠码 {deal['voucher']}"
+        if family == "epic":
+            row.update(originalPriceDesc=regular_price, isFreeNow=True, freeStartAt=None, publisher="", creator="")
+        elif family == "steam":
+            row.update(image=row["cover"], discountText="-100%", finalPrice="0", shortDescription=row["description"])
+        else:
+            row.update(platform={"psn": "PlayStation Store", "gog": "GOG", "xbox": "Microsoft Store"}[family],
+                       publisher="", releaseDate="", genres=[], features=[], languages="")
+            if family == "psn":
+                row["image"] = row["cover"]
+        target.append(row)
 
     return leftover_deals + bundles
 

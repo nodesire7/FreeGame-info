@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -86,10 +86,10 @@ jobs:
         run: |
           set -e
           cd history-wt
-          if [ -n "$(git status --porcelain history)" ]; then
+          git add -f history
+          if ! git diff --cached --quiet -- history; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -f history
             git commit -m "Update history store"
             git push origin HEAD:history
           else
@@ -107,6 +107,50 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Check out the account Pages repository
+        if: github.repository == 'nodesire7/FreeGame-info'
+        uses: actions/checkout@v4
+        with:
+          repository: nodesire7/nodesire7.github.io
+          ref: main
+          path: account-pages
+          ssh-key: ${{ secrets.ROOT_PAGES_DEPLOY_KEY }}
+
+      - name: Publish the same build to the account site
+        if: github.repository == 'nodesire7/FreeGame-info'
+        shell: bash
+        run: |
+          bash deploy/sync-account-pages.sh site account-pages
+          cd account-pages
+          git add --all
+          if ! git diff --cached --quiet; then
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "Sync FreeGame-info ${GITHUB_SHA::7} (run ${GITHUB_RUN_ID})"
+            git push origin HEAD:main
+          fi
+
+      - name: Verify both public sites serve this build
+        if: github.repository == 'nodesire7/FreeGame-info'
+        shell: bash
+        run: |
+          query="build=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          snapshot='%E7%99%BD%E5%AB%96%E4%BF%A1%E6%81%AF.json'
+          matches() {
+            curl -fsSL --connect-timeout 5 --max-time 15 "$1?$query" -o "$RUNNER_TEMP/pages-check" &&
+              cmp -s "$RUNNER_TEMP/pages-check" "$2"
+          }
+          for attempt in {1..36}; do
+            if matches "https://nodesire7.github.io/" account-pages/index.html &&
+               matches "https://nodesire7.github.io/$snapshot" 'site/白嫖信息.json' &&
+               matches "https://gameinfo.gbtgame.me/$snapshot" 'site/白嫖信息.json'; then
+              echo "Both public sites serve the new build."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for the two public Pages deployments." >&2
+          exit 1
 
   # ── 仅代码 push 时运行：构建 Docker 镜像并创建 GitHub Release ─────────────
   release:

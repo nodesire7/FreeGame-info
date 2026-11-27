@@ -49,9 +49,26 @@ async def _fetch_with_aiohttp(url: str, session: aiohttp.ClientSession, timeout:
 
 
 async def _fetch_html_page() -> str:
-    """抓取 Steam 搜索结果页面 HTML"""
-    async with aiohttp.ClientSession() as session:
-        return await _fetch_with_aiohttp(STEAM_FREEBIES_URL, session)
+    """Steam's infinite-scroll endpoint exposes the complete result count."""
+    url = "https://store.steampowered.com/search/results/"
+    count = 50
+    params = dict(start=0, count=count, infinite=1, maxprice="free", specials=1, cc="cn", l="schinese")
+    parts = []
+    async with aiohttp.ClientSession(headers={"User-Agent": USER_AGENT}, trust_env=True) as session:
+        while True:
+            async with session.get(url, params=params, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                resp.raise_for_status()
+                page = await resp.json(content_type=None)
+            if page.get("success") != 1:
+                raise ValueError("Steam 搜索请求未成功")
+            fragment = page["results_html"]
+            if page["total_count"] > params["start"] and "search_result_row" not in fragment:
+                raise ValueError("Steam 搜索结果缺少商品")
+            parts.append(fragment)
+            params["start"] += count
+            if params["start"] >= page["total_count"]:
+                break
+    return '<div id="search_resultsRows">' + "".join(parts) + "</div>"
 
 
 async def _fetch_with_playwright() -> str:
@@ -103,7 +120,9 @@ def parse_steam_freebies(html_content: str) -> List[Dict[str, Any]]:
     soup = BeautifulSoup(html_content, "html.parser")
     rows_container = soup.select_one("#search_resultsRows")
     if rows_container is None:
-        return []
+        if re.search(r"\bvar nItemCount\s*=\s*0\s*;", html_content):
+            return []
+        raise ValueError("Steam 搜索结果结构异常")
 
     items: List[Dict[str, Any]] = []
 
@@ -133,6 +152,11 @@ def parse_steam_freebies(html_content: str) -> List[Dict[str, Any]]:
         original_price = original_price_el.get_text(strip=True) if original_price_el else None
         final_price = final_price_el.get_text(strip=True) if final_price_el else None
 
+        discount_block = row.select_one(".discount_block")
+        if (discount_text not in ("-100%", "−100%") or discount_block is None
+                or discount_block.get("data-price-final") != "0"):
+            continue
+
         review_el = row.select_one(".search_review_summary")
         review_summary_raw = review_el.get("data-tooltip-html") if review_el else None
         review_summary = (
@@ -161,6 +185,7 @@ def parse_steam_freebies(html_content: str) -> List[Dict[str, Any]]:
                 "releaseDate": release_date,
                 "platforms": platforms,
                 "discountText": discount_text,
+                "offerType": "giveaway", "source": "steam", "region": "CN",
                 "originalPrice": original_price,
                 "finalPrice": final_price,
                 "reviewSummary": review_summary,
@@ -366,8 +391,7 @@ async def fetch_steam(output_path: Optional[str] = None) -> List[Dict[str, Any]]
         try:
             html_content = await _fetch_with_playwright()
         except Exception as e2:
-            print(f"Playwright 也失败: {e2}")
-            return []
+            raise RuntimeError("Steam 搜索页请求失败") from e2
 
     items = parse_steam_freebies(html_content)
     if not items:
@@ -450,34 +474,35 @@ async def fetch_steam(output_path: Optional[str] = None) -> List[Dict[str, Any]]
             if store_meta.get("recommendations"):
                 items[idx]["recommendations"] = store_meta["recommendations"]
 
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=True,
-            args=[
-                "--disable-blink-features=AutomationControlled",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-            ],
-        )
-        context = await browser.new_context(
-            user_agent=USER_AGENT,
-            viewport={"width": 1920, "height": 1080},
-            locale="zh-CN",
-        )
-        tasks = []
-        for i, item in enumerate(items):
-            app_id = item.get("appId")
-            if not app_id:
-                continue
-            tasks.append(_fetch_with_semaphore(i, app_id, context))
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(
+                headless=True,
+                args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                ],
+            )
+            context = await browser.new_context(
+                user_agent=USER_AGENT,
+                viewport={"width": 1920, "height": 1080},
+                locale="zh-CN",
+            )
+            tasks = []
+            for i, item in enumerate(items):
+                app_id = item.get("appId")
+                if not app_id:
+                    continue
+                tasks.append(_fetch_with_semaphore(i, app_id, context))
 
-        if tasks:
-            await asyncio.gather(*tasks)
+            if tasks:
+                await asyncio.gather(*tasks)
 
-        await context.close()
-        await browser.close()
-
-    print(f"Steam: 商店页元数据获取完成")
+            await context.close()
+            await browser.close()
+    except Exception as error:
+        print(f"Steam 商品详情补充失败，保留搜索和 API 数据: {type(error).__name__}")
 
     # Step 6: 输出
     if output_path:
