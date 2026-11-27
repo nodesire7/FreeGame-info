@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>白嫖游戏速报 | GBTGAME官方网站</title>
+    <meta name="6da64ae9f15c6a6e81499ff21b745e42d48f40db" content="6da64ae9f15c6a6e81499ff21b745e42d48f40db" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="alternate" type="application/rss+xml" title="白嫖游戏速报 RSS Feed" href="/feed.xml">
+    <!-- ads.txt -->
+    <meta name="adsense-ads.txt" content="google.com, pub-9956808351564739, DIRECT, f08c47fec0942fa0">
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "白嫖游戏速报 | GBTGAME",
+        "url": "https://gameinfo.gbtgame.me",
+        "description": "聚合 EPIC、Steam、PlayStation 限免与 ITAD Bundle / 慈善包情报",
+        "publisher": {
+            "@type": "Organization",
+            "name": "GBTGAME",
+            "url": "https://gameinfo.gbtgame.me"
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://gameinfo.gbtgame.me/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "白嫖游戏速报",
+        "url": "https://gameinfo.gbtgame.me",
+        "description": "实时更新 EPIC、Steam、PlayStation 平台的免费游戏限免信息",
+        "isAccessibleForFree": "True",
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": [".epic-freebies__panel"]
+        }
+    }
+    </script>
+    <!-- Google AdSense -->
+    <script data-cfasync="false" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9956808351564739"
+     crossorigin="anonymous"></script>
+    <!-- AMP Auto-Ads script -->
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tab 激活状态样式 */
+        .epic-freebies__tab.is-active {
+            background-color: rgb(220 38 38 / 1) !important;
+            color: rgb(255 255 255 / 1) !important;
+            box-shadow: 6px 6px 0 0 #fff;
+        }
+        .epic-freebies__tab.is-active .tab-badge-bg {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+        .epic-freebies__tab.is-active .tab-badge-text {
+            color: #d10000 !important;
+        }
+        .epic-freebies__panel { display: none; }
+        .epic-freebies__panel.is-active { display: block; }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee { animation: marquee 12s linear infinite; }
+        @keyframes countdown-pulse {
+            0% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .countdown-tick { animation: countdown-pulse 0.3s ease-out; }
+        /* BASE RESET */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+        a { color: inherit; text-decoration: none; }
+        button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+        img { display: block; max-width: 100%; }
+
+        /* === LAYOUT UTILITIES === */
+        .max-w-7xl { max-width: 80rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .my-12 { margin-top: 3rem; margin-bottom: 3rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-10 { margin-bottom: 2.5rem; }
+        .mb-12 { margin-bottom: 3rem; }
+        .mb-20 { margin-bottom: 5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mr-4 { margin-right: 1rem; }
+        .mr-6 { margin-right: 1.5rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .ml-4 { margin-left: 1rem; }
+        .ml-6 { margin-left: 1.5rem; }
+        .p-1 { padding: 0.25rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+        .px-12 { padding-left: 3rem; padding-right: 3rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .pt-6 { padding-top: 1.5rem; }
+        .pb-8 { padding-bottom: 2rem; }
+        .lg\:p-12 { @media (min-width: 1024px) { padding: 3rem; } }
+        .lg\:p-10 { @media (min-width: 1024px) { padding: 2.5rem; } }
+        .lg\:w-2\/5 { @media (min-width: 1024px) { width: 40%; } }
+        .lg\:w-3\/5 { @media (min-width: 1024px) { width: 60%; } }
+        .lg\:w-1\/3 { @media (min-width: 1024px) { width: 33.333%; } }
+        .lg\:w-2\/3 { @media (min-width: 1024px) { width: 66.666%; } }
+        .w-full { width: 100%; }
+        .w-3 { width: 0.75rem; }
+        .w-6 { width: 1.5rem; }
+        .w-8 { width: 2rem; }
+        .w-12 { width: 3rem; }
+        .w-16 { width: 4rem; }
+        .w-32 { width: 8rem; }
+        .w-48 { width: 12rem; }
+        .h-3 { height: 0.75rem; }
+        .h-6 { height: 1.5rem; }
+        .h-8 { height: 2rem; }
+        .h-12 { height: 3rem; }
+        .h-16 { height: 4rem; }
+        .min-h-screen { min-height: 100vh; }
+        .aspect-video { aspect-ratio: 16 / 9; }
+
+        /* === FLEXBOX === */
+        .flex { display: flex; }
+        .inline-flex { display: inline-flex; }
+        .flex-col { flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .items-end { align-items: flex-end; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .gap-8 { gap: 2rem; }
+        .gap-12 { gap: 3rem; }
+        .gap-x-6 { column-gap: 1.5rem; }
+        .gap-y-3 { row-gap: 0.75rem; }
+
+        /* === GRID === */
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        /* === POSITIONING === */
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .z-10 { z-index: 10; }
+        .z-20 { z-index: 20; }
+        .z-30 { z-index: 30; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .inset-y-0 { top: 0; bottom: 0; }
+        .left-0 { left: 0; }
+        .-top-4 { top: -1rem; }
+        .-right-4 { right: -1rem; }
+        .-bottom-4 { bottom: -1rem; }
+        .-left-4 { left: -1rem; }
+        .translate-x-6 { transform: translateX(1.5rem); }
+        .-translate-x-12 { transform: translateX(-3rem); }
+
+        /* === DISPLAY === */
+        .hidden { display: none; }
+        .block { display: block; }
+        .inline-block { display: inline-block; }
+        .no-underline { text-decoration: none; }
+        .overflow-hidden { overflow: hidden; }
+        .pointer-events-none { pointer-events: none; }
+
+        /* === BORDERS === */
+        .border-2 { border-width: 2px; border-style: solid; }
+        .border-4 { border-width: 4px; border-style: solid; }
+        .border-6 { border-width: 6px; border-style: solid; }
+        .border-\[6px\] { border-width: 6px; border-style: solid; }
+        .border-\[10px\] { border-width: 10px; border-style: solid; }
+        .border-t-2 { border-top-width: 2px; border-style: solid; }
+        .border-t-\[6px\] { border-top-width: 6px; border-style: solid; }
+        .border-t-\[10px\] { border-top-width: 10px; border-style: solid; }
+        .border-dashed { border-style: dashed; }
+        .border-black { border-color: #000; }
+        .border-white { border-color: #fff; }
+        .border-zinc-700 { border-color: #3f3f46; }
+        .border-zinc-800 { border-color: #27272a; }
+        .border-l-4 { border-left-width: 4px; border-style: solid; }
+        .border-l-8 { border-left-width: 8px; border-style: solid; }
+        .border-l-8.border-red-600 { border-color: #d10000; }
+        .rounded-full { border-radius: 9999px; }
+        .border-\[8px\] { border-width: 8px; border-style: solid; }
+
+        /* === COLORS === */
+        .bg-black { background-color: #000; }
+        .bg-white { background-color: #fff; }
+        .bg-red-600 { background-color: #d10000; }
+        .bg-zinc-700 { background-color: #3f3f46; }
+        .bg-zinc-800 { background-color: #27272a; }
+        .bg-zinc-900 { background-color: #161616; }
+        .bg-zinc-950 { background-color: #030303; }
+        .bg-\[\#d10000\] { background-color: #d10000; }
+        .text-white { color: #fff; }
+        .text-black { color: #000; }
+        .text-red-600 { color: #d10000; }
+        .text-zinc-400 { color: #a1a1aa; }
+        .text-zinc-500 { color: #71717a; }
+        .text-zinc-600 { color: #52525b; }
+        .text-zinc-700 { color: #3f3f46; }
+        .text-zinc-800 { color: #27272a; }
+        .selection\:bg-white::selection { background-color: #fff; }
+        .selection\:text-red-600::selection { color: #d10000; }
+
+        /* === TYPOGRAPHY === */
+        .text-\[10px\] { font-size: 10px; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-xl { font-size: 1.25rem; line-height: 2rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+        .text-5xl { font-size: 3rem; line-height: 1; }
+        .text-6xl { font-size: 3.75rem; line-height: 1; }
+        .text-7xl { font-size: 4.5rem; line-height: 1; }
+        .font-black { font-weight: 900; }
+        .font-bold { font-weight: 700; }
+        .italic { font-style: italic; }
+        .uppercase { text-transform: uppercase; }
+        .tracking-tighter { letter-spacing: -0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .tracking-\[0\.4em\] { letter-spacing: 0.4em; }
+        .leading-none { line-height: 1; }
+        .leading-relaxed { line-height: 1.625; }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* === SHADOWS === */
+        .shadow-\[20px_20px_0_0_\#fff\,_-1px_-1px_0_0_\#000\] { box-shadow: 20px 20px 0 0 #fff, -1px -1px 0 0 #000; }
+        .shadow-\[12px_12px_0_0_\#d10000\] { box-shadow: 12px 12px 0 0 #d10000; }
+        .shadow-\[8px_8px_0_0_\#000\] { box-shadow: 8px 8px 0 0 #000; }
+        .shadow-\[6px_6px_0_0_\#fff\] { box-shadow: 6px 6px 0 0 #fff; }
+        .shadow-\[4px_4px_0_0_\#d10000\] { box-shadow: 4px 4px 0 0 #d10000; }
+        .shadow-\[20px_0_0_0_\#000\] { box-shadow: 20px 0 0 0 #000; }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+        /* === TRANSFORMS === */
+        .transform { transform: translateX(0) translateY(0) rotate(0) skewX(0) skewY(0) scale(1); }
+        .skew-x-12 { transform: skewX(-12deg); }
+        .skew-x-\[20deg\] { transform: skewX(20deg); }
+        .skew-x-\[35deg\] { transform: skewX(-35deg); }
+        .rotate-12 { transform: rotate(12deg); }
+        .-rotate-1 { transform: rotate(-1deg); }
+        .hover\:-rotate-1:hover { transform: rotate(-1deg); }
+        .hover\:rotate-1:hover { transform: rotate(1deg); }
+
+        /* === TRANSITIONS === */
+        .transition-all { transition: all 0.15s ease; }
+        .transition-colors { transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; }
+        .transition-transform { transition: transform 0.2s ease; }
+        .duration-700 { transition-duration: 0.7s; }
+
+        /* === HOVER STATES === */
+        .hover\:bg-white:hover { background-color: #fff; }
+        .hover\:bg-red-600:hover { background-color: #d10000; }
+        .hover\:text-black:hover { color: #000; }
+        .hover\:text-white:hover { color: #fff; }
+        .hover\:scale-110:hover { transform: scale(1.1); }
+        .hover\:underline:hover { text-decoration: underline; }
+
+        /* === ANIMATIONS === */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee { animation: marquee 12s linear infinite; }
+        @keyframes countdown-pulse {
+            0% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .countdown-tick { animation: countdown-pulse 0.3s ease-out; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+
+        /* === SCROLLBAR === */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* === RESPONSIVE HELPERS === */
+        @media (min-width: 768px) {
+            .md\:inline { display: inline; }
+            .md\:block { display: block; }
+            .md\:flex { display: flex; }
+            .md\:flex-row { flex-direction: row; }
+            .md\:items-center { align-items: center; }
+            .md\:text-7xl { font-size: 4.5rem; line-height: 1; }
+        }
+        @media (max-width: 767px) {
+            .md\:hidden { display: none; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:inline { display: inline; }
+            .lg\:flex { display: flex; }
+            .lg\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+            .lg\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+            .lg\:border-t-\[10px\] { border-top-width: 10px; }
+            .lg\:h-20 { height: 5rem; }
+            .lg\:mx-16 { margin-left: 4rem; margin-right: 4rem; }
+            .lg\:p-12 { padding: 3rem; }
+        }
+
+        /* === TAB SYSTEM === */
+        .epic-freebies__tab.is-active {
+            background-color: #d10000;
+            color: #fff !important;
+            box-shadow: 6px 6px 0 0 #fff;
+        }
+        .epic-freebies__tab.is-active .tab-badge-bg { background-color: #fff; }
+        .epic-freebies__tab.is-active .tab-badge-text { color: #d10000; }
+        .epic-freebies__tab.is-active .tab-red { color: #d10000; }
+        .epic-freebies__panel { display: none; }
+        .epic-freebies__panel.is-active { display: block; }
+
+        /* === CUSTOM PROPERTIES === */
+        :root {
+            --red: #d10000;
+            --white: #fff;
+            --black: #000;
+            --zinc-900: #161616;
+            --zinc-950: #030303;
+        }
+
+        /* === OBJECT FIT === */
+        .object-cover { object-fit: cover; }
+    </style>
+</head>
+<body class="m-0 min-h-screen text-white antialiased">
+    <!-- AMP Auto-Ads -->
+    <amp-auto-ads type="adsense" data-ad-client="ca-pub-9956808351564739"></amp-auto-ads>
+
+    <!-- ads.txt 供爬虫索引 -->
+    <pre id="ads-txt" style="display:none;">google.com, pub-9956808351564739, DIRECT, f08c47fec0942fa0</pre>
+
+    <section class="max-w-7xl mx-auto my-12 font-sans bg-[#d10000] p-1 sm:p-2 overflow-hidden selection:bg-white selection:text-red-600">
+        <div class="relative bg-black text-white shadow-[20px_20px_0_0_#fff,-1px_-1px_0_0_#000]">
+
+            <!-- 点状纹理 -->
+            <div class="absolute inset-0 opacity-15 pointer-events-none" style="background-image: radial-gradient(#fff 2px, transparent 2px); background-size: 28px 28px;"></div>
+
+            <!-- 顶部栏 -->
+            <div class="relative z-10 flex justify-between items-center px-6 py-4 border-b-[10px] border-white bg-zinc-950">
+                <div class="flex gap-6 items-center">
+                    <svg class="w-6 h-6 text-red-600 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M12 3L2 21H22L12 3Z" /></svg>
+                    <h2 class="text-xs font-black tracking-[0.4em] italic uppercase hidden md:inline">GBTGAME_FREEBIE_RADAR_V3</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] text-zinc-500 font-bold italic">LAST_SYNC: 2026-10-04 07:35</span>
+                    <div class="bg-red-600 text-white px-6 py-1 font-black transform -skew-x-12 italic shadow-[4px_4px_0_0_#fff] text-xs">
+                        侦测中...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="relative z-10 p-6 lg:p-12">
+
+                <!-- 标题区 -->
+                <div class="relative mb-20 transform -rotate-1 z-20">
+                    <div class="bg-white text-black inline-block px-4 py-1 font-black text-[10px] uppercase tracking-widest transform translate-x-6">INTEL_MISSION</div>
+                    <div class="bg-black border-[6px] border-white p-6 shadow-[12px_12px_0_0_#d10000] flex flex-col md:flex-row justify-between items-end gap-6">
+                        <div>
+                            <h1 class="text-5xl md:text-7xl font-black text-white italic leading-none flex items-center gap-4">
+                                <span class="text-red-600 text-6xl">/</span>白嫖游戏速报
+                            </h1>
+                            <p class="text-zinc-400 mt-4 border-l-8 border-red-600 pl-4 py-1 italic text-sm">聚合 EPIC | Steam | PlayStation | GOG | Xbox 限免与 ITAD Bundle / 慈善包情报</p>
+                        </div>
+                        <a class="share-button bg-white text-black px-10 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[8px_8px_0_0_#000] text-sm whitespace-nowrap no-underline"
+                           data-share-button href="records/20261004073506白嫖信息.webp" download="GBTGame限免拼图-20261128-0146.webp">
+                            下载分享图片
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Desktop Ad: 300x250 Banner（仅桌面端，标题下方） -->
+                <div class="hidden md:flex justify-center mb-12">
+                    <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-4 flex flex-col items-center justify-center gap-2">
+                        <span class="text-[10px] text-zinc-600 font-black italic tracking-widest uppercase">AD</span>
+                        <script>
+                        (function(rnoa){
+                        var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+                        s.settings = rnoa || {}; s.src = "\/\/profitable-grocery.com\/bOX\/VqsOd.GDl\/0gYjW\/cB\/GeGmj9puiZ\/UzljkLPiTSYd5iNDDukj4ZOgD-U\/t\/N\/jKkM0_OqT\/gj4bOiQZ";
+                        s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+                        })({})
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Mobile Ad: In-Page Push（移动端，标题下方） -->
+                <div class="block md:hidden w-full mb-8">
+                    <div class="border-2 border-zinc-800 bg-zinc-950 px-4 py-3 flex items-center justify-center">
+                        <span class="text-[10px] text-zinc-600 font-bold italic mr-4 tracking-widest uppercase">AD</span>
+                        <script>
+                        (function(zlqb){
+                        var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+                        s.settings = zlqb || {}; s.src = "\/\/profitable-grocery.com\/bjX.VjscdhG\/lb0\/Y\/WZce\/letmC9muQZuUilJkBPIT\/YO5uNODpgK2-NGjnEttHNijhkA0TOFDSYd2_NhQf";
+                        s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+                        })({})
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Tab 导航 -->
+                <nav class="flex flex-wrap gap-4 mb-16 relative z-10" role="tablist" aria-label="限免平台切换">
+                    <button class="epic-freebies__tab is-active group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="true" aria-controls="free-panel-epic" data-tab="epic">
+                        <span class="relative z-10">EPIC 限免 <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">7</span></span>
+                    </button>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-steam" data-tab="steam">
+                        <span class="relative z-10">STEAM 限免 <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">2</span></span>
+                    </button>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-psn" data-tab="psn">
+                        <span class="relative z-10">PS_PLUS <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">4</span></span>
+                    </button>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-itad" data-tab="itad">
+                        <span class="relative z-10">ITAD <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">15</span></span>
+                    </button>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-gog" data-tab="gog">
+                        <span class="relative z-10">GOG <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">0</span></span>
+                    </button>
+                    <button class="epic-freebies__tab group relative px-8 py-3 bg-zinc-900 text-zinc-400 font-black italic transform skew-x-12 hover:bg-white hover:text-black transition-colors" role="tab" aria-selected="false" aria-controls="free-panel-xbox" data-tab="xbox">
+                        <span class="relative z-10">XBOX <span class="tab-badge-bg bg-zinc-700 text-white px-2 ml-2 not-italic">0</span></span>
+                    </button>
+                </nav>
+
+                <!-- Tab Panels -->
+                <div class="epic-freebies__panels">
+
+                    <!-- Epic Panel (active) -->
+                    <div class="epic-freebies__panel is-active" role="tabpanel" id="free-panel-epic" data-panel="epic">
+                        <!-- Now Section -->
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">Now_Available / 正在免费</h3>
+                            </div>
+                            <div class="grid grid-cols-1 gap-12">
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://cdn1.epicgames.com/spt-assets/690ff600d5134d9ab12c96862ed5257a/system-shock-2-25th-anniversary-remaster-1e28j.jpg" alt="System Shock 2: 25th Anniversary Remaster" loading="lazy">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 93.00</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">System Shock 2: 25th Anniversary Remaster</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">System Shock® 2: 25th Anniversary Remaster is a genre defining experience that established innovative game-play mechanics that are a staple of the FPS and RPG genre today. Survive the wretched corridors of the Von Braun. Your training has prepared you for this.</p>
+        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">发行：Atari</span></div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-2xl font-black text-red-600 italic"><span class="countdown-tick" data-countdown-target="1791500400000" data-countdown-prefix="剩余" data-countdown-finished="已结束">已结束</span></span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">截止：10月09日 07:00</span>
+            </div>
+            <a href="https://store.epicgames.com/zh-CN/p/system-shock-2-25th-anniversary-remaster-cb94d9" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://cdn1.epicgames.com/spt-assets/e2dc55c2709641a18fc37ef7ce32cfdd/buried-stars-1j9of.jpg" alt="深埋之星" loading="lazy">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 116.00</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">深埋之星</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">《深埋之星》是以直播选秀节目中发生的坍塌事故为背景的悬疑冒险游戏。 受困的人们一边彼此交流，一边通过社交媒体向外界传递信息，等待救援。 然而，随着意外事件的发生，生存者们环绕于矛盾和怀疑之中。</p>
+        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">发行：LINE Games Corporation</span></div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-2xl font-black text-red-600 italic"><span class="countdown-tick" data-countdown-target="1791500400000" data-countdown-prefix="剩余" data-countdown-finished="已结束">已结束</span></span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">截止：10月09日 07:00</span>
+            </div>
+            <a href="https://store.epicgames.com/zh-CN/p/buried-stars-d7c88c" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
+</article>
+</div>
+                        </div>
+
+                        <!-- In-Page Push Ad（Epic Now 与 Upcoming 之间，内容穿插） -->
+                        <div class="w-full my-12">
+                            <div class="border-4 border-dashed border-zinc-700 bg-zinc-950 p-8 flex flex-col items-center justify-center gap-4">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="h-3 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                    <span class="text-[10px] text-zinc-500 font-black italic tracking-widest uppercase">Sponsored / 推广内容</span>
+                                </div>
+                                <script>
+                                (function(zlqb){
+                                var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+                                s.settings = zlqb || {}; s.src = "\/\/profitable-grocery.com\/bjX.VjscdhG\/lb0\/Y\/WZce\/letmC9muQZuUilJkBPIT\/YO5uNODpgK2-NGjnEttHNijhkA0TOFDSYd2_NhQf";
+                                s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+                                })({})
+                                </script>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Section -->
+                        <div class="mb-10">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-white skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase text-zinc-400">Upcoming_Missions / 预告</h3>
+                            </div>
+                            <div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://cdn1.epicgames.com/offer/708f57aaa04b42ef885be16c8288f0ac/EGS_Ghostrunner2_OneMoreLevel_S1_2560x1440-15845148fae1d0cfd7f3e98c9b3ba6ba" alt="《幽灵行者 2》" loading="lazy">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 169.00</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">《幽灵行者 2》</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">《幽灵行者 2》是第一人称视角硬核砍杀游戏的续作，故事背景设定在后世界末日的赛博朋克世界。游戏延续了《幽灵行者》粉丝喜爱的所有内容，包括精彩绝伦的 BOSS 战、全新的可互动式剧情主线、刺激的摩托车关卡、重新优化的技能以及更多生化忍者的打斗场面。</p>
+        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">发行：505 Games</span></div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-2xl font-black text-red-600 italic"><span class="countdown-tick" data-countdown-target="1796950800000" data-countdown-prefix="剩余" data-countdown-finished="已结束">距离开放还剩 13天 07:13:16</span></span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">限免窗口：12月11日 09:00</span>
+            </div>
+            <a href="https://store.epicgames.com/zh-CN/p/ghostrunner-2" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://cdn2.unrealengine.com/egs-lisathedefinitiveedition-dingalingproductions-bundles-s1-2560x1440-5be18c558828.jpg" alt="《LISA: Definitive Edition》" loading="lazy">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 108.00</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">《LISA: Definitive Edition》</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">入手《LISA: Definitive Edition》，探索 Olathe，揭开背后隐藏的扭曲秘密。Definitive Edition 包括叙事驱动角色扮演原作《LISA: The Painful》及续作《LISA: The Joyful》。</p>
+        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">发行：Serenity Forge</span></div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-2xl font-black text-red-600 italic"><span class="countdown-tick" data-countdown-target="1793541600000" data-countdown-prefix="剩余" data-countdown-finished="已结束">活动时间：时间待定</span></span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">开始：11月01日 22:00</span>
+            </div>
+            <a href="https://store.epicgames.com/zh-CN/p/lisa-the-definitive-edition" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://cdn1.epicgames.com/spt-assets/6e1bf54cfa6344c89d41e4e7af036ac9/out-of-sight-1l12n.jpg" alt="虎视眈眈 (Out of Sight)" loading="lazy">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 53.00</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">虎视眈眈 (Out of Sight)</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">《熊视眈眈》是一款将第一人称和第二人称视角相融合的氛围恐怖游戏，拥有引人入胜的配音，给你带来沉浸式的惊悚情感之旅。</p>
+        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">发行：The Gang Studio AB</span></div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-2xl font-black text-red-600 italic"><span class="countdown-tick" data-countdown-target="1791500400000" data-countdown-prefix="剩余" data-countdown-finished="已结束">活动时间：时间待定</span></span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">开始：10月09日 07:00</span>
+            </div>
+            <a href="https://store.epicgames.com/zh-CN/p/out-of-sight-b96ca8" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://cdn1.epicgames.com/spt-assets/e56a7411805046d3b5b7253a6e4e0faa/monument-valley-1gys5.jpg" alt="纪念碑谷（Monument Valley）" loading="lazy">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 33.00</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">纪念碑谷（Monument Valley）</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">踏上宽恕之旅，穿越几乎不可能破解的环境和幻想谜题。操纵纪念碑、创建不断发展的道路，探索全新超现实且神秘的世界，体验这款冥想且平静的解谜游戏。</p>
+        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">发行：ustwo games</span></div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-2xl font-black text-red-600 italic"><span class="countdown-tick" data-countdown-target="1792450800000" data-countdown-prefix="剩余" data-countdown-finished="已结束">活动时间：时间待定</span></span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">开始：10月20日 07:00</span>
+            </div>
+            <a href="https://store.epicgames.com/zh-CN/p/monument-valley-1d99d3" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://cdn1.epicgames.com/spt-assets/a740a2eed807469f88b9dff17e7cd3a3/terrascape-j7p8d.png" alt="TerraScape" loading="lazy">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">原价 53.00</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">TerraScape</h4>
+        <p class="text-zinc-500 text-sm leading-relaxed mb-6 border-l-4 border-zinc-800 pl-4">在这款温馨惬意的中世纪城市建造解谜游戏中，通过合理布局建筑，在浮空岛屿上打造壮丽王国。发现隐藏组合，挑战每周任务，并在多种单人和多人游戏模式中探索随机生成的地图。</p>
+        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">发行：Bitfall Studios GmbH</span></div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-2xl font-black text-red-600 italic"><span class="countdown-tick" data-countdown-target="1791500400000" data-countdown-prefix="剩余" data-countdown-finished="已结束">活动时间：时间待定</span></span>
+                <span class="text-[10px] text-zinc-500 font-bold uppercase">开始：10月09日 07:00</span>
+            </div>
+            <a href="https://store.epicgames.com/zh-CN/p/terrascape-2b12b1" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+        </div>
+    </div>
+</article>
+</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Steam Panel -->
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-steam" data-panel="steam">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">Steam_Deals / Steam 限免</h3>
+                            </div>
+                            <div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative min-w-0">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/9bdae1b3fecd63e2b66b2dec7772d6d690beb475/capsule_231x87_schinese.jpg?t=1790874934" alt="熔炉密林：爪克龙剑甲包 封面" loading="lazy" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">Steam 限免</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-3 tracking-tighter uppercase leading-tight">熔炉密林：爪克龙剑甲包</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-3 border-l-4 border-zinc-800 pl-4 line-clamp-3">全新武器和可选物种降临熔炉密林！加入爪克龙，挥舞他们的传奇巨剑征服密林，击退凶恶的爪克龙子体！</p>
+            <div class="flex flex-wrap gap-1 mt-2"><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">迷宫探索</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">砍杀</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">轻度 Rogue</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">清版动作</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">角色扮演</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">动作</span></div>
+            
+            <span class="text-[10px] text-zinc-600 italic">语言：简体中文 ✔ ✔ ✔</span>
+            
+        </div>
+        <div class="mt-4">
+            <div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">开发：Klei Entertainment</span><span class="bg-zinc-800 px-3 py-1">发行：Klei Entertainment</span><span class="bg-zinc-800 px-3 py-1">类型：动作 / 冒险 / 角色扮演</span><span class="bg-zinc-800 px-3 py-1">发行：2026 年 10 月 1 日</span><span class="bg-zinc-800 px-3 py-1">平台：Windows</span></div>
+            <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-2xl font-black text-red-600 italic">-100% · ¥0.00</span>
+                    <span class="text-[10px] text-zinc-500 font-bold uppercase">¥18.00</span>
+                </div>
+                <a href="https://store.steampowered.com/app/5067220/_/?snr=1_7_7_2300_150_1" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative min-w-0">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4847440/8c4482813a102b146a6d4b3eb464df30cc69623d/capsule_231x87.jpg?t=1790841917" alt="MXGP 26 - Scrubdesignz Liveries 封面" loading="lazy" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">Steam 限免</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-3 tracking-tighter uppercase leading-tight">MXGP 26 - Scrubdesignz Liveries</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-3 border-l-4 border-zinc-800 pl-4 line-clamp-3">此 DLC 可让您获得 6 款专为您摩托车打造的 SCRUB Designz 涂装。</p>
+            <div class="flex flex-wrap gap-1 mt-2"><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">竞速</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">模拟</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">体育</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">摩托车</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">拟真</span><span class="bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">物理</span></div>
+            
+            <span class="text-[10px] text-zinc-600 italic">语言：简体中文 ✔</span>
+            
+        </div>
+        <div class="mt-4">
+            <div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic"><span class="bg-zinc-800 px-3 py-1">开发：Artefacts Studio</span><span class="bg-zinc-800 px-3 py-1">发行：Nacon</span><span class="bg-zinc-800 px-3 py-1">类型：竞速 / 模拟 / 体育</span><span class="bg-zinc-800 px-3 py-1">发行：2026 年 10 月 1 日</span><span class="bg-zinc-800 px-3 py-1">平台：Windows</span></div>
+            <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-2xl font-black text-red-600 italic">-100% · ¥0.00</span>
+                    <span class="text-[10px] text-zinc-500 font-bold uppercase">¥11.00</span>
+                </div>
+                <a href="https://store.steampowered.com/app/4847440/MXGP_26__Scrubdesignz_Liveries/?snr=1_7_7_2300_150_1" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
+        </div>
+    </div>
+</article>
+</div>
+                        </div>
+                    </div>
+
+                    <!-- PSN Panel -->
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-psn" data-panel="psn">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">PS_Plus / PlayStation 会员福利</h3>
+                            </div>
+                            <div class="grid grid-cols-1 3xl:grid-cols-2 gap-10">
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative min-w-0">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://gmedia.playstation.com/is/image/SIEPDC/sniper-elite-resistance-screenshot-01-en-190826" alt="Sniper Elite: Resistance" loading="lazy" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">PlayStation</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">Sniper Elite: Resistance</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">协助法国抵抗运动粉碎纳粹的阴险阴谋。这是一款沙盒潜行射击游戏，您可以单人游玩，或与一名盟友在线合作。</p>
+            
+        </div>
+        <div class="mt-4">
+            <div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic"><span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">PS Plus 会员免费</span></div>
+            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
+                <a href="https://www.playstation.com/zh-hans-hk/games/sniper-elite-resistance/" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative min-w-0">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://gmedia.playstation.com/is/image/SIEPDC/mlb-the-show-26-screenshot-01-en-190826" alt="MLB® The Show™ 26" loading="lazy" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">PlayStation</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">MLB® The Show™ 26</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">在《MLB® The Show™》系列至今最身历其境的作品中留下您的印记，游戏具备改良的投球与打击控制，以及翻新的“Franchise”（经营模式）体验。</p>
+            
+        </div>
+        <div class="mt-4">
+            <div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic"><span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">PS Plus 会员免费</span></div>
+            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
+                <a href="https://www.playstation.com/zh-hans-hk/games/mlb-the-show/" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative min-w-0">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://gmedia.playstation.com/is/image/SIEPDC/wobbly-life-screenshot-01-en-190826" alt="Wobbly Life" loading="lazy" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">PlayStation</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">Wobbly Life</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">与最多三位朋友一起探索充满摇晃怪奇事物的开放世界，并通过消防员、宇航员和迪斯科舞者等各式各样的正当工作来赚取生活费。</p>
+            
+        </div>
+        <div class="mt-4">
+            <div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic"><span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">PS Plus 会员免费</span></div>
+            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
+                <a href="https://www.playstation.com/zh-hans-hk/games/wobbly-life/" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <!-- GET corner badge -->
+    <div class="absolute -top-4 -right-4 w-16 h-16 bg-white text-black flex items-center justify-center rotate-12 font-black text-xl shadow-[4px_4px_0_0_#d10000] z-20 group-hover:bg-red-600 group-hover:text-white transition-colors">GET</div>
+
+    <!-- Cover image -->
+    <div class="lg:w-2/5 relative min-w-0">
+        <div class="border-[8px] border-white shadow-2xl overflow-hidden aspect-video">
+            <img src="https://gmedia.playstation.com/is/image/SIEPDC/chained-echoes-screenshot-01-en-190826" alt="Chained Echoes" loading="lazy" class="w-full h-full object-cover">
+        </div>
+        <div class="absolute -bottom-4 -left-4 bg-red-600 text-white px-6 py-2 font-black italic shadow-[6px_6px_0_0_#fff]">PlayStation</div>
+    </div>
+
+    <!-- Content -->
+    <div class="lg:w-3/5 flex flex-col justify-between py-2 min-w-0">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase leading-tight">Chained Echoes</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">在这款回合制像素艺术角色扮演游戏中，为三个交战中的王国带来和平。游戏背景设定在一个龙与驾驶机甲一样常见的奇幻世界。</p>
+            
+        </div>
+        <div class="mt-4">
+            <div class="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 italic"><span class="bg-red-600 px-3 py-1 text-[10px] font-black text-white italic">PS Plus 会员免费</span></div>
+            <div class="mt-4 flex items-center justify-end border-t-2 border-dashed border-zinc-800 pt-4">
+                <a href="https://www.playstation.com/zh-hans-hk/games/chained-echoes/" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase whitespace-nowrap" target="_blank" rel="noopener noreferrer">立即抢夺</a>
+            </div>
+        </div>
+    </div>
+</article>
+</div>
+                        </div>
+                    </div>
+
+                    <!-- ITAD Panel -->
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-itad" data-panel="itad">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">ITAD_Bundles / 慈善包与礼包</h3>
+                            </div>
+                            <section class="mb-14 last:mb-0"><div class="flex items-center justify-between gap-4 mb-8"><h4 class="text-2xl lg:text-3xl font-black italic uppercase">Bundles / 慈善包与礼包</h4><span class="bg-red-600 text-white px-4 py-2 font-black text-xs uppercase">15 项</span></div><div class="grid grid-cols-1 3xl:grid-cols-2 gap-10"><article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Humble Bundle</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Humble Bundle · 12 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Akupara Games 10 Year Anniversary Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月24日 11:59</span>
+            </div>
+            <a href="https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fakupara-10th-anniversary-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Humble Bundle</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Humble Bundle · 6 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Capcom Classics Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月31日 11:59</span>
+            </div>
+            <a href="https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fcapcom-classics-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <img src="https://cdn-ext.fanatical.com/production/product/1280x720/90368d02-f3ff-416e-96b6-68c19610b56b.jpeg" alt="CoppaFeel! Charity Bundle" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Fanatical · 10 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">CoppaFeel! Charity Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月30日 23:00</span>
+            </div>
+            <a href="https://www.awin1.com/cread.php?awinmid=118821&amp;awinaffid=235265&amp;ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fbundle%2Fcoppafeel-charity-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Humble Bundle</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Humble Bundle · 13 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Dying Light 2 Stay Human Complete DLC Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月22日 12:00</span>
+            </div>
+            <a href="https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fdying-light-2-stay-human-complete-dlc-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Humble Bundle</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Humble Bundle · 13 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">2D Rewind Collection: S2 Games Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月22日 12:00</span>
+            </div>
+            <a href="https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2F2d-rewind-collection-from-s2-games" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <img src="https://www.indiegalacdn.com/bundle_cover/og_image/coffee-break-bundle-fb.jpg?v=20260907.1" alt="Coffee Break Bundle" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            IndieGala · 6 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Coffee Break Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 12月15日 21:59</span>
+            </div>
+            <a href="https://www.indiegala.com/bundle/coffee-break-bundle?ref=itad" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Fanatical</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Fanatical · 18 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Build Your Own Platinum Collection Bundle (Oct 2026)</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 11月05日 21:49</span>
+            </div>
+            <a href="https://www.awin1.com/cread.php?awinmid=118821&amp;awinaffid=235265&amp;ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fplatinum-collection-build-your-own-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Fanatical</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Fanatical · 24 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Build Your Own Retro Revival Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 11月02日 23:00</span>
+            </div>
+            <a href="https://www.awin1.com/cread.php?awinmid=118821&amp;awinaffid=235265&amp;ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fbuild-your-own-retro-revival-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <img src="https://media.greenmangamingbundles.com/media/images/HomepageBanner_Post_v2.original.jpg" alt="Go Postal Bundle" class="w-full h-full object-cover" loading="lazy">
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            GreenManGaming · 5 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Go Postal Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月21日 01:00</span>
+            </div>
+            <a href="https://greenmangaming.sjv.io/c/2545989/3298418/15105?u=https%3A%2F%2Fwww.greenmangamingbundles.com%2Fbundles%2Fgo-postal-bundle%2F" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Humble Bundle</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Humble Bundle · 7 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Programming Puzzles Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月20日 12:00</span>
+            </div>
+            <a href="https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fprogramming-puzzles-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Humble Bundle</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Humble Bundle · 9 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Gear &amp; Glory Action RPG&#x27;s Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月17日 12:00</span>
+            </div>
+            <a href="https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fgear-glory-action-rpgs" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Humble Bundle</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Humble Bundle · 8 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Fall into Fall Fun-dle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月17日 12:00</span>
+            </div>
+            <a href="https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Ffall-into-fall-fundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Fanatical</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Fanatical · 17 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Build Your Own Fall Bundle (2026)</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月29日 22:00</span>
+            </div>
+            <a href="https://www.awin1.com/cread.php?awinmid=118821&amp;awinaffid=235265&amp;ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fbuild-your-own-fall-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Fanatical</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Fanatical · 17 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">Build Your Own Misfits and Mayhem Bundle</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月28日 23:00</span>
+            </div>
+            <a href="https://www.awin1.com/cread.php?awinmid=118821&amp;awinaffid=235265&amp;ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fbuild-your-own-misfits-and-mayhem-bundle" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article>
+<article class="relative flex flex-col lg:flex-row gap-8 bg-zinc-950 border-[6px] border-zinc-800 p-6 lg:p-10 transform hover:-rotate-1 transition-transform group">
+    <div class="absolute -top-4 -right-4 min-w-16 h-16 px-3 bg-red-600 text-white flex items-center justify-center rotate-12 font-black text-sm shadow-[4px_4px_0_0_#000] z-20">BUNDLE</div>
+
+    <div class="lg:w-2/5 relative">
+        <div class="border-[8px] border-white shadow-2xl aspect-video overflow-hidden bg-zinc-900">
+            <div class="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2"><span class="text-zinc-500 text-xs uppercase tracking-[0.3em]">Humble Bundle</span><span class="text-zinc-700 text-[10px]">无封面</span></div>
+        </div>
+        <div class="absolute -bottom-3 left-4 bg-white text-black px-4 py-2 font-black italic text-xs uppercase shadow-[4px_4px_0_0_#d10000]">
+            Humble Bundle · 5 款
+        </div>
+    </div>
+
+    <div class="lg:w-3/5 flex flex-col justify-between py-2">
+        <div>
+            <h4 class="text-3xl font-black italic mb-4 tracking-tighter uppercase">TrineVerse Triple Co-op Pack</h4>
+            <p class="text-zinc-500 text-sm leading-relaxed mb-4 border-l-4 border-zinc-800 pl-4 line-clamp-3">ITAD bundle / charity 信息</p>
+        </div>
+        <div class="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t-2 border-dashed border-zinc-800 pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xl font-black text-red-600 italic leading-tight">截止 10月15日 12:00</span>
+            </div>
+            <a href="https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Ftrineverse-triple-coop-pack" class="bg-white text-black px-12 py-4 font-black transform -skew-x-12 hover:bg-red-600 hover:text-white transition-all shadow-[6px_6px_0_0_#d10000] text-sm uppercase" target="_blank" rel="noopener noreferrer">查看 Bundle</a>
+        </div>
+    </div>
+</article></div></section>
+                        </div>
+                    </div>
+
+                    <!-- GOG Panel -->
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-gog" data-panel="gog">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">GOG_Giveaways / GOG 限免</h3>
+                            </div>
+                            <div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">暂未检测到 GOG 平台限免活动。</div>
+                        </div>
+                    </div>
+
+                    <!-- Xbox Panel -->
+                    <div class="epic-freebies__panel hidden" role="tabpanel" id="free-panel-xbox" data-panel="xbox">
+                        <div class="mb-20">
+                            <div class="flex items-center gap-4 mb-10">
+                                <div class="h-12 w-3 bg-red-600 skew-x-[20deg]"></div>
+                                <h3 class="text-4xl font-black italic uppercase">Xbox_GamePass / Xbox 游戏</h3>
+                            </div>
+                            <div class="py-16 lg:py-20 px-10 border border-dashed border-zinc-700 text-center text-zinc-500 bg-zinc-950 leading-relaxed">暂未检测到 Xbox 平台限免活动。</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 底部滚动条 -->
+            <div class="relative bg-white h-12 lg:h-20 overflow-hidden flex items-center border-t-[6px] lg:border-t-[10px] border-black z-30">
+                <div class="absolute inset-y-0 left-0 bg-red-600 w-32 lg:w-48 -skew-x-[35deg] -translate-x-12 z-10 shadow-[20px_0_0_0_#000]"></div>
+                <!-- overflow-hidden 裁剪动画内容，形成无缝滚动窗口 -->
+                <div class="w-full overflow-hidden z-0">
+                    <div class="animate-marquee whitespace-nowrap flex w-max">
+                        <!-- 原始组 -->
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <!-- 重复组（与原始组完全相同，保证无缝衔接） -->
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-black font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                        <span class="text-red-600 font-black text-xl lg:text-4xl italic mx-8 lg:mx-16 tracking-tighter">GBTGAME.ME</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto mt-8 pb-8 px-4 text-center text-zinc-600 text-xs">
+        <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-3">
+            <img class="w-8 h-8 rounded-full object-cover border border-zinc-700" src="https://avatars.githubusercontent.com/u/63827263?v=4" alt="Nodesire7 头像" width="32" height="32">
+            <span>作者：<a href="https://github.com/nodesire7/" target="_blank" rel="noopener noreferrer" class="text-red-600 no-underline hover:underline">Nodesire7</a></span>
+            <span>邮箱：<a href="mailto:amocnfk@gmail.com" class="text-red-600 no-underline hover:underline">amocnfk@gmail.com</a></span>
+            <span>仓库：<a href="https://github.com/nodesire7/FreeGame-info" target="_blank" rel="noopener noreferrer" class="text-red-600 no-underline hover:underline">FreeGame-info</a></span>
+            <span>历史记录：<a href="history/" target="_blank" rel="noopener noreferrer">查看</a></span><span>数据库：<a href="history/date.db" target="_blank" rel="noopener noreferrer">date.db</a></span><span>本次记录：<a href="白嫖信息.json" target="_blank" rel="noopener noreferrer">JSON</a></span><span>最新归档：<a href="history/records/20261004073506白嫖信息.webp" target="_blank" rel="noopener noreferrer">图片</a></span>
+        </div>
+    </footer>
+
+    <script type="application/json" id="share-payload">{"generatedAtDisplay": "2026-10-04 07:35", "generatedAtTimestamp": 1791070506901, "totalItems": 16, "suggestedFileName": "GBTGame限免拼图-20261128-0146.webp", "sections": [{"title": "EPIC 正在免费", "items": [{"title": "System Shock 2: 25th Anniversary Remaster", "primary": "已结束", "secondary": "截止：10月09日 07:00", "tertiary": "原价 93.00 · 发行 Atari", "description": "System Shock® 2: 25th Anniversary Remaster is a genre defining experience that established innovative game-play mechanics that are a staple of the FPS and RPG genre today. Survive the wretched corridors of the Von Braun. Your training has prepared you for this.", "coverUrl": "https://cdn1.epicgames.com/spt-assets/690ff600d5134d9ab12c96862ed5257a/system-shock-2-25th-anniversary-remaster-1e28j.jpg"}, {"title": "深埋之星", "primary": "已结束", "secondary": "截止：10月09日 07:00", "tertiary": "原价 116.00 · 发行 LINE Games Corporation", "description": "《深埋之星》是以直播选秀节目中发生的坍塌事故为背景的悬疑冒险游戏。 受困的人们一边彼此交流，一边通过社交媒体向外界传递信息，等待救援。 然而，随着意外事件的发生，生存者们环绕于矛盾和怀疑之中。", "coverUrl": "https://cdn1.epicgames.com/spt-assets/e2dc55c2709641a18fc37ef7ce32cfdd/buried-stars-1j9of.jpg"}]}, {"title": "EPIC 即将免费", "items": [{"title": "《幽灵行者 2》", "primary": "距离开放还剩 13天 07:13:16", "secondary": "开始：12月11日 09:00", "tertiary": "原价 169.00 · 发行 505 Games", "description": "《幽灵行者 2》是第一人称视角硬核砍杀游戏的续作，故事背景设定在后世界末日的赛博朋克世界。游戏延续了《幽灵行者》粉丝喜爱的所有内容，包括精彩绝伦的 BOSS 战、全新的可互动式剧情主线、刺激的摩托车关卡、重新优化的技能以及更多生化忍者的打斗场面。", "coverUrl": "https://cdn1.epicgames.com/offer/708f57aaa04b42ef885be16c8288f0ac/EGS_Ghostrunner2_OneMoreLevel_S1_2560x1440-15845148fae1d0cfd7f3e98c9b3ba6ba"}, {"title": "《LISA: Definitive Edition》", "primary": "已开放", "secondary": "开始：11月01日 22:00", "tertiary": "原价 108.00 · 发行 Serenity Forge", "description": "入手《LISA: Definitive Edition》，探索 Olathe，揭开背后隐藏的扭曲秘密。Definitive Edition 包括叙事驱动角色扮演原作《LISA: The Painful》及续作《LISA: The Joyful》。", "coverUrl": "https://cdn2.unrealengine.com/egs-lisathedefinitiveedition-dingalingproductions-bundles-s1-2560x1440-5be18c558828.jpg"}, {"title": "虎视眈眈 (Out of Sight)", "primary": "已开放", "secondary": "开始：10月09日 07:00", "tertiary": "原价 53.00 · 发行 The Gang Studio AB", "description": "《熊视眈眈》是一款将第一人称和第二人称视角相融合的氛围恐怖游戏，拥有引人入胜的配音，给你带来沉浸式的惊悚情感之旅。", "coverUrl": "https://cdn1.epicgames.com/spt-assets/6e1bf54cfa6344c89d41e4e7af036ac9/out-of-sight-1l12n.jpg"}, {"title": "纪念碑谷（Monument Valley）", "primary": "已开放", "secondary": "开始：10月20日 07:00", "tertiary": "原价 33.00 · 发行 ustwo games", "description": "踏上宽恕之旅，穿越几乎不可能破解的环境和幻想谜题。操纵纪念碑、创建不断发展的道路，探索全新超现实且神秘的世界，体验这款冥想且平静的解谜游戏。", "coverUrl": "https://cdn1.epicgames.com/spt-assets/e56a7411805046d3b5b7253a6e4e0faa/monument-valley-1gys5.jpg"}]}, {"title": "Steam 限免精选", "items": [{"title": "熔炉密林：爪克龙剑甲包", "primary": "折扣 -100%", "secondary": "现价 ¥0.00", "tertiary": "原价 ¥18.00 · 发行 2026 年 10 月 1 日 · 平台 Windows", "description": "", "coverUrl": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/9bdae1b3fecd63e2b66b2dec7772d6d690beb475/capsule_231x87_schinese.jpg?t=1790874934"}, {"title": "MXGP 26 - Scrubdesignz Liveries", "primary": "折扣 -100%", "secondary": "现价 ¥0.00", "tertiary": "原价 ¥11.00 · 发行 2026 年 10 月 1 日 · 平台 Windows", "description": "", "coverUrl": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4847440/8c4482813a102b146a6d4b3eb464df30cc69623d/capsule_231x87.jpg?t=1790841917"}]}, {"title": "PlayStation 会员福利", "items": [{"title": "Sniper Elite: Resistance", "primary": "会员免费", "secondary": "", "tertiary": "平台 ['PS Plus']", "description": "协助法国抵抗运动粉碎纳粹的阴险阴谋。这是一款沙盒潜行射击游戏，您可以单人游玩，或与一名盟友在线合作。", "coverUrl": "https://gmedia.playstation.com/is/image/SIEPDC/sniper-elite-resistance-screenshot-01-en-190826"}, {"title": "MLB® The Show™ 26", "primary": "会员免费", "secondary": "", "tertiary": "平台 ['PS Plus']", "description": "在《MLB® The Show™》系列至今最身历其境的作品中留下您的印记，游戏具备改良的投球与打击控制，以及翻新的“Franchise”（经营模式）体验。", "coverUrl": "https://gmedia.playstation.com/is/image/SIEPDC/mlb-the-show-26-screenshot-01-en-190826"}, {"title": "Wobbly Life", "primary": "会员免费", "secondary": "", "tertiary": "平台 ['PS Plus']", "description": "与最多三位朋友一起探索充满摇晃怪奇事物的开放世界，并通过消防员、宇航员和迪斯科舞者等各式各样的正当工作来赚取生活费。", "coverUrl": "https://gmedia.playstation.com/is/image/SIEPDC/wobbly-life-screenshot-01-en-190826"}, {"title": "Chained Echoes", "primary": "会员免费", "secondary": "", "tertiary": "平台 ['PS Plus']", "description": "在这款回合制像素艺术角色扮演游戏中，为三个交战中的王国带来和平。游戏背景设定在一个龙与驾驶机甲一样常见的奇幻世界。", "coverUrl": "https://gmedia.playstation.com/is/image/SIEPDC/chained-echoes-screenshot-01-en-190826"}]}, {"title": "ITAD Bundles", "items": [{"title": "Akupara Games 10 Year Anniversary Bundle", "primary": "已过期", "secondary": "来自 Humble Bundle", "tertiary": "12 款 · Humble Bundle", "description": "", "coverUrl": "", "store": "Humble Bundle", "gameCount": 12}, {"title": "Capcom Classics Bundle", "primary": "已过期", "secondary": "来自 Humble Bundle", "tertiary": "6 款 · Humble Bundle", "description": "", "coverUrl": "", "store": "Humble Bundle", "gameCount": 6}, {"title": "CoppaFeel! Charity Bundle", "primary": "已过期", "secondary": "来自 Fanatical", "tertiary": "10 款 · Fanatical", "description": "", "coverUrl": "https://cdn-ext.fanatical.com/production/product/1280x720/90368d02-f3ff-416e-96b6-68c19610b56b.jpeg", "store": "Fanatical", "gameCount": 10}, {"title": "Dying Light 2 Stay Human Complete DLC Bundle", "primary": "已过期", "secondary": "来自 Humble Bundle", "tertiary": "13 款 · Humble Bundle", "description": "", "coverUrl": "", "store": "Humble Bundle", "gameCount": 13}]}], "config": {"width": 1080, "padding": 48, "titleBlockHeight": 200, "sectionGap": 64, "cardHeight": 180, "cardGap": 16, "cardRadius": 0, "cardInset": 16, "coverWidth": 200, "coverRadius": 0, "fontWeights": {"light": 300, "regular": 400, "semibold": 600, "bold": 900}, "fontFamily": "\"Noto Sans SC\",\"Microsoft YaHei\",\"PingFang SC\",\"Heiti SC\",sans-serif", "qrSize": 100, "qrMargin": 6}}</script>
+    <script>
+    (function() {
+  'use strict';
+
+  // =========================
+  // 倒计时（以截止时间计算）
+  // =========================
+  const countdownNodes = Array.from(document.querySelectorAll('[data-countdown-target]'));
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const formatCountdown = (diffMs) => {
+    if (diffMs <= 0) return '';
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    if (days > 0) {
+      return `${days}天 ${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+    }
+    return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+  };
+
+  const updateCountdowns = () => {
+    if (!countdownNodes.length) {
+      console.warn('Countdown: no nodes found');
+      return;
+    }
+    const now = Date.now();
+    countdownNodes.forEach((node) => {
+      const targetRaw = node.getAttribute('data-countdown-target');
+      if (!targetRaw) return;
+      const target = Number(targetRaw);
+      if (!Number.isFinite(target)) return;
+      const prefix = node.getAttribute('data-countdown-prefix') || '剩余';
+      const finished = node.getAttribute('data-countdown-finished') || '已结束';
+      const diff = target - now;
+      if (diff <= 0) {
+        node.textContent = finished;
+        node.classList.remove('countdown-tick');
+        return;
+      }
+      const body = formatCountdown(diff);
+      node.textContent = body ? `${prefix} ${body}` : finished;
+      node.classList.remove('countdown-tick');
+      void node.offsetWidth;
+      node.classList.add('countdown-tick');
+    });
+  };
+
+  updateCountdowns();
+  setInterval(updateCountdowns, 1000);
+
+  const shareButton = document.querySelector('[data-share-button]');
+  const tabs = Array.from(document.querySelectorAll('.epic-freebies__tab'));
+  const panels = Array.from(document.querySelectorAll('.epic-freebies__panel'));
+
+  let sharePayload = null;
+  const payloadNode = document.getElementById('share-payload');
+  if (payloadNode) {
+    try {
+      const raw = (payloadNode.textContent || payloadNode.innerText || '').trim();
+      if (raw) {
+        sharePayload = JSON.parse(raw);
+      }
+    } catch (error) {
+      console.error('Failed to parse share payload', error);
+    }
+  }
+
+  if (sharePayload && shareButton) {
+    shareButton.setAttribute('download', sharePayload.suggestedFileName || 'GBTGame限免拼图.png');
+  }
+
+  if (shareButton) {
+    const originalLabel = (shareButton.textContent || '').trim() || '生成分享拼图';
+    shareButton.dataset.originalLabel = originalLabel;
+
+    const hasSections = Boolean(
+      sharePayload &&
+        Array.isArray(sharePayload.sections) &&
+        sharePayload.sections.length > 0,
+    );
+
+    if (!hasSections) {
+      shareButton.setAttribute('aria-disabled', 'true');
+      shareButton.setAttribute('tabindex', '-1');
+    } else {
+      shareButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        if (shareButton.dataset.generating === 'true') {
+          return;
+        }
+        generateShareImage(sharePayload, shareButton).catch(function(error) {
+          console.error(error);
+        });
+      });
+    }
+  }
+
+  async function generateShareImage(payload, button) {
+    button.dataset.generating = 'true';
+    const originalLabel = button.dataset.originalLabel || button.textContent || '生成分享拼图';
+    button.textContent = '生成中...';
+
+    try {
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (fontError) {
+          console.debug('Font readiness wait failed', fontError);
+        }
+      }
+
+      const blob = await renderShareCanvas(payload, null);
+      await triggerDownload(blob, payload.suggestedFileName);
+      button.textContent = '已生成';
+      setTimeout(function() {
+        button.textContent = originalLabel;
+      }, 1600);
+    } catch (error) {
+      console.error('Failed to generate share puzzle', error);
+      button.textContent = '生成失败';
+      setTimeout(function() {
+        button.textContent = originalLabel;
+      }, 2000);
+    } finally {
+      button.dataset.generating = 'false';
+      button.blur();
+    }
+  }
+
+  async function renderShareCanvas(payload, qrCodeDataUrl) {
+    const config = payload.config;
+    const sections = payload.sections;
+    const height = measureCanvasHeight(sections, config);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = config.width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Canvas 2D context is unavailable');
+    }
+
+    ctx.textBaseline = 'top';
+
+    // === BLACK BACKGROUND ===
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, config.width, height);
+
+    // === WHITE DOT GRID PATTERN ===
+    const dotSpacing = 28;
+    const dotRadius = 1;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    for (let x = dotSpacing / 2; x < config.width; x += dotSpacing) {
+      for (let y = dotSpacing / 2; y < height; y += dotSpacing) {
+        ctx.beginPath();
+        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // === TITLE BLOCK ===
+    let cursorY = config.padding;
+
+    // Red bar at top (6px)
+    ctx.fillStyle = '#d10000';
+    ctx.fillRect(0, 0, config.width, 6);
+
+    // White title: "白嫖游戏速报" in bold 52px
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(config.fontWeights.bold, 52, config.fontFamily);
+    ctx.fillText('白嫖游戏速报', config.padding, cursorY);
+    cursorY += 64;
+
+    // Gray subtitle
+    ctx.fillStyle = '#888888';
+    ctx.font = font(config.fontWeights.regular, 18, config.fontFamily);
+    ctx.fillText('GBTGAME FREEBIES · EPIC · STEAM · PSN · ITAD', config.padding, cursorY);
+    cursorY += 28;
+
+    // Timestamp line
+    ctx.fillStyle = '#666666';
+    ctx.font = font(config.fontWeights.light, 14, config.fontFamily);
+    ctx.fillText(
+      'GENERATED: ' + payload.generatedAtDisplay + ' · ' + payload.totalItems + ' ITEMS',
+      config.padding,
+      cursorY,
+    );
+    cursorY = config.padding + config.titleBlockHeight;
+
+    // === SECTIONS ===
+    const cardWidth = config.width - config.padding * 2;
+
+    for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
+      const section = sections[sectionIndex];
+
+      // Section header: red vertical bar + white uppercase bold
+      ctx.fillStyle = '#d10000';
+      ctx.fillRect(config.padding, cursorY, 4, 40);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = font(config.fontWeights.bold, 32, config.fontFamily);
+      ctx.fillText(section.title.toUpperCase(), config.padding + 16, cursorY + 32);
+      cursorY += 56;
+
+      // Draw items
+      for (let itemIndex = 0; itemIndex < section.items.length; itemIndex += 1) {
+        if (itemIndex > 0) {
+          cursorY += config.cardGap;
+        }
+        if (section.type === 'itad') {
+          await drawItadCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
+        } else {
+          await drawCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
+        }
+        cursorY += config.cardHeight;
+      }
+
+      if (sectionIndex !== sections.length - 1) {
+        cursorY += config.sectionGap;
+      }
+    }
+
+    // === FOOTER WITH QR CODE ===
+    const footerHeight = 160;
+    cursorY = height - footerHeight;
+
+    // Black footer bar
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, cursorY, config.width, footerHeight);
+
+    // White top border 6px
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, cursorY, config.width, 6);
+
+    // Red accent bar on left side of footer
+    ctx.fillStyle = '#d10000';
+    ctx.fillRect(0, cursorY, 8, footerHeight);
+
+    // Draw QR code at bottom center
+    if (qrCodeDataUrl) {
+      const qrSize = config.qrSize || 100;
+      const qrX = (config.width - qrSize) / 2;
+      const qrY = cursorY + 16;
+
+      const qrImg = new Image();
+      await new Promise(function(resolve, reject) {
+        qrImg.onload = resolve;
+        qrImg.onerror = reject;
+        qrImg.src = qrCodeDataUrl;
+      });
+      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+    }
+
+    // Text below QR
+    const qrSize = config.qrSize || 100;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
+    ctx.textAlign = 'center';
+    ctx.fillText(
+      '扫描获取最新限免 · GBTGAME.ME',
+      config.width / 2,
+      cursorY + qrSize + 32,
+    );
+    ctx.textAlign = 'left';
+
+    return await new Promise(function(resolve, reject) {
+      canvas.toBlob(
+        function(result) {
+          if (result) {
+            resolve(result);
+          } else {
+            reject(new Error('Failed to export share canvas'));
+          }
+        },
+        'image/png',
+        0.92,
+      );
+    });
+  }
+
+  function measureCanvasHeight(sections, config) {
+    const footerHeight = 160;
+    let total = config.padding * 2 + config.titleBlockHeight;
+    for (let i = 0; i < sections.length; i += 1) {
+      const section = sections[i];
+      total += 56; // section header
+      total += section.items.length * config.cardHeight;
+      if (section.items.length > 1) {
+        total += (section.items.length - 1) * config.cardGap;
+      }
+      if (i !== sections.length - 1) {
+        total += config.sectionGap;
+      }
+    }
+    total += footerHeight;
+    return Math.ceil(total);
+  }
+
+  async function drawCard(ctx, item, config, x, y, width) {
+    // BLACK CARD with WHITE 4px border (NO rounded corners)
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(x, y, width, config.cardHeight);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x, y, width, config.cardHeight);
+
+    const coverX = x + config.cardInset;
+    const coverY = y + config.cardInset;
+    const coverHeight = config.cardHeight - config.cardInset * 2;
+    const coverWidth = config.coverWidth;
+
+    // Cover with WHITE 4px border, no radius
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(coverX, coverY, coverWidth, coverHeight);
+
+    // Load and draw cover image
+    const coverImage = await loadCover(item.coverUrl);
+    if (coverImage) {
+      const scale = Math.max(
+        coverWidth / coverImage.width,
+        coverHeight / coverImage.height,
+      );
+      const drawWidth = coverImage.width * scale;
+      const drawHeight = coverImage.height * scale;
+      const dx = coverX + (coverWidth - drawWidth) / 2;
+      const dy = coverY + (coverHeight - drawHeight) / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(coverX, coverY, coverWidth, coverHeight);
+      ctx.clip();
+      ctx.drawImage(coverImage, dx, dy, drawWidth, drawHeight);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(coverX, coverY, coverWidth, coverHeight);
+      ctx.fillStyle = '#444444';
+      ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
+      ctx.textAlign = 'center';
+      ctx.fillText('NO IMAGE', coverX + coverWidth / 2, coverY + coverHeight / 2);
+      ctx.textAlign = 'left';
+    }
+
+    // Content area (right side, 60%)
+    const textX = coverX + coverWidth + config.cardInset;
+    const textWidth = x + width - config.cardInset - textX;
+    let cursorY = y + config.cardInset;
+
+    // Title: white bold italic 22px uppercase
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(config.fontWeights.bold, 22, config.fontFamily);
+    ctx.fillText(item.title.toUpperCase(), textX, cursorY);
+    cursorY += 30;
+
+    // Description: gray 14px, max 2 lines
+    if (item.description) {
+      cursorY = drawWrappedText(ctx, item.description, {
+        x: textX,
+        y: cursorY,
+        width: textWidth,
+        lineHeight: 20,
+        font: font(config.fontWeights.regular, 14, config.fontFamily),
+        color: '#888888',
+        maxLines: 2,
+      });
+      cursorY += 4;
+    }
+
+    // Price tag: red background #d10000 with white text
+    if (item.tertiary) {
+      const priceText = '原价 ' + item.tertiary;
+      ctx.fillStyle = '#d10000';
+      const priceWidth = ctx.measureText(priceText).width + 16;
+      ctx.fillRect(textX, cursorY, priceWidth, 24);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = font(config.fontWeights.regular, 12, config.fontFamily);
+      ctx.fillText(priceText, textX + 8, cursorY + 16);
+      cursorY += 32;
+    }
+
+    // Timer: red bold italic 20px
+    if (item.primary) {
+      ctx.fillStyle = '#d10000';
+      ctx.font = font(config.fontWeights.bold, 20, config.fontFamily);
+      ctx.fillText(item.primary, textX, cursorY);
+      cursorY += 28;
+    }
+
+    // CTA button: white background, black text
+    const btnText = '立即抢夺';
+    ctx.fillStyle = '#ffffff';
+    const btnWidth = 120;
+    const btnHeight = 32;
+    ctx.fillRect(textX, cursorY, btnWidth, btnHeight);
+    ctx.fillStyle = '#000000';
+    ctx.font = font(config.fontWeights.bold, 14, config.fontFamily);
+    ctx.fillText(btnText, textX + 12, cursorY + 22);
+  }
+
+  async function drawItadCard(ctx, item, config, x, y, width) {
+    // BLACK CARD with WHITE 4px border
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(x, y, width, config.cardHeight);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x, y, width, config.cardHeight);
+
+    const coverX = x + config.cardInset;
+    const coverY = y + config.cardInset;
+    const coverHeight = config.cardHeight - config.cardInset * 2;
+    const coverWidth = config.coverWidth;
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(coverX, coverY, coverWidth, coverHeight);
+
+    const coverImage = await loadCover(item.coverUrl);
+    if (coverImage) {
+      const scale = Math.max(
+        coverWidth / coverImage.width,
+        coverHeight / coverImage.height,
+      );
+      const drawWidth = coverImage.width * scale;
+      const drawHeight = coverImage.height * scale;
+      const dx = coverX + (coverWidth - drawWidth) / 2;
+      const dy = coverY + (coverHeight - drawHeight) / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(coverX, coverY, coverWidth, coverHeight);
+      ctx.clip();
+      ctx.drawImage(coverImage, dx, dy, drawWidth, drawHeight);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(coverX, coverY, coverWidth, coverHeight);
+      ctx.fillStyle = '#444444';
+      ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
+      ctx.textAlign = 'center';
+      ctx.fillText('NO IMAGE', coverX + coverWidth / 2, coverY + coverHeight / 2);
+      ctx.textAlign = 'left';
+    }
+
+    ctx.fillStyle = '#d10000';
+    ctx.font = font(config.fontWeights.bold, 14, config.fontFamily);
+    ctx.fillRect(coverX, y + config.cardHeight - 34, coverWidth, 24);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText((item.store || 'ITAD').toUpperCase(), coverX + 8, y + config.cardHeight - 26);
+
+    const textX = coverX + coverWidth + config.cardInset;
+    const textWidth = x + width - config.cardInset - textX;
+    let cursorY = y + config.cardInset;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
+    ctx.fillText(item.title.toUpperCase(), textX, cursorY);
+    cursorY += 26;
+
+    if (item.tertiary) {
+      cursorY = drawWrappedText(ctx, item.tertiary, {
+        x: textX,
+        y: cursorY,
+        width: textWidth,
+        lineHeight: 18,
+        font: font(config.fontWeights.regular, 12, config.fontFamily),
+        color: '#888888',
+        maxLines: 2,
+      });
+      cursorY += 6;
+    }
+
+    if (item.primary) {
+      ctx.fillStyle = '#d10000';
+      ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
+      ctx.fillText(item.primary, textX, cursorY);
+      cursorY += 26;
+    }
+
+    if (item.description) {
+      cursorY = drawWrappedText(ctx, item.description, {
+        x: textX,
+        y: cursorY,
+        width: textWidth,
+        lineHeight: 18,
+        font: font(config.fontWeights.regular, 12, config.fontFamily),
+        color: '#777777',
+        maxLines: 2,
+      });
+      cursorY += 8;
+    }
+
+    const btnText = '立即抢夺';
+    ctx.fillStyle = '#ffffff';
+    const btnWidth = 100;
+    const btnHeight = 28;
+    ctx.fillRect(textX, cursorY, btnWidth, btnHeight);
+    ctx.fillStyle = '#000000';
+    ctx.font = font(config.fontWeights.bold, 12, config.fontFamily);
+    ctx.fillText(btnText, textX + 8, cursorY + 18);
+  }
+
+  async function loadCover(url) {
+    if (!url) {
+      return null;
+    }
+    try {
+      const image = new Image();
+      image.crossOrigin = 'anonymous';
+      image.decoding = 'async';
+      const result = await new Promise(function(resolve, reject) {
+        image.onload = function() {
+          resolve(image);
+        };
+        image.onerror = function() {
+          reject(new Error('Image load failed'));
+        };
+        image.src = url;
+      });
+      return result;
+    } catch (error) {
+      console.debug('Share cover load failed', error);
+      return null;
+    }
+  }
+
+  function drawWrappedText(ctx, text, options) {
+    if (!text) {
+      return options.y;
+    }
+    ctx.font = options.font;
+    ctx.fillStyle = options.color;
+    ctx.textAlign = 'left';
+
+    const lines = wrapText(ctx, text, options.width, options.maxLines);
+    let cursor = options.y;
+    for (let i = 0; i < lines.length; i += 1) {
+      ctx.fillText(lines[i], options.x, cursor);
+      cursor += options.lineHeight;
+    }
+    return cursor;
+  }
+
+  function wrapText(ctx, text, maxWidth, maxLines) {
+    if (!text) {
+      return [];
+    }
+    const normalized = text.replace(/\s+/g, ' ').trim();
+    if (!normalized) {
+      return [];
+    }
+    const characters = Array.from(normalized);
+    const lines = [];
+    let current = '';
+
+    for (let i = 0; i < characters.length; i += 1) {
+      const candidate = current + characters[i];
+      if (ctx.measureText(candidate).width > maxWidth && current) {
+        lines.push(current);
+        current = characters[i];
+      } else {
+        current = candidate;
+      }
+    }
+    if (current) {
+      lines.push(current);
+    }
+
+    if (typeof maxLines === 'number' && maxLines > 0 && lines.length > maxLines) {
+      const truncated = lines.slice(0, maxLines);
+      let lastLine = truncated[maxLines - 1];
+      while (
+        lastLine.length > 0 &&
+        ctx.measureText(lastLine + '…').width > maxWidth
+      ) {
+        lastLine = lastLine.slice(0, -1);
+      }
+      truncated[maxLines - 1] = lastLine ? lastLine + '…' : '…';
+      return truncated;
+    }
+
+    return lines;
+  }
+
+  function font(weight, size, family) {
+    return weight + ' ' + size + 'px ' + family;
+  }
+
+  function triggerDownload(blob, fileName) {
+    return new Promise(function(resolve) {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = fileName || 'GBTGame限免拼图.png';
+      anchor.rel = 'noopener';
+      anchor.style.display = 'none';
+      document.body.appendChild(anchor);
+      anchor.click();
+      setTimeout(function() {
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(url);
+        resolve();
+      }, 0);
+    });
+  }
+
+  function switchTab(targetKey) {
+    tabs.forEach(function(tab) {
+      const isActive = tab.getAttribute('data-tab') === targetKey;
+      tab.classList.toggle('is-active', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
+    });
+    panels.forEach(function(panel) {
+      const isActive = panel.getAttribute('data-panel') === targetKey;
+      panel.classList.toggle('is-active', isActive);
+      panel.classList.toggle('hidden', !isActive);
+    });
+  }
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      const key = tab.getAttribute('data-tab');
+      if (!key || tab.classList.contains('is-active')) {
+        return;
+      }
+      switchTab(key);
+    });
+  });
+
+})();
+    </script>
+
+    <!-- Popunder: 新标签页打开（静默加载，无容器） -->
+    <script>
+    (function(byra){
+    var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
+    s.settings = byra || {}; s.src = "\/\/baggymaintenance.com\/c_D.9v6Zba2\/5GlWSRWWQE9wN\/jXke0POkT\/kAwiMuSa0v2cOBTWQT5VORTeAY1B";
+    s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade'; l.parentNode.insertBefore(s, l);
+    })({})
+    </script>
+</body>
+</html>

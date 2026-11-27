@@ -1,0 +1,17 @@
+name: Deploy existing FreeGame pages with AdSense
+on:
+  push:
+    branches: [codex/adsense-pages-20261128]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4

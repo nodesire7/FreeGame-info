@@ -1,0 +1,544 @@
+{
+  "fetchedAt": "2026-10-04T07:35:06.901004+08:00",
+  "epic": {
+    "now": [
+      {
+        "title": "System Shock 2: 25th Anniversary Remaster",
+        "link": "https://store.epicgames.com/zh-CN/p/system-shock-2-25th-anniversary-remaster-cb94d9",
+        "cover": "https://cdn1.epicgames.com/spt-assets/690ff600d5134d9ab12c96862ed5257a/system-shock-2-25th-anniversary-remaster-1e28j.jpg",
+        "originalPriceDesc": "93.00",
+        "publisher": "Atari",
+        "creator": "Atari",
+        "description": "System Shock® 2: 25th Anniversary Remaster is a genre defining experience that established innovative game-play mechanics that are a staple of the FPS and RPG genre today. Survive the wretched corridors of the Von Braun. Your training has prepared you for this.",
+        "isFreeNow": true,
+        "freeStartAt": null,
+        "freeEndAt": 1791500400000
+      },
+      {
+        "title": "深埋之星",
+        "link": "https://store.epicgames.com/zh-CN/p/buried-stars-d7c88c",
+        "cover": "https://cdn1.epicgames.com/spt-assets/e2dc55c2709641a18fc37ef7ce32cfdd/buried-stars-1j9of.jpg",
+        "originalPriceDesc": "116.00",
+        "publisher": "LINE Games Corporation",
+        "creator": "LINE Games Corporation",
+        "description": "《深埋之星》是以直播选秀节目中发生的坍塌事故为背景的悬疑冒险游戏。 受困的人们一边彼此交流，一边通过社交媒体向外界传递信息，等待救援。 然而，随着意外事件的发生，生存者们环绕于矛盾和怀疑之中。",
+        "isFreeNow": true,
+        "freeStartAt": null,
+        "freeEndAt": 1791500400000
+      }
+    ],
+    "upcoming": [
+      {
+        "title": "《幽灵行者 2》",
+        "link": "https://store.epicgames.com/zh-CN/p/ghostrunner-2",
+        "cover": "https://cdn1.epicgames.com/offer/708f57aaa04b42ef885be16c8288f0ac/EGS_Ghostrunner2_OneMoreLevel_S1_2560x1440-15845148fae1d0cfd7f3e98c9b3ba6ba",
+        "originalPriceDesc": "169.00",
+        "publisher": "505 Games",
+        "creator": "505 Games",
+        "description": "《幽灵行者 2》是第一人称视角硬核砍杀游戏的续作，故事背景设定在后世界末日的赛博朋克世界。游戏延续了《幽灵行者》粉丝喜爱的所有内容，包括精彩绝伦的 BOSS 战、全新的可互动式剧情主线、刺激的摩托车关卡、重新优化的技能以及更多生化忍者的打斗场面。",
+        "isFreeNow": false,
+        "freeStartAt": 1796950800000,
+        "freeEndAt": null
+      },
+      {
+        "title": "《LISA: Definitive Edition》",
+        "link": "https://store.epicgames.com/zh-CN/p/lisa-the-definitive-edition",
+        "cover": "https://cdn2.unrealengine.com/egs-lisathedefinitiveedition-dingalingproductions-bundles-s1-2560x1440-5be18c558828.jpg",
+        "originalPriceDesc": "108.00",
+        "publisher": "Serenity Forge",
+        "creator": "Serenity Forge",
+        "description": "入手《LISA: Definitive Edition》，探索 Olathe，揭开背后隐藏的扭曲秘密。Definitive Edition 包括叙事驱动角色扮演原作《LISA: The Painful》及续作《LISA: The Joyful》。",
+        "isFreeNow": false,
+        "freeStartAt": 1793541600000,
+        "freeEndAt": null
+      },
+      {
+        "title": "虎视眈眈 (Out of Sight)",
+        "link": "https://store.epicgames.com/zh-CN/p/out-of-sight-b96ca8",
+        "cover": "https://cdn1.epicgames.com/spt-assets/6e1bf54cfa6344c89d41e4e7af036ac9/out-of-sight-1l12n.jpg",
+        "originalPriceDesc": "53.00",
+        "publisher": "The Gang Studio AB",
+        "creator": "The Gang Studio AB",
+        "description": "《熊视眈眈》是一款将第一人称和第二人称视角相融合的氛围恐怖游戏，拥有引人入胜的配音，给你带来沉浸式的惊悚情感之旅。",
+        "isFreeNow": false,
+        "freeStartAt": 1791500400000,
+        "freeEndAt": null
+      },
+      {
+        "title": "纪念碑谷（Monument Valley）",
+        "link": "https://store.epicgames.com/zh-CN/p/monument-valley-1d99d3",
+        "cover": "https://cdn1.epicgames.com/spt-assets/e56a7411805046d3b5b7253a6e4e0faa/monument-valley-1gys5.jpg",
+        "originalPriceDesc": "33.00",
+        "publisher": "ustwo games",
+        "creator": "ustwo games",
+        "description": "踏上宽恕之旅，穿越几乎不可能破解的环境和幻想谜题。操纵纪念碑、创建不断发展的道路，探索全新超现实且神秘的世界，体验这款冥想且平静的解谜游戏。",
+        "isFreeNow": false,
+        "freeStartAt": 1792450800000,
+        "freeEndAt": null
+      },
+      {
+        "title": "TerraScape",
+        "link": "https://store.epicgames.com/zh-CN/p/terrascape-2b12b1",
+        "cover": "https://cdn1.epicgames.com/spt-assets/a740a2eed807469f88b9dff17e7cd3a3/terrascape-j7p8d.png",
+        "originalPriceDesc": "53.00",
+        "publisher": "Bitfall Studios GmbH",
+        "creator": "Bitfall Studios GmbH",
+        "description": "在这款温馨惬意的中世纪城市建造解谜游戏中，通过合理布局建筑，在浮空岛屿上打造壮丽王国。发现隐藏组合，挑战每周任务，并在多种单人和多人游戏模式中探索随机生成的地图。",
+        "isFreeNow": false,
+        "freeStartAt": 1791500400000,
+        "freeEndAt": null
+      }
+    ]
+  },
+  "steam": [
+    {
+      "id": "https://store.steampowered.com/app/5067220/_/?snr=1_7_7_2300_150_1",
+      "appId": 5067220,
+      "title": "熔炉密林：爪克龙剑甲包",
+      "link": "https://store.steampowered.com/app/5067220/_/?snr=1_7_7_2300_150_1",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/9bdae1b3fecd63e2b66b2dec7772d6d690beb475/capsule_231x87_schinese.jpg?t=1790874934",
+      "releaseDate": "2026 年 10 月 1 日",
+      "platforms": [
+        "Windows"
+      ],
+      "discountText": "-100%",
+      "originalPrice": "¥18.00",
+      "finalPrice": "¥0.00",
+      "reviewSummary": null,
+      "developers": [
+        "Klei Entertainment"
+      ],
+      "publishers": [
+        "Klei Entertainment"
+      ],
+      "genres": [
+        "动作",
+        "冒险",
+        "角色扮演"
+      ],
+      "shortDescription": "全新武器和可选物种降临熔炉密林！加入爪克龙，挥舞他们的传奇巨剑征服密林，击退凶恶的爪克龙子体！",
+      "detailedDescription": "<p class=\"bb_paragraph\" >全新武器和可选物种降临熔炉密林！加入爪克龙，挥舞他们的传奇巨剑征服密林，击退凶恶的爪克龙子体！</p><h2 class=\"bb_tag\" ><strong>扮演全新种族：爪克龙！</strong></h2><p class=\"bb_paragraph\" >从火山的另一边振翅而来的是我们的全新可选种族——爪克龙！随心混搭琳琅满目的独特身体组件与动画表情，以一身鳞甲的独特风格征服熔炉密林。<br><br><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay muted loop playsinline poster=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/966f642430eaf8e1ae70efdc30068a3d.poster.avif?t=1790874934\" width=1170 height=390 ><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/966f642430eaf8e1ae70efdc30068a3d.webm?t=1790874934\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/966f642430eaf8e1ae70efdc30068a3d.mp4?t=1790874934\" type=\"video/mp4\"></video></span></p><p class=\"bb_paragraph\" ></p><h2 class=\"bb_tag\" ><strong>在新委托中，帮助爪克龙找回被盗走的仪式甲胄！</strong></h2><p class=\"bb_paragraph\" >帮助爪克龙武僧天地和尚，踏上寻回寺院失窃仪式甲胄的征程。他的信仰与未来皆悬于一线！</p><p class=\"bb_paragraph\" ><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay muted loop playsinline poster=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/f93ab91f1bd0e53e515da081119974c7.poster.avif?t=1790874934\" width=1170 height=390 ><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/f93ab91f1bd0e53e515da081119974c7.webm?t=1790874934\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/f93ab91f1bd0e53e515da081119974c7.mp4?t=1790874934\" type=\"video/mp4\"></video></span></p><p class=\"bb_paragraph\" ></p><h2 class=\"bb_tag\" ><strong>新武器类型：巨剑！</strong></h2><p class=\"bb_paragraph\" >巨剑加入武器架家族，让猎人们在对抗落腐精时占尽优势。挥舞沉重的剑刃，掌握势大力沉的招式，再进入狂暴状态，彻底放飞自我！<br><br><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay muted loop playsinline poster=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/7b10c3dcfdbaaefaceb64138348893e0.poster.avif?t=1790874934\" width=1170 height=390 ><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/7b10c3dcfdbaaefaceb64138348893e0.webm?t=1790874934\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/7b10c3dcfdbaaefaceb64138348893e0.mp4?t=1790874934\" type=\"video/mp4\"></video></span></p><p class=\"bb_paragraph\" ></p><h2 class=\"bb_tag\" ><strong>爪克龙剑甲包</strong></h2><p class=\"bb_paragraph\" >全新武器和可选物种降临熔炉密林！加入爪克龙，挥舞他们的传奇巨剑征服密林，击退凶恶的爪克龙子体！<br><br><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay muted loop playsinline poster=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/52cd77d9009e9a5fdbc56aa35ade6247.poster.avif?t=1790874934\" width=1170 height=390 ><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/52cd77d9009e9a5fdbc56aa35ade6247.webm?t=1790874934\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/5067220/extras/52cd77d9009e9a5fdbc56aa35ade6247.mp4?t=1790874934\" type=\"video/mp4\"></video></span></p><p class=\"bb_paragraph\" ></p><h2 class=\"bb_tag\" ><strong>搜刮武器库的战利品！</strong></h2><p class=\"bb_paragraph\" >全新装备和个性饰品散落在熔炉密林各处，等你一一发现！</p><p class=\"bb_paragraph\" ><strong>特色内容</strong></p><ul class=\"bb_ul\"><li><p class=\"bb_paragraph\" >新武器类型：巨剑</p></li><li><p class=\"bb_paragraph\" >新可选种族：爪克龙</p></li><li><p class=\"bb_paragraph\" >20+种可解锁的巨剑款式</p></li><li><p class=\"bb_paragraph\" >巨剑专属的新武器神力</p></li><li><p class=\"bb_paragraph\" >在新委托中挑战两名全新小头目</p></li><li><p class=\"bb_paragraph\" >可解锁的全新护具幻影</p></li></ul><p class=\"bb_paragraph\" ></p>",
+      "headerImage": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/69686f03dc47930c93b273e1d255144f7b63e8b1/header_schinese.jpg?t=1790874934",
+      "backgroundImage": "https://store.akamai.steamstatic.com/images/storepagebackground/app/5067220?t=1790874934",
+      "isFree": true,
+      "price_steam": "¥ 0.00",
+      "detailedDescriptionHTML": "<h2>关于此内容</h2>\n\t\t\t\t\t\t\t<p class=\"bb_paragraph\">全新武器和可选物种降临熔炉密林！加入爪克龙，挥舞他们的传奇巨剑征服密林，击退凶恶的爪克龙子体！</p><h2 class=\"bb_tag\"><strong>扮演全新种族：爪克龙！</strong></h2><p class=\"bb_paragraph\">从火山的另一边振翅而来的是我们的全新可选种族——爪克龙！随心混搭琳琅满目的独特身体组件与动画表情，以一身鳞甲的独特风格征服熔炉密林。<br><br><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay=\"\" muted=\"\" loop=\"\" playsinline=\"\" poster=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/966f642430eaf8e1ae70efdc30068a3d.poster.avif?t=1790874934\" width=\"1170\" height=\"390\"><source src=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/966f642430eaf8e1ae70efdc30068a3d.webm?t=1790874934\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/966f642430eaf8e1ae70efdc30068a3d.mp4?t=1790874934\" type=\"video/mp4\"></video><div class=\"bb_img_icons\"><div class=\"bb_img_play_pause playing\" data-panel=\"{&quot;focusable&quot;:true,&quot;clickOnActivate&quot;:true}\" role=\"button\" data-tooltip=\"您的浏览器启用了减少画面动态效果的设置，因此此动画图片默认不显示动态效果。\" data-tooltip-visible=\"false\">\n\t\t\t<img width=\"18\" height=\"18\" draggable=\"false\" src=\"/public/images/ico/media_playback/pause.svg\" alt=\"暂停动画\">\n\t\t</div></div></span></p><p class=\"bb_paragraph\"></p><h2 class=\"bb_tag\"><strong>在新委托中，帮助爪克龙找回被盗走的仪式甲胄！</strong></h2><p class=\"bb_paragraph\">帮助爪克龙武僧天地和尚，踏上寻回寺院失窃仪式甲胄的征程。他的信仰与未来皆悬于一线！</p><p class=\"bb_paragraph\"><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay=\"\" muted=\"\" loop=\"\" playsinline=\"\" poster=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/f93ab91f1bd0e53e515da081119974c7.poster.avif?t=1790874934\" width=\"1170\" height=\"390\"><source src=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/f93ab91f1bd0e53e515da081119974c7.webm?t=1790874934\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/f93ab91f1bd0e53e515da081119974c7.mp4?t=1790874934\" type=\"video/mp4\"></video><div class=\"bb_img_icons\"><div class=\"bb_img_play_pause playing\" data-panel=\"{&quot;focusable&quot;:true,&quot;clickOnActivate&quot;:true}\" role=\"button\" data-tooltip=\"您的浏览器启用了减少画面动态效果的设置，因此此动画图片默认不显示动态效果。\" data-tooltip-visible=\"false\">\n\t\t\t<img width=\"18\" height=\"18\" draggable=\"false\" src=\"/public/images/ico/media_playback/pause.svg\" alt=\"暂停动画\">\n\t\t</div></div></span></p><p class=\"bb_paragraph\"></p><h2 class=\"bb_tag\"><strong>新武器类型：巨剑！</strong></h2><p class=\"bb_paragraph\">巨剑加入武器架家族，让猎人们在对抗落腐精时占尽优势。挥舞沉重的剑刃，掌握势大力沉的招式，再进入狂暴状态，彻底放飞自我！<br><br><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay=\"\" muted=\"\" loop=\"\" playsinline=\"\" poster=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/7b10c3dcfdbaaefaceb64138348893e0.poster.avif?t=1790874934\" width=\"1170\" height=\"390\"><source src=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/7b10c3dcfdbaaefaceb64138348893e0.webm?t=1790874934\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/7b10c3dcfdbaaefaceb64138348893e0.mp4?t=1790874934\" type=\"video/mp4\"></video><div class=\"bb_img_icons\"><div class=\"bb_img_play_pause playing\" data-panel=\"{&quot;focusable&quot;:true,&quot;clickOnActivate&quot;:true}\" role=\"button\" data-tooltip=\"您的浏览器启用了减少画面动态效果的设置，因此此动画图片默认不显示动态效果。\" data-tooltip-visible=\"false\">\n\t\t\t<img width=\"18\" height=\"18\" draggable=\"false\" src=\"/public/images/ico/media_playback/pause.svg\" alt=\"暂停动画\">\n\t\t</div></div></span></p><p class=\"bb_paragraph\"></p><h2 class=\"bb_tag\"><strong>爪克龙剑甲包</strong></h2><p class=\"bb_paragraph\">全新武器和可选物种降临熔炉密林！加入爪克龙，挥舞他们的传奇巨剑征服密林，击退凶恶的爪克龙子体！<br><br><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay=\"\" muted=\"\" loop=\"\" playsinline=\"\" poster=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/52cd77d9009e9a5fdbc56aa35ade6247.poster.avif?t=1790874934\" width=\"1170\" height=\"390\"><source src=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/52cd77d9009e9a5fdbc56aa35ade6247.webm?t=1790874934\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5067220/extras/52cd77d9009e9a5fdbc56aa35ade6247.mp4?t=1790874934\" type=\"video/mp4\"></video><div class=\"bb_img_icons\"><div class=\"bb_img_play_pause playing\" data-panel=\"{&quot;focusable&quot;:true,&quot;clickOnActivate&quot;:true}\" role=\"button\" data-tooltip=\"您的浏览器启用了减少画面动态效果的设置，因此此动画图片默认不显示动态效果。\" data-tooltip-visible=\"false\">\n\t\t\t<img width=\"18\" height=\"18\" draggable=\"false\" src=\"/public/images/ico/media_playback/pause.svg\" alt=\"暂停动画\">\n\t\t</div></div></span></p><p class=\"bb_paragraph\"></p><h2 class=\"bb_tag\"><strong>搜刮武器库的战利品！</strong></h2><p class=\"bb_paragraph\">全新装备和个性饰品散落在熔炉密林各处，等你一一发现！</p><p class=\"bb_paragraph\"><strong>特色内容</strong></p><ul class=\"bb_ul\"><li><p class=\"bb_paragraph\">新武器类型：巨剑</p></li><li><p class=\"bb_paragraph\">新可选种族：爪克龙</p></li><li><p class=\"bb_paragraph\">20+种可解锁的巨剑款式</p></li><li><p class=\"bb_paragraph\">巨剑专属的新武器神力</p></li><li><p class=\"bb_paragraph\">在新委托中挑战两名全新小头目</p></li><li><p class=\"bb_paragraph\">可解锁的全新护具幻影</p></li></ul><p class=\"bb_paragraph\"></p>",
+      "steamTags": [
+        "迷宫探索",
+        "砍杀",
+        "轻度 Rogue",
+        "清版动作",
+        "角色扮演",
+        "动作",
+        "玩家对战环境",
+        "类 Rogue",
+        "冒险",
+        "阖家"
+      ],
+      "reviews": {
+        "all": "无",
+        "recent": "无"
+      },
+      "sysReq": {
+        "Minimum": [
+          "需要 64 位处理器和操作系统",
+          "操作系统: Windows 11(64位)",
+          "处理器: 双核3.0赫兹",
+          "内存: 6 GB RAM",
+          "显卡: 2GB 显存 / 支持DirectX 11+",
+          "DIRECTX 版本: 11",
+          "存储空间: 需要 6 GB 可用空间",
+          "附注事项: Spec for \"Low Quality\" Graphics, 720p, 30fps - 8GB system memory required if using integrated graphics card"
+        ],
+        "Recommended": [
+          "需要 64 位处理器和操作系统",
+          "操作系统: Windows 11 (64-bit)",
+          "处理器: Intel Core i5-7400 equivalent (4-core)",
+          "内存: 8 GB RAM",
+          "显卡: 6GB VRAM NVIDIA GTX 1060 equivalent or higher",
+          "DIRECTX 版本: 11",
+          "存储空间: 需要 6 GB 可用空间",
+          "附注事项: Spec for \"High Quality\" Graphics, 1080p, 60fps"
+        ]
+      },
+      "languages": "简体中文 ✔ ✔ ✔"
+    },
+    {
+      "id": "https://store.steampowered.com/app/4847440/MXGP_26__Scrubdesignz_Liveries/?snr=1_7_7_2300_150_1",
+      "appId": 4847440,
+      "title": "MXGP 26 - Scrubdesignz Liveries",
+      "link": "https://store.steampowered.com/app/4847440/MXGP_26__Scrubdesignz_Liveries/?snr=1_7_7_2300_150_1",
+      "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4847440/8c4482813a102b146a6d4b3eb464df30cc69623d/capsule_231x87.jpg?t=1790841917",
+      "releaseDate": "2026 年 10 月 1 日",
+      "platforms": [
+        "Windows"
+      ],
+      "discountText": "-100%",
+      "originalPrice": "¥11.00",
+      "finalPrice": "¥0.00",
+      "reviewSummary": null,
+      "developers": [
+        "Artefacts Studio"
+      ],
+      "publishers": [
+        "Nacon"
+      ],
+      "genres": [
+        "竞速",
+        "模拟",
+        "体育"
+      ],
+      "shortDescription": "此 DLC 可让您获得 6 款专为您摩托车打造的 SCRUB Designz 涂装。",
+      "detailedDescription": "此 DLC 可让您获得 SCRUB Designz 品牌的六款摩托车涂装。用这些独特的专属设计震撼你的对手！",
+      "headerImage": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4847440/29e3b1f272186cffd9336fef4f8374416d280d97/header.jpg?t=1790841917",
+      "backgroundImage": "https://store.akamai.steamstatic.com/images/storepagebackground/app/4847440?t=1790841917",
+      "isFree": true,
+      "price_steam": "¥ 0.00",
+      "detailedDescriptionHTML": "<h2>关于此内容</h2>\n\t\t\t\t\t\t\t此 DLC 可让您获得 SCRUB Designz 品牌的六款摩托车涂装。用这些独特的专属设计震撼你的对手！",
+      "steamTags": [
+        "竞速",
+        "模拟",
+        "体育",
+        "摩托车",
+        "拟真",
+        "物理",
+        "汽车模拟",
+        "驾驶",
+        "第三人称"
+      ],
+      "reviews": {
+        "all": "无",
+        "recent": "无"
+      },
+      "sysReq": {
+        "Minimum": [
+          "需要 64 位处理器和操作系统",
+          "操作系统: Windows 10/11",
+          "处理器: AMD Ryzen 5 3600, 3.6 GHz",
+          "内存: 12 GB RAM",
+          "显卡: Nvidia GeForce GTX 1080, 8 GB",
+          "DIRECTX 版本: 12",
+          "存储空间: 需要 26 GB 可用空间",
+          "附注事项: SSD is recommended"
+        ],
+        "Recommended": [
+          "需要 64 位处理器和操作系统",
+          "操作系统: Windows 10/11",
+          "处理器: AMD Ryzen 7 5800X 8 cores",
+          "内存: 16 GB RAM",
+          "显卡: Nvidia GeForce RTX 3070, 8 GB / AMD Radeon RX 6700, 10 GB",
+          "DIRECTX 版本: 12",
+          "存储空间: 需要 26 GB 可用空间",
+          "附注事项: SSD is recommended"
+        ]
+      },
+      "languages": "简体中文 ✔"
+    }
+  ],
+  "psn": [
+    {
+      "title": "Sniper Elite: Resistance",
+      "link": "https://www.playstation.com/zh-hans-hk/games/sniper-elite-resistance/",
+      "cover": "https://gmedia.playstation.com/is/image/SIEPDC/sniper-elite-resistance-screenshot-01-en-190826",
+      "description": "协助法国抵抗运动粉碎纳粹的阴险阴谋。这是一款沙盒潜行射击游戏，您可以单人游玩，或与一名盟友在线合作。",
+      "publisher": "Rebellion",
+      "releaseDate": "",
+      "price": "包含",
+      "originalPrice": "HK$468.00",
+      "currency": "HKD",
+      "features": [
+        "在线游玩需要PS Plus\n可在游戏内购买\n支持多达16位PS Plus在线玩家\n可以在线游玩\n1位玩家\nPS5版本\n支持震动功能和扳机效果（DualSense无线控制器）\nPS5 Pro增强\nPS4版本\nPS4 Pro增强版\n查看所有PS5 和 PS4兼容性声明",
+        "在线游玩需要PS Plus",
+        "可在游戏内购买",
+        "支持多达16位PS Plus在线玩家",
+        "可以在线游玩",
+        "1位玩家",
+        "PS5版本\n支持震动功能和扳机效果（DualSense无线控制器）",
+        "PS5版本",
+        "支持震动功能和扳机效果（DualSense无线控制器）",
+        "PS5 Pro增强",
+        "PS4版本\nPS4 Pro增强版\n查看所有PS5 和 PS4兼容性声明",
+        "PS4版本",
+        "PS4 Pro增强版",
+        "查看所有PS5 和 PS4兼容性声明",
+        "视觉",
+        "颜色替代, 视觉舒适（基本）",
+        "颜色替代\n\n您无需依赖于理解颜色游玩游戏，或者您可以变更重要的颜色以更易于区分它们。\n\n视觉舒适（基本）\n\n在可能造成视觉不适的游戏游玩过程中，无需摄像头移动和效果即可游玩。",
+        "音频",
+        "音量控制",
+        "音量控制\n\n您可以调低单个音频音量并将其设置为静音。",
+        "字幕和说明文字",
+        "字幕（高级）, 清晰的字幕",
+        "字幕（高级）\n\n游戏内的语音对话提供完整的字幕。\n\n清晰的字幕\n\n字幕以更易于阅读的方式呈现。",
+        "控制",
+        "可调整操作杆灵敏度（高级）, 可调整操作杆反转（基本）, 无需快速按下键即可游玩, 无需运动控制即可游玩, 无需触控即可游玩, 无需控制器震动即可游玩, 无需自适应扳机效果即可游玩",
+        "可调整操作杆灵敏度（高级）\n\n您可以调整游戏中使用的每个操作杆的水平和垂直灵敏度。\n\n可调整操作杆反转（基本）\n\n提供一些反转操作杆选项。\n\n无需快速按下键即可游玩\n\n您无需迅速或在限定时间内按下键即可游玩游戏和导航菜单。\n\n无需运动控制即可游玩\n\n您无需使用运动控制即可游玩游戏。\n\n无需触控即可游玩\n\n您无需使用触控即可游玩游戏。\n\n无需控制器震动即可游玩\n\n您无需打开控制器震动/触觉反馈即可游玩游戏。\n\n无需自适应扳机效果即可游玩\n\n您无需打开扳机自适应阻力即可游玩游戏。",
+        "游戏游玩过程",
+        "可调整难度（高级）, 游戏速度（基本）, 控制提示, 教程提示, 手动保存",
+        "可调整难度（高级）\n\n您可以自定义挑战等级或单独激活一系列辅助功能，帮助您游玩游戏。\n\n游戏速度（基本）\n\n您可以在限定时间内或仅在进行特定操作时放慢游戏。\n\n控制提示\n\n您可以随时查看游戏控制。\n\n教程提示\n\n您可以随时查看游戏游玩过程教程信息。\n\n手动保存\n\n您可以创建手动保存点，以便准确返回您离开游戏的位置。",
+        "在线通信",
+        "快速聊天, 标记通信",
+        "快速聊天\n\n您可以发送和接收预设字词、短语或图标，以便更易于与其他玩家通信。\n\n标记通信\n\n您可以在其他玩家的HUD或地图上标记兴趣点或特定信息，而无需使用语音或文字输入进行通信。"
+      ],
+      "platform": "PS Plus",
+      "date": "",
+      "status": "ACTIVE"
+    },
+    {
+      "title": "MLB® The Show™ 26",
+      "link": "https://www.playstation.com/zh-hans-hk/games/mlb-the-show/",
+      "cover": "https://gmedia.playstation.com/is/image/SIEPDC/mlb-the-show-26-screenshot-01-en-190826",
+      "description": "在《MLB® The Show™》系列至今最身历其境的作品中留下您的印记，游戏具备改良的投球与打击控制，以及翻新的“Franchise”（经营模式）体验。",
+      "publisher": "Sony Interactive Entertainment",
+      "releaseDate": "",
+      "price": "HK$398.00",
+      "originalPrice": "HK$398.00",
+      "currency": "HKD",
+      "features": [
+        "在线游玩需要PS Plus\n可在游戏内购买\n支持多达8位PS Plus在线玩家\n可以在线游玩\n1 - 2位玩家\n支持远程游玩\n辅助功能(17)\n\n辅助功能\nPS5版本\n支持震动功能（DualSense无线控制器）\n查看全部",
+        "在线游玩需要PS Plus",
+        "可在游戏内购买",
+        "支持多达8位PS Plus在线玩家",
+        "可以在线游玩",
+        "1 - 2位玩家",
+        "支持远程游玩",
+        "辅助功能(17)\n\n辅助功能",
+        "辅助功能(17)",
+        "辅助功能",
+        "PS5版本\n支持震动功能（DualSense无线控制器）\n查看全部",
+        "PS5版本",
+        "支持震动功能（DualSense无线控制器）",
+        "查看全部",
+        "视觉",
+        "音频提示替代",
+        "音频提示替代\n\n音频信息还可通过视觉方式或控制器震动呈现。",
+        "音频",
+        "音量控制, 单声道音频",
+        "音量控制\n\n您可以调低单个音频音量并将其设置为静音。\n\n单声道音频\n\n您可以将每个喇叭的音频输出设置为相同。",
+        "字幕和说明文字",
+        "无需字幕即可游玩, 说明文字（基本）",
+        "无需字幕即可游玩\n\n您无需字幕即可游玩，因为此游戏不包括语音对话。\n\n说明文字（基本）\n\n在游戏游玩过程中，游戏仅包括重要声音的说明文字。",
+        "控制",
+        "无需快速按下键即可游玩, 无需运动控制即可游玩, 无需触控即可游玩, 无需控制器震动即可游玩, 无需自适应扳机效果即可游玩",
+        "无需快速按下键即可游玩\n\n您无需迅速或在限定时间内按下键即可游玩游戏和导航菜单。\n\n无需运动控制即可游玩\n\n您无需使用运动控制即可游玩游戏。\n\n无需触控即可游玩\n\n您无需使用触控即可游玩游戏。\n\n无需控制器震动即可游玩\n\n您无需打开控制器震动/触觉反馈即可游玩游戏。\n\n无需自适应扳机效果即可游玩\n\n您无需打开扳机自适应阻力即可游玩游戏。",
+        "游戏游玩过程",
+        "可调整难度（高级）, 控制提示, 教程提示, 练习模式, 游戏暂停, 手动保存",
+        "可调整难度（高级）\n\n您可以自定义挑战等级或单独激活一系列辅助功能，帮助您游玩游戏。\n\n控制提示\n\n您可以随时查看游戏控制。\n\n教程提示\n\n您可以随时查看游戏游玩过程教程信息。\n\n练习模式\n\n您可以存取涵盖整个游戏的无后果环境练习如何游玩。\n\n游戏暂停\n\n您可以在游戏游玩过程或过场动画中随时暂停游戏（仅限离线游玩）。\n\n手动保存\n\n您可以创建手动保存点，以便准确返回您离开游戏的位置。",
+        "在线通信",
+        "快速聊天",
+        "快速聊天\n\n您可以发送和接收预设字词、短语或图标，以便更易于与其他玩家通信。"
+      ],
+      "platform": "PS Plus",
+      "date": "",
+      "status": "ACTIVE"
+    },
+    {
+      "title": "Wobbly Life",
+      "link": "https://www.playstation.com/zh-hans-hk/games/wobbly-life/",
+      "cover": "https://gmedia.playstation.com/is/image/SIEPDC/wobbly-life-screenshot-01-en-190826",
+      "description": "与最多三位朋友一起探索充满摇晃怪奇事物的开放世界，并通过消防员、宇航员和迪斯科舞者等各式各样的正当工作来赚取生活费。",
+      "publisher": "H2 Interactive Co., Ltd.",
+      "releaseDate": "",
+      "price": "包含",
+      "originalPrice": "HK$178.00",
+      "currency": "HKD",
+      "features": [
+        "在线游玩需要PS Plus\n支持多达4位PS Plus在线玩家\n可以在线游玩\n1 - 4位玩家",
+        "在线游玩需要PS Plus",
+        "支持多达4位PS Plus在线玩家",
+        "可以在线游玩",
+        "1 - 4位玩家"
+      ],
+      "platform": "PS Plus",
+      "date": "",
+      "status": "ACTIVE"
+    },
+    {
+      "title": "Chained Echoes",
+      "link": "https://www.playstation.com/zh-hans-hk/games/chained-echoes/",
+      "cover": "https://gmedia.playstation.com/is/image/SIEPDC/chained-echoes-screenshot-01-en-190826",
+      "description": "在这款回合制像素艺术角色扮演游戏中，为三个交战中的王国带来和平。游戏背景设定在一个龙与驾驶机甲一样常见的奇幻世界。",
+      "publisher": "DECK13 INTERACTIVE",
+      "releaseDate": "",
+      "price": "包含",
+      "originalPrice": "HK$198.00",
+      "currency": "HKD",
+      "features": [
+        "离线游玩已启动\n1位玩家\nPS4版本\nDUALSHOCK 4震动",
+        "离线游玩已启动",
+        "1位玩家",
+        "PS4版本\nDUALSHOCK 4震动",
+        "PS4版本",
+        "DUALSHOCK 4震动"
+      ],
+      "platform": "PS Plus",
+      "date": "",
+      "status": "ACTIVE"
+    }
+  ],
+  "gog": [],
+  "xbox": [],
+  "itad": [
+    {
+      "title": "Akupara Games 10 Year Anniversary Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1792814383,
+      "gameCount": 12,
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fakupara-10th-anniversary-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble"
+    },
+    {
+      "title": "Capcom Classics Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1793419166,
+      "gameCount": 6,
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fcapcom-classics-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble"
+    },
+    {
+      "title": "CoppaFeel! Charity Bundle",
+      "store": "Fanatical",
+      "expiry": 1793372400,
+      "gameCount": 10,
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fbundle%2Fcoppafeel-charity-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical",
+      "cover": "https://cdn-ext.fanatical.com/production/product/1280x720/90368d02-f3ff-416e-96b6-68c19610b56b.jpeg"
+    },
+    {
+      "title": "Dying Light 2 Stay Human Complete DLC Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1792641650,
+      "gameCount": 13,
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fdying-light-2-stay-human-complete-dlc-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble"
+    },
+    {
+      "title": "2D Rewind Collection: S2 Games Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1792641612,
+      "gameCount": 13,
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2F2d-rewind-collection-from-s2-games",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble"
+    },
+    {
+      "title": "Coffee Break Bundle",
+      "store": "IndieGala",
+      "expiry": 1797343177,
+      "gameCount": 6,
+      "url": "https://www.indiegala.com/bundle/coffee-break-bundle?ref=itad",
+      "isPending": false,
+      "isMature": true,
+      "storeFamily": "indiegala",
+      "cover": "https://www.indiegalacdn.com/bundle_cover/og_image/coffee-break-bundle-fb.jpg?v=20260907.1"
+    },
+    {
+      "title": "Build Your Own Platinum Collection Bundle (Oct 2026)",
+      "store": "Fanatical",
+      "expiry": 1793886598,
+      "gameCount": 18,
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fplatinum-collection-build-your-own-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical"
+    },
+    {
+      "title": "Build Your Own Retro Revival Bundle",
+      "store": "Fanatical",
+      "expiry": 1793631600,
+      "gameCount": 24,
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fbuild-your-own-retro-revival-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical"
+    },
+    {
+      "title": "Go Postal Bundle",
+      "store": "GreenManGaming",
+      "expiry": 1792515600,
+      "gameCount": 5,
+      "url": "https://greenmangaming.sjv.io/c/2545989/3298418/15105?u=https%3A%2F%2Fwww.greenmangamingbundles.com%2Fbundles%2Fgo-postal-bundle%2F",
+      "isPending": false,
+      "isMature": true,
+      "storeFamily": "other",
+      "cover": "https://media.greenmangamingbundles.com/media/images/HomepageBanner_Post_v2.original.jpg"
+    },
+    {
+      "title": "Programming Puzzles Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1792468810,
+      "gameCount": 7,
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fprogramming-puzzles-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble"
+    },
+    {
+      "title": "Gear & Glory Action RPG's Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1792209650,
+      "gameCount": 9,
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fgear-glory-action-rpgs",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble"
+    },
+    {
+      "title": "Fall into Fall Fun-dle",
+      "store": "Humble Bundle",
+      "expiry": 1792209637,
+      "gameCount": 8,
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Ffall-into-fall-fundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble"
+    },
+    {
+      "title": "Build Your Own Fall Bundle (2026)",
+      "store": "Fanatical",
+      "expiry": 1793282400,
+      "gameCount": 17,
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fbuild-your-own-fall-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical"
+    },
+    {
+      "title": "Build Your Own Misfits and Mayhem Bundle",
+      "store": "Fanatical",
+      "expiry": 1793199600,
+      "gameCount": 17,
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fbuild-your-own-misfits-and-mayhem-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical"
+    },
+    {
+      "title": "TrineVerse Triple Co-op Pack",
+      "store": "Humble Bundle",
+      "expiry": 1792036823,
+      "gameCount": 5,
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Ftrineverse-triple-coop-pack",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble"
+    }
+  ],
+  "sources": {
+    "epic": "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions",
+    "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese",
+    "psn": "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/",
+    "itad": "https://api.isthereanydeal.com/deals/v2?sort=-cut",
+    "gog": "https://www.gog.com/en/games?price=free",
+    "xbox": "https://www.xbox.com/zh-hk/xbox-game-pass/games"
+  }
+}
