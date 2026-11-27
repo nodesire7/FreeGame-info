@@ -1,0 +1,1470 @@
+{
+  "fetchedAt": "2026-11-28T03:00:25.140748+08:00",
+  "sources": {
+    "epic": "https://store.epicgames.com/zh-CN/free-games",
+    "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese",
+    "psn": "https://www.playstation.com/zh-hans-hk/ps-plus/whats-new/#monthly-games",
+    "gog": "https://www.gog.com/zh/games?priceRange=0,0",
+    "xbox": "https://www.xbox.com/zh-HK/xbox-game-pass/games",
+    "itad": "https://isthereanydeal.com/giveaways/",
+    "gamerpower": "https://www.gamerpower.com/giveaways"
+  },
+  "sourceStatus": {
+    "epic": {
+      "state": "cached",
+      "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+      "asOf": "2026-11-28T02:49:13.037398+08:00",
+      "primary": {
+        "state": "ok",
+        "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+        "asOf": "2026-11-28T03:00:25.140748+08:00"
+      }
+    },
+    "steam": {
+      "state": "ok",
+      "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+      "asOf": "2026-11-28T03:00:25.140748+08:00"
+    },
+    "psn": {
+      "state": "ok",
+      "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+      "asOf": "2026-11-28T03:00:25.140748+08:00"
+    },
+    "gog": {
+      "state": "ok",
+      "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+      "asOf": "2026-11-28T03:00:25.140748+08:00"
+    },
+    "xbox": {
+      "state": "cached",
+      "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+      "asOf": "2026-11-28T02:49:13.037398+08:00",
+      "primary": {
+        "state": "ok",
+        "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+        "asOf": "2026-11-28T03:00:25.140748+08:00"
+      }
+    },
+    "gamerpower": {
+      "state": "ok",
+      "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+      "asOf": "2026-11-28T03:00:25.140748+08:00"
+    },
+    "itad": {
+      "state": "cached",
+      "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+      "asOf": "2026-11-28T02:49:13.037398+08:00",
+      "components": {
+        "deals": {
+          "state": "cached",
+          "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+          "asOf": "2026-11-28T02:49:13.037398+08:00"
+        },
+        "bundles": {
+          "state": "ok",
+          "checkedAt": "2026-11-28T03:00:25.140748+08:00",
+          "asOf": "2026-11-28T03:00:25.140748+08:00"
+        }
+      }
+    }
+  },
+  "epic": {
+    "now": [
+      {
+        "title": "Bread and Fred",
+        "status": "ACTIVE",
+        "freeStartAt": 1795708800000,
+        "freeEndAt": 1796313600000,
+        "offerType": "giveaway",
+        "region": "CN",
+        "source": "epic",
+        "publisher": "Atari",
+        "creator": "Atari",
+        "description": "Grab your best bud for help in this new co-op challenge to help two adorable penguins, Bread and Fred, reach the top of the snowy summit. Time your jumps, cling to walls and swing across gaps to see how far you can make it before you tumble all the way back down the mountain.",
+        "originalPrice": "47.00",
+        "date": "2026/12/04 00:00:00",
+        "link": "https://store.epicgames.com/zh-CN/p/bread-and-fred-1db362",
+        "cover": "https://cdn1.epicgames.com/spt-assets/545b4dd8bb364c12b719268198a93ef3/bread-and-fred-pr4o2.jpg",
+        "originalPriceDesc": "47.00",
+        "isFreeNow": true
+      },
+      {
+        "id": "019f62ea-4de4-734f-ac26-d94cb55fef39",
+        "title": "Contractor: The Clean Up Part II",
+        "link": "https://itad.link/019f62ea-4dd6-715c-ba5c-17520a280a59/?app=1rl7p4",
+        "cover": "https://assets.isthereanydeal.com/019f62ea-4de4-734f-ac26-d94cb55fef39/banner600.png?t=1784223611",
+        "originalPrice": "19.99 CNY",
+        "price": "免费",
+        "description": "Epic Game Store 限时免费",
+        "platforms": [],
+        "freeEndAt": 1796205600000,
+        "expiry": 1796205600,
+        "status": "ACTIVE",
+        "date": "",
+        "source": "itad",
+        "offerType": "giveaway",
+        "region": "CN",
+        "originalPriceDesc": "19.99 CNY",
+        "isFreeNow": true,
+        "freeStartAt": null,
+        "publisher": "",
+        "creator": ""
+      }
+    ],
+    "upcoming": [
+      {
+        "title": "Strange Antiquities",
+        "status": "UPCOMING",
+        "freeStartAt": 1796313600000,
+        "freeEndAt": 1796918400000,
+        "offerType": "giveaway",
+        "region": "CN",
+        "source": "epic",
+        "publisher": "Iceberg Interactive",
+        "creator": "Iceberg Interactive",
+        "description": "Strange Antiquities is a game set in Undermere, where you explore occult artifacts and solve dark mysteries. As an apprentice thaumaturge, you'll identify magical items and help townsfolk. A sequel to Strange Horticulture, it blends exploration to uncover strange secrets.",
+        "originalPrice": "56.00",
+        "date": "2026/12/04 00:00:00",
+        "link": "https://store.epicgames.com/zh-CN/p/strange-antiquities-e37660",
+        "cover": "https://cdn1.epicgames.com/spt-assets/d0e3b7c3690c485ca7a435d298262ab2/strange-antiquities-1ozyj.png",
+        "originalPriceDesc": "56.00",
+        "isFreeNow": false
+      }
+    ]
+  },
+  "steam": [
+    {
+      "id": 3859,
+      "title": "Vertical Drop Heroes HD Steam Key Giveaway",
+      "link": "https://www.gamerpower.com/vertical-drop-heroes-hd-steam-key-giveaway",
+      "platforms": "PC, Steam",
+      "endDate": "2026-11-28 23:59:00",
+      "worth": "$6.99",
+      "description": "Claim your free Vertical Drop Heroes HD Steam key via Fanatical and keep this Steam game forever! Vertical Drop Heroes is a 2d procedural platformer RPG with roguelike elements. Don´t miss it!",
+      "instructions": "1. Login into your Fanatical account and subscribe to their newsletter\r\n2. Link a valid Steam account and unlock your Steam key!\r\n3. Launch the Steam client and click the Games menu option.\r\n4. Choose \"activate a Product on Steam\" to redeem your Steam key.",
+      "cover": "https://www.gamerpower.com/offers/1b/6b0967296e680.jpg",
+      "source": "gamerpower",
+      "offerType": "externalGiveaway"
+    },
+    {
+      "id": 3716,
+      "title": "Dwarven Realms (Steam) Key Giveaway",
+      "link": "https://www.gamerpower.com/dwarven-realms-steam-key-giveaway",
+      "platforms": "PC, Steam",
+      "endDate": "",
+      "worth": "$9.99",
+      "description": "Claim free Steam keys for Dwarven Realms! Dwarven Realms is a 3D action-packed ARPG with epic powers and endless possibilities. Please note this Steam Key giveaway requires 10 ARP (Arena Reward Points) to claim a key. Fortunately, you can earn ARP daily for free.",
+      "instructions": "1. Log in to your free Alienware account and click the button to unlock your key (10 ARP required).\r\n2. Launch the Steam client and click the Games menu option.\r\n3. Choose \"activate a Product on Steam\" to redeem your Steam key.",
+      "cover": "https://www.gamerpower.com/offers/1b/6a59119a8eb8d.jpg",
+      "source": "gamerpower",
+      "offerType": "externalGiveaway"
+    }
+  ],
+  "psn": [
+    {
+      "title": "Dead Island 2",
+      "link": "https://www.playstation.com/zh-hans-hk/games/dead-island-2/",
+      "cover": "https://gmedia.playstation.com/is/image/SIEPDC/dead-island-screenshot-04-en-21nov22",
+      "description": "制作创意十足的丧尸屠戮武器，对抗占领洛杉矶的尸潮，您可以独自战斗，也可以与朋友在线联机。",
+      "platform": "PS Plus",
+      "region": "HK",
+      "offerType": "subscription",
+      "price": "PS Plus 会员领取",
+      "source": "psn",
+      "status": "ACTIVE",
+      "publisher": "Deep Silver",
+      "releaseDate": "2023/4/20",
+      "date": "",
+      "originalPrice": "",
+      "currency": "",
+      "features": [],
+      "supportedLanguages": "俄语, 德语, 意大利语, 捷克语, 日语, 法语（法国）, 波兰语, 简体中文, 繁体中文, 英语, 葡萄牙语（巴西）, 西班牙语, 西班牙语（墨西哥）, 韩语",
+      "platforms": [
+        "PS4",
+        "PS5"
+      ]
+    },
+    {
+      "title": "Tomb Raider IV-VI Remastered",
+      "link": "https://www.playstation.com/zh-hans-hk/games/tomb-raider-iv-vi-remastered/",
+      "cover": "https://gmedia.playstation.com/is/image/SIEPDC/tomb-raider-iv-vi-remastered-screenshot-01-en-141026",
+      "description": "在三款重制版《Tomb Raider》冒险游戏《The Last Revelation》、《Chronicles》和《The Angel of Darkness》中，揭开劳拉·克劳馥特过去的秘密。",
+      "platform": "PS Plus",
+      "region": "HK",
+      "offerType": "subscription",
+      "price": "PS Plus 会员领取",
+      "source": "psn",
+      "status": "ACTIVE",
+      "publisher": "U&I Entertainment Japan Ltd.",
+      "releaseDate": "2025/12/10",
+      "date": "",
+      "originalPrice": "",
+      "currency": "",
+      "features": [],
+      "supportedLanguages": "",
+      "platforms": [
+        "PS4",
+        "PS5"
+      ]
+    },
+    {
+      "title": "怪物火车2",
+      "link": "https://www.playstation.com/zh-hans-hk/games/monster-train-2/",
+      "cover": "https://gmedia.playstation.com/is/image/SIEPDC/monster-train-2-screenshot-01-en-261026",
+      "description": "在这款策略卡牌构建游戏中，带领天使与恶魔氏族登上新打造的火车，为拯救世界而战。",
+      "platform": "PS Plus",
+      "region": "HK",
+      "offerType": "subscription",
+      "price": "PS Plus 会员领取",
+      "source": "psn",
+      "status": "ACTIVE",
+      "publisher": "Big Fan",
+      "releaseDate": "2025/5/21",
+      "date": "",
+      "originalPrice": "",
+      "currency": "",
+      "features": [],
+      "supportedLanguages": "俄语, 德语, 日语, 法语（法国）, 简体中文, 繁体中文, 英语, 葡萄牙语（巴西）, 西班牙语, 韩语",
+      "platforms": [
+        "PS5"
+      ]
+    }
+  ],
+  "gog": [
+    {
+      "id": 3860,
+      "title": "Dead Age 2 (GOG) Giveaway",
+      "link": "https://www.gamerpower.com/dead-age-2-gog-giveaway",
+      "platforms": "PC, GOG, DRM-Free",
+      "endDate": "2026-11-30 14:40:09",
+      "worth": "$17.99",
+      "description": "Download Dead Age 2 for free via GOG! Dead Age 2 is a fun indie survival RPG with rogue-like features, fast-paced turn-based combat and survival all in one.",
+      "instructions": "1. Click the \"Go to giveaway\" green button and you will be redirected to the GOG home page\r\n2. Scroll down until you find the game banner.\r\n3. Click the \"Get it Free\" button and login into your GOG account to unlock the game.",
+      "cover": "https://www.gamerpower.com/offers/1b/6b0969de22e37.jpg",
+      "claimChannel": "gogBanner",
+      "freeEndAt": 1796047259000,
+      "storeTitle": "Dead Age 2",
+      "poster": "https://images.gog-statics.com/598e417b19d737ce12af0e2c5136cd420d502d760d3cceac7d2cb71afb4e37c9.jpg",
+      "source": "gamerpower",
+      "offerType": "storeGiveaway"
+    }
+  ],
+  "xbox": [
+    {
+      "id": "9NFZHXPSB473",
+      "title": "Arkheron (Game Preview)",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9NFZHXPSB473",
+      "cover": "https://store-images.s-microsoft.com/image/apps.26633.13589912066336146.960b6af0-616b-4327-891e-43879004fc77.2fde4c71-985a-4bc8-abf0-feb15e7535f6",
+      "publisher": "Bonfire Studios",
+      "releaseDate": "",
+      "date": "",
+      "description": "《Arkheron》是一款快節奏的團隊 PvP 遊戲，物品會賦予你強大的能力。組合這些能力，憑藉技術與創意智取敵對隊伍，一路登上高塔。每一局都在考驗你的應變與生存能力，促使你精通全新的組合。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9NV8BWGH15GN",
+      "title": "Sniper Ghost Warrior Contracts 2",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9NV8BWGH15GN",
+      "cover": "https://store-images.s-microsoft.com/image/apps.26838.14403486953530579.8b4d5859-c0ba-42f4-a4b1-7157a546eaa8.89013b87-c493-4a18-9bd4-700b28776012",
+      "publisher": "CI Games",
+      "releaseDate": "",
+      "date": "",
+      "description": "前所未有的遠程射擊。《Sniper Ghost Warrior Contracts 2》將為粉絲們推出戲劇性的單人戰役模式，你將賭上一切潛入敵方領域。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Shooter"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9N3P3TRJGWV0",
+      "title": "汪汪隊立大功：恐龍世界",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9N3P3TRJGWV0",
+      "cover": "https://store-images.s-microsoft.com/image/apps.23698.14003155671712527.e2286374-c296-44cb-8b6c-1bb5b97b583a.6e26181c-b9e8-4402-8d4b-77f3dcadcd79",
+      "publisher": "Outright Games Ltd.",
+      "releaseDate": "",
+      "date": "",
+      "description": "跟著汪汪隊和樂樂到恐龍島。打造威猛外型和玩小遊戲。 ",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Family & kids",
+        "Action & adventure",
+        "Platformer"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "BTHC2G28X9H4",
+      "title": "Grabbed by the Ghoulies™ 《鬼屋大冒險》",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/BTHC2G28X9H4",
+      "cover": "https://store-images.s-microsoft.com/image/apps.59433.70863828853700397.56ab1f4a-a316-4055-8172-52200337d56f.d0e37ded-a86f-4757-9ed4-1f68d310e177",
+      "publisher": "Microsoft",
+      "releaseDate": "",
+      "date": "",
+      "description": "遊戲進行警示：本遊戲已通過完整測試，可在 Xbox 360 主機上順利進行。不過，有時候您可能會在音訊/視訊方面碰到一些小問題。如需詳細資訊，請參閱 www.xbox.com/xboxoriginals。 在遊戲中玩家將化身年輕的 Cooper，任務是營救出被惡鬼抓走的女友。玩家將要冒險通過一個既鬧鬼又令人毛骨悚然的古屋，並與各式各樣的妖怪搏鬥！您需要躲避沿路上各種的詭計、陷阱、以及突如其來的驚嚇。 本遊戲無法退款。如需詳細資訊，請參閱 www.xbox.com/live/accounts。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9MTGCZ84M503",
+      "title": "John Carpenter's Toxic Commando",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9MTGCZ84M503",
+      "cover": "https://store-images.s-microsoft.com/image/apps.29766.13813225504277272.60187aa7-cee5-4670-9406-da8555a77e6d.c837b95c-ea53-45ca-8a1d-e10bea8f2ff1",
+      "publisher": "Focus Entertainment",
+      "releaseDate": "",
+      "date": "",
+      "description": "選擇一名角色並與三位好友組隊出發拯救世界。使用激烈的 FPS 動作來消滅駭人怪物群！您也許不是最強僱兵團的一員，但至少... 您是劇毒戰將的一員！ ",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Shooter"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9P1S707BPW6W",
+      "title": "Hope in the City",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9P1S707BPW6W",
+      "cover": "https://store-images.s-microsoft.com/image/apps.18291.14501332661010356.1878bbae-b86e-4579-a4ee-b6e5b6f9498a.006155a7-c92b-46e3-8067-ae5260091bde",
+      "publisher": "Lofty Sky Games and NAGA publishing",
+      "releaseDate": "",
+      "date": "",
+      "description": "17 歲的宋希望原本以為高考才是她最大的煩惱……直到她回到家，發現家裡一片狼藉，父母雙雙失蹤。以畫家的視角展開調查，將素描轉化為關鍵線索；隨著一個個謎團被解開，她家庭背後的秘密也變得愈發離奇與陰暗。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Puzzle & trivia"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9NWWL1CBWFCG",
+      "title": "Thronefall",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9NWWL1CBWFCG",
+      "cover": "https://store-images.s-microsoft.com/image/apps.6680.14441309410256211.99377474-23f3-49c1-b8b5-99ac2efbc206.679c84e1-8453-4a86-a0d9-73938d5be9ad",
+      "publisher": "Mythwright",
+      "releaseDate": "",
+      "date": "",
+      "description": "A minimalist game about building and defending your little kingdom.",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Strategy"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9N5DDTDLTWCL",
+      "title": "《Football Manager 27》主機版",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9N5DDTDLTWCL",
+      "cover": "https://store-images.s-microsoft.com/image/apps.33382.14035709193149319.c0b48782-5397-43ae-95b7-be2ecd468b49.f531ab0a-2ff2-42b3-9b12-e108b709763d",
+      "publisher": "SEGA",
+      "releaseDate": "",
+      "date": "",
+      "description": "看看你的足球遠見能帶你登上什麼樣的高峰。11月11日發售。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Simulation",
+        "Sports"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9MZZWGTF7V65",
+      "title": "Warhammer Survivors",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9MZZWGTF7V65",
+      "cover": "https://store-images.s-microsoft.com/image/apps.63012.13865289401901694.ec4fd4fe-95aa-4110-a6b3-96d9a78df1a3.0a17bc32-56e3-46a1-8aae-d4edfc5689e8",
+      "publisher": "Auroch Digital",
+      "releaseDate": "",
+      "date": "",
+      "description": "投入《Warhammer Survivors》這款節奏飛快的 Roguelite 類幸存者遊戲，化身為滿天的彈幕地獄吧！操控來自《Warhammer 40,000》與《Warhammer: Age of Sigmar》宇宙的角色，收集經典武器並讓其進化，在層出不窮的敵襲中殺出一條血路。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9NRBW3FJSJWT",
+      "title": "TANUKI: Pon's Summer",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9NRBW3FJSJWT",
+      "cover": "https://store-images.s-microsoft.com/image/apps.55068.14390224744653316.b8cfc87d-5763-4e3b-9506-f6dc3b4f7735.9e7b7cab-1918-46f7-a5a7-258279566820",
+      "publisher": "CRITICAL REFLEX",
+      "releaseDate": "",
+      "date": "",
+      "description": "距離狸貓祭只剩下一個月，神社卻沒有人來修理……幸好心地善良，卻又有點愛偷懶的兼職郵差澎澎，決定在夏天結束前把神社整修好。寄送包裹，結交好友，在祭典來臨前，幫神社來場大改造吧！",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Family & kids",
+        "Platformer"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9P743P6195Q5",
+      "title": "Escape Academy 2: Back 2 School",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9P743P6195Q5",
+      "cover": "https://store-images.s-microsoft.com/image/apps.32075.14607328992338706.a7a9f492-6e2c-4b94-ab21-d3b4889e76fe.303a41a4-14bb-4486-a564-6e3cc7dbf83a",
+      "publisher": "iam8bit Presents",
+      "releaseDate": "",
+      "date": "",
+      "description": "前往《逃脫學院 2：返校囉》，再次回到課堂！探索全新校區，逃出致命密室，揭開自創校以來就存在的古老陰謀...通通都要在打鐘前完成。你能獨自遊玩，也可以線上或單機合作，找朋友一起解開謎題。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Puzzle & trivia",
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9N74KFV7253H",
+      "title": "MySims™",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9N74KFV7253H",
+      "cover": "https://store-images.s-microsoft.com/image/apps.60612.14005579857467322.9c4802f5-cf2d-4d79-93bf-b33cd7d45331.e9ab6f16-67a2-4818-a235-000490801ab1",
+      "publisher": "Electronic Arts",
+      "releaseDate": "",
+      "date": "",
+      "description": "在《MySims™》中探索新世界——在更新眾多場景後的再版復刻遊戲中翻轉您的世界！搬到一個可愛的城鎮，只需要一些創意和當地居民的協力，您就能讓這裡繁榮發達起來！",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Simulation",
+        "Action & adventure",
+        "Family & kids",
+        "Other",
+        "Classics"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9N8RS7CW8CGL",
+      "title": "MySims™ Kingdom",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9N8RS7CW8CGL",
+      "cover": "https://store-images.s-microsoft.com/image/apps.39038.14039526998713941.72b547b4-f64a-4bb8-95bd-1caa549f1df5.d479a5d0-2b40-4cc5-9ed3-acfb4d37de04",
+      "publisher": "Electronic Arts",
+      "releaseDate": "",
+      "date": "",
+      "description": "在更新眾多場景後的懷舊再版遊戲中探索新的土地，並結識新朋友！集結《MySims™》遊戲中所有您最愛的元素，但加入了更多挑戰、謎題和值得探索的事物。您能助王國的振興一臂之力嗎？",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Simulation",
+        "Action & adventure",
+        "Family & kids",
+        "Other",
+        "Classics"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9N8RKWJT32L4",
+      "title": "消防模擬：烈焰",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9N8RKWJT32L4",
+      "cover": "https://store-images.s-microsoft.com/image/apps.32408.14039390486448903.600abc2c-9f2a-489a-8d46-0eefc0946576.cabef57c-c072-408a-a400-ef040fd8bca9",
+      "publisher": "astragon Entertainment GmbH",
+      "releaseDate": "",
+      "date": "",
+      "description": "在《Firefighting Simulator: Ignite》面對難以預料的危險、與隊員一起撲滅險惡的火勢，並拯救人命。化身美國消防員，與最多 3 名好友一起遊玩，或由 NPC 協助控制隊員。 ",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Simulation"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9MW4MFG0192L",
+      "title": "PIT OF GOBLIN",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9MW4MFG0192L",
+      "cover": "https://store-images.s-microsoft.com/image/apps.9831.13846192334895629.23a9d00d-834c-4fd7-abe1-41b8b885b3ee.6ec243d5-63f7-4a8a-bf58-7a0bd6fcd318",
+      "publisher": "Friendly Foe, Bright Gambit",
+      "releaseDate": "",
+      "date": "",
+      "description": "你有想像過成為最低等的存在，過著連老鼠都瞧不起的骯髒生活嗎？在《哥布林深淵》中，這就是你的日常！穿上臭氣熏天的靴子，潛入破敗陵墓、陰森洞窟和鬧鬼廢墟。一步一驚心，處處皆危機。你的任務，就是填滿至高王的無底洞胃口。不過別擔心，你可以拖著你的哥布林小夥伴陪你一起受苦！\n\n攜手合作或製造混亂\n你最多能與3名哥布林夥伴組隊。團隊合作至關重要……但如果你是喜歡搗亂的哥布林，那就另當別論！你們會團結一致，還是會偷偷惡搞呢？不管怎麼選擇，一定都會迎來滿滿的混亂樂趣！\n每次潛入深淵，都是一段獨特的哥布林傳奇。無論你是敏捷躲過致命陷阱，還是被自己的大腳丫絆個狗吃屎，每一次冒險，保證都有截然不同的驚喜與「臭味」！\n隨著冒險展開，你面臨的挑戰也會越嚴苛。別忘了，你若是想活下去，就得找到出路……\n\n貪婪與精算的抉擇\n在深淵裡搜刮食物的過程中，你需要做出抉擇：要將戰利品上交給地精王，還是自行享用來增強體力，又或者拿到商店出售，換取之後冒險需要的物資。稍有差池，就可能讓你的哥布林生涯就此終結。\n切記，至高王的肚子是填不滿的無底洞。無論是食物或哥布林，至高王來者不拒！\n\n陰森探險，地精胡鬧\n地下城裡陰森的程度，絕對讓你連腳趾頭都發涼！無論是令人毛骨悚然的墓穴、被詛咒的走廊，還是哥布林的荒謬日常，深淵裡的旅程從沒有一刻安寧。在這裡，就連想好好吃頓飯都少不了一場驚險的冒險。\n\n戰利品、貪婪與哥布林榮耀！\n你是會選擇私藏戰利品以確保生存，還是會秉持保守之策，上交給地精王來博取歡心？決定權掌握在你手中。每次潛入深淵，你都有機會升級裝備、提升實力，但務必謹慎行事，因為一旦讓至高王感到失望，你的命運恐將急轉直下。\n\n遊戲特色\n2-6人線上合作\n近距離語音聊天\n城堡、墓穴、礦坑等恐怖場景\n被可怕的怪物追殺！\n永遠吃不飽的至高王！\n搜刮食物和戰利品！\n火把可以照亮路途……也能傷害友軍！\n小心陷阱，謹慎前行！\n發掘謎團真相……？\n\n遊戲玩法和特色\n《哥布林深淵》是一款多人線上合作的生存撤離遊戲。雖然單槍匹馬也能闖關，但與好友同樂或線上隨機組隊，更能體驗完整樂趣。你的目標就是潛入深淵，搜刮食物與各種珍貴物品。\n深淵各處都潛伏著怪物與威脅，牠們會追殺你和夥伴一行人，甚至搶走你辛苦搜刮的食物。逃跑躲藏的同時，千萬別忘了留意腳下，否則一旦誤觸陷阱，這趟受苦之旅可就提前謝幕了。\n哥布林具備衝刺、跳躍的能力，還能在口袋私藏滿滿戰利品。不過遇到大型物品時，可能得騰出雙手才搬得動！吞下特定食物可獲得能力加成，你也可以嘗試把物品扔出去，拿來當作武器或吸引敵人的注意！\n你的使命就是餵飽至高王。只要獻上足夠的食物，至高王就會把你再次扔回深淵裡。不過至高王的胃口一次比一次大，要求也越來越貪婪。越深入深淵，獎勵固然越豐富，但這場豪賭究竟值不值得？\n在哥布林村出售戰利品，用珍貴的金幣換取火把、魔法燈籠、護甲與各式實用道具。哥布林商人應有盡有！你也能光顧古董店，只要預算夠高，就能買到特殊的通訊石！\n勇敢踏上深淵的探索冒險，至高王正餓得發慌！",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9PBG4MTM3JJC",
+      "title": "GRAVHOUNDS (遊戲預覽)",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9PBG4MTM3JJC",
+      "cover": "https://store-images.s-microsoft.com/image/apps.4614.14119486704236036.abde8f1d-835f-498a-a443-5a7c4d6c7932.2cbe07c7-3cc6-4955-8a0f-a41503ba0b9c",
+      "publisher": "Octopus Panic, Inc.",
+      "releaseDate": "",
+      "date": "",
+      "description": "此遊戲仍在開發中。可能無法隨著時間變更或發售為最終產品。購買前請確認您瞭解遊戲的未完成狀態。《GRAVHOUNDS》是一款支援 1–4 人合作的動作建造遊戲。與狗隊一起降落在危機四伏的星球，在物理效果驅動的瘋狂混戰中建造並守護基地，帶著能搬走的一切成功撤離——否則就等著成為外星生物的盤中飧吧。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Shooter",
+        "Action & adventure",
+        "Strategy"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9PKFL1XJT73S",
+      "title": "Terrible Lizards",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9PKFL1XJT73S",
+      "cover": "https://store-images.s-microsoft.com/image/apps.39250.14263508046410977.85ca9e89-ec54-4c85-9c49-0ce9abe3f1fd.9aafbae6-8834-48f7-b413-2e0e49f377b9",
+      "publisher": "Digital Pajamas",
+      "releaseDate": "",
+      "date": "",
+      "description": "《恐怖蜥蜴》是一款恐怖跑酷遊戲，背景設定在一個古老的66號公路景點……其地下潛藏著黑暗邪惡的事物。為了逃出生天，你必須快速移動、跨越險惡地形，並揭開「道爾頓恐龍樂園」究竟隱藏著什麼祕密。你最好快點跑起來。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9PGSDFM3JD85",
+      "title": "植物大戰殭屍™：移植版",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9PGSDFM3JD85",
+      "cover": "https://store-images.s-microsoft.com/image/apps.44024.14249493036313298.22c0dae5-4fa6-41f8-a5bd-bfdfcb3e98a0.e9d9cbb7-341e-49bc-9f14-09919dbaae4e",
+      "publisher": "Electronic Arts",
+      "releaseDate": "",
+      "date": "",
+      "description": "經典的《植物大戰殭屍》以 HD 高畫質榮耀回歸！天哪！原汁原味的植物對抗殭屍大戰重出江湖——更盛大、更白熱化、瘋狂度更勝以往！透過重製絕美 HD 高畫質版遊戲體驗最初的感動，還有滿滿的全新祕密與內容等你來一探究竟。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Strategy",
+        "Family & kids"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9MVNCSJ14754",
+      "title": "Mouthwashing",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9MVNCSJ14754",
+      "cover": "https://store-images.s-microsoft.com/image/apps.53631.13855544626090177.00f10a03-a204-4b92-893c-87ea3db07631.14702d75-4bb9-45eb-ab3e-1aa7bec2490b",
+      "publisher": " CRITICAL REFLEX",
+      "releaseDate": "",
+      "date": "",
+      "description": "拓帕號的五名船員受困於茫茫宇宙中。永恆日落壟罩，老天卻別過目光。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9NRQVQ7ZRM7Z",
+      "title": "FINAL FANTASY VII REMAKE INTERGRADE",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9NRQVQ7ZRM7Z",
+      "cover": "https://store-images.s-microsoft.com/image/apps.50920.14378305291947412.8d8cbc22-0457-455b-807c-34822c76e54f.91e88811-dea2-4b9e-b0f8-ccebbb29f2aa",
+      "publisher": "SQUARE ENIX",
+      "releaseDate": "",
+      "date": "",
+      "description": "身背毀滅劍的前神羅戰士克勞德踏入魔晄都市米德加。\n運用最先進技術製作的畫面、融合戰略性與直覺式動作操作的戰鬥系統——\n不朽名作《FINAL FANTASY VII》的世界重生為「全新故事」。 ",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Role playing",
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9PNRLJNDPP4G",
+      "title": "The Séance of Blake Manor",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9PNRLJNDPP4G",
+      "cover": "https://store-images.s-microsoft.com/image/apps.16621.14338899831126037.225accb3-8e9c-4c00-a01b-619f2e44276d.56c0b677-c7a4-41bb-ba89-862d2a38f74d",
+      "publisher": "Raw Fury",
+      "releaseDate": "",
+      "date": "",
+      "description": "《布雷克莊園的降靈會》是一款超自然偵探推理遊戲，背景設定在1897年的愛爾蘭。你將深入一間隱身鄉間、暗藏祕密與靈異現象的旅館，調查伊芙琳·狄安的失蹤事件。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Puzzle & trivia"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9NK039GWVTVC",
+      "title": "Scramble Knights Online (Game Preview)",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9NK039GWVTVC",
+      "cover": "https://store-images.s-microsoft.com/image/apps.4371.13666925911831228.39a643d8-0904-4270-b0a3-7b063f9c1c1d.2a4489c3-fa20-45ec-a31a-bdd0ae8e1d4f",
+      "publisher": "Funktronic Labs",
+      "releaseDate": "",
+      "date": "",
+      "description": "This game is a work in progress. It may or may not change over time or release as a final product. Purchase only if you are comfortable with the current state of the unfinished game.\n\nAdventure with friends in this MMO-lite action RPG! Explore the shared online kingdom of Terracott as a knight-in-training. Team up to conquer dungeons, slay monsters, discover rare loot, and return home to forge powerful new gear before setting out on your next quest.",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Role playing",
+        "Multi-player Online Battle Arena",
+        "Other"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9P7S9F02293J",
+      "title": "Dodo Duckie",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9P7S9F02293J",
+      "cover": "https://store-images.s-microsoft.com/image/apps.25990.14101741972261561.9e10f950-0892-454b-9313-97bca79aa676.8670253d-aac4-4976-8dbb-f4dddb211c62",
+      "publisher": "BornMonkie",
+      "releaseDate": "",
+      "date": "",
+      "description": "You’re a DUCK! with one special cap that gives you the power to switch between 2D and 3D. Use it to explore, switch perspectives, solve puzzles and save your chicken friends.",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Platformer",
+        "Family & kids",
+        "Puzzle & trivia"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9PKZRN4RJRC9",
+      "title": "Chained Beasts",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9PKZRN4RJRC9",
+      "cover": "https://store-images.s-microsoft.com/image/apps.60883.14257629622536824.7ae5f381-bcdf-4fa8-b97f-cc953530aeb5.cd3cfc9c-7767-44a0-a2a5-4d89e5f1b4bc",
+      "publisher": "FEATHERWEIGHT GAMES PTY LIMITED",
+      "releaseDate": "",
+      "date": "",
+      "description": "《Chained Beasts》是一款支援1至4名玩家合作的角鬥Roguelike遊戲。與你的夥伴以鎖鏈相連，在混亂的戰場上並肩奮戰。善用鎖鏈與競技場環境，以各種創意方式擊倒敵人，贏得嗜血觀眾的喝采。承受身心的創傷，挑戰強大的首領，努力活過每一個血與汗交織的戰鬥之日。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Fighting"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9NQVHHW88XW9",
+      "title": "Bluey's Happy Snaps",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9NQVHHW88XW9",
+      "cover": "https://store-images.s-microsoft.com/image/apps.35599.13762188493241252.c9eed3d4-2711-40bb-b507-e4c31d9fe3e1.010ff7ff-e206-4830-ad42-9734bafe87c8",
+      "publisher": "Gameloft",
+      "releaseDate": "",
+      "date": "",
+      "description": "Explore Bluey's world like never before! ",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Family & kids"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9P861V1542BL",
+      "title": "Valor Mortis",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9P861V1542BL",
+      "cover": "https://store-images.s-microsoft.com/image/apps.6950.14098465670758705.ee77a872-5740-4661-bec6-399c86db9b2c.57a42d9a-98d4-4d4d-98fd-56200c024d29",
+      "publisher": "Lyrical Games",
+      "releaseDate": "",
+      "date": "",
+      "description": "《Valor Mortis》是一款由 Ghostrunner 團隊打造的第一人稱動作魂系遊戲。你將化身為一名拿破崙軍隊的前士兵，在死亡後重生，掌握超自然力量，與恐怖怪物展開激戰，並揭開威脅全人類的驚天陰謀。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Role playing",
+        "Shooter"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9P2FF14JZLL3",
+      "title": "戰地風雲™ 6",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9P2FF14JZLL3",
+      "cover": "https://store-images.s-microsoft.com/image/apps.65490.14559138935406168.e7f01a08-ebf9-41d8-88ba-39fb1a148711.c65ba007-7378-497e-b934-101230f24e82",
+      "publisher": "Electronic Arts",
+      "releaseDate": "",
+      "date": "",
+      "description": "2025 年最暢銷射擊遊戲",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9PPF72ZH6RP8",
+      "title": "Deep Dish Dungeon",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9PPF72ZH6RP8",
+      "cover": "https://store-images.s-microsoft.com/image/apps.42452.14326063685133853.939b1741-3671-493b-b12d-2c262722c883.895b973c-6205-405e-be6d-00ace2e16503",
+      "publisher": "Raw Fury AB",
+      "releaseDate": "",
+      "date": "",
+      "description": "在這款生存探索遊戲中，你將深入處處皆謎題的精巧地城中冒險，體驗結合了類銀河戰士惡魔城與製作系統的玩法。可單人挑戰，也能透過線上合作模式與夥伴一同揭開地城的種種謎團。 ",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Strategy",
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9N72DFC6GL91",
+      "title": "Echo Weaver",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9N72DFC6GL91",
+      "cover": "https://store-images.s-microsoft.com/image/apps.10430.14007070537305664.23c6e561-edd5-44ed-a3ad-86b6c1a5c1c1.e3ee97c9-cd7d-44f4-9171-b07a3c8daaab",
+      "publisher": "Akupara Games",
+      "releaseDate": "",
+      "date": "",
+      "description": "時間是你最寶貴的資源，而秘密是你唯一的升級途徑。在這款以知識驅動的「類銀河戰士惡魔城」(Metroidvania) 遊戲中，玩家將掌握時間迴圈並逐步揭開其中真相。身為碩果僅存的織者，玩家要利用扭曲時間的異常現象，以及你所知的一切來打破循環。探索殘存遺跡、揭開深藏謎團、找出完美迴圈。\n\n",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure",
+        "Platformer"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9NFB47H2SDRX",
+      "title": "Forever Ago",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9NFB47H2SDRX",
+      "cover": "https://store-images.s-microsoft.com/image/apps.32369.13602461240998233.6f87298c-1315-45ca-95cb-f70de3689fc6.f3660ec0-09b3-43fa-ae60-bb898e75b5ee",
+      "publisher": "Annapurna Interactive",
+      "releaseDate": "",
+      "date": "",
+      "description": "經歷了一場無情的命運打擊後，艾佛烈踏上了向北的旅程，在這場單人公路冒險中尋求救贖。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9P5QV5XX8S9H",
+      "title": "Neon Abyss 2",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9P5QV5XX8S9H",
+      "cover": "https://store-images.s-microsoft.com/image/apps.11563.14568732908027610.68635d5d-3a83-401c-989b-7640ee69ed9c.34d576fc-b83b-46ab-939e-a06d96e8f02c",
+      "publisher": "Kepler Interactive",
+      "releaseDate": "",
+      "date": "",
+      "description": "快一起踏入《Neon Abyss 2》的賽博奇幻 Roguelike 世界中！搭配種類數不盡的戰鬥風格、以及毫無極限的物品協同效果，每一輪都充滿緊湊刺激的動作場面，帶來絕對難忘的體驗。\n",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Platformer",
+        "Action & adventure",
+        "Shooter"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9N4PT8HGCDHQ",
+      "title": "Gears of War: E-Day",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9N4PT8HGCDHQ",
+      "cover": "https://store-images.s-microsoft.com/image/apps.58579.13978914104035031.46ab30c4-87b3-48d6-9e4a-ed44b301b17a.0c0f53d8-d3af-4c48-a1a6-22b31c4ec463",
+      "publisher": "Xbox Game Studios",
+      "releaseDate": "",
+      "date": "",
+      "description": "體驗「事變日」的恐怖與殘酷。加入馬可斯‧菲尼克斯和多姆‧聖地牙哥的行列，當獸族群從地底爆發湧現時，展開一場為生存而戰的絕望之戰。",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Shooter",
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9PM3J18QM4Q3",
+      "title": "Minecraft Dungeons II",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9PM3J18QM4Q3",
+      "cover": "https://store-images.s-microsoft.com/image/apps.26573.14305479850136392.1d44bfb9-b43e-4fae-a421-d6f972529d66.fd3f91b2-3de0-4920-a853-4f5725b2495f",
+      "publisher": "Xbox Game Studios",
+      "releaseDate": "",
+      "date": "",
+      "description": "《Minecraft Dungeons》的全新篇章將於 2026 年秋季揭幕！ 一股全新威脅正蠢蠢欲動，準備降臨這片大地與其居民之上，掀起難以言喻的浩劫。 化身英雄，迎戰前所未見的強敵，踏上塵封已久的古老之地，再次與邪惡勢力正面交鋒！ ",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "9N9K5QP9G3GL",
+      "title": "VOID/BREAKER",
+      "link": "https://www.xbox.com/zh-HK/games/store/-/9N9K5QP9G3GL",
+      "cover": "https://store-images.s-microsoft.com/image/apps.8077.13536036111571877.6e9314d2-c36f-4ec9-ad65-425453b390bd.43f1c606-e026-4cd5-8eab-759d0b1b550e",
+      "publisher": "Playstack",
+      "releaseDate": "",
+      "date": "",
+      "description": "令人血脈噴張的Roguelite第一人稱射擊遊戲",
+      "price": "Game Pass Ultimate 会员可玩",
+      "originalPrice": "",
+      "platform": "Xbox Game Pass",
+      "genres": [
+        "Shooter",
+        "Action & adventure"
+      ],
+      "features": [],
+      "platforms": [
+        "Xbox"
+      ],
+      "offerType": "subscription",
+      "region": "HK",
+      "status": "ACTIVE",
+      "source": "xbox"
+    },
+    {
+      "id": "01a187ad-2374-72d9-9769-d98c525b3eee",
+      "title": "TrayCade",
+      "link": "https://itad.link/01a187ad-2368-72dd-afc8-0c82c317116b/?app=1rl7p4",
+      "cover": "",
+      "originalPrice": "49 CNY",
+      "price": "免费",
+      "description": "Microsoft Store 限时免费",
+      "platforms": [
+        "Windows"
+      ],
+      "freeEndAt": null,
+      "expiry": null,
+      "status": "ACTIVE",
+      "date": "",
+      "source": "itad",
+      "offerType": "giveaway",
+      "region": "CN",
+      "platform": "Microsoft Store",
+      "publisher": "",
+      "releaseDate": "",
+      "genres": [],
+      "features": [],
+      "languages": ""
+    }
+  ],
+  "gamerpower": [
+    {
+      "id": 3334,
+      "title": "Mysterious House (IndieGala) Giveaway",
+      "link": "https://www.gamerpower.com/mysterious-house-pc-giveaway",
+      "platforms": "PC, DRM-Free",
+      "endDate": "",
+      "worth": "$0.99",
+      "description": "Mysterious House is free this week on Indiegala! Mysterious House is a indie 2d platformer filled with challenging puzzles and obstacles.",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
+      "cover": "https://www.gamerpower.com/offers/1b/68fcca241e9d0.jpg"
+    },
+    {
+      "id": 3858,
+      "title": "A Tiny Sticker Tale (Mobile) Giveaway",
+      "link": "https://www.gamerpower.com/a-tiny-sticker-tale-mobile-giveaway",
+      "platforms": "Android, iOS",
+      "endDate": "2026-12-03 23:59:00",
+      "worth": "$3.99",
+      "description": "A Tiny Sticker Tale (Mobile version) is free until December 3 on the Epic Games Store App for iPhone, iPad, and Android.\r\n\r\nNote: May not be available in all regions.",
+      "instructions": "1. Click the button using your phone to visit the Epic Games Store mobile page.\r\n2. Install the Epic Games Store App on your Android or iOS device.\r\n3. Open the App, scroll down to the \"Free Games\" section and click on the giveaway banner.\r\n4. Install the game and have fun!",
+      "cover": "https://www.gamerpower.com/offers/1b/6b085c2f77be3.jpg"
+    },
+    {
+      "id": 3857,
+      "title": "Bread and Fred (Epic Games) Giveaway",
+      "link": "https://www.gamerpower.com/bread-and-fred-epic-games-giveaway",
+      "platforms": "PC, Epic Games Store",
+      "endDate": "2026-12-03 23:59:00",
+      "worth": "$14.99",
+      "description": "The mountain awaits you! Claim Bread and Fred for free via Epic Games Store! Bread and Fred is a cute 2d co-op platformer where two players must cooperate to climb to the top of a snowy mountain.",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your Epic Games Store account.\r\n3. Click the button to add the game to your library",
+      "cover": "https://www.gamerpower.com/offers/1b/6b0857f437cbd.jpg"
+    },
+    {
+      "id": 3852,
+      "title": "Contractor: The Clean Up Part 2 (Epic Games) Giveaway",
+      "link": "https://www.gamerpower.com/contractor-the-clean-up-part-2-epic-games-giveaway",
+      "platforms": "PC, Epic Games Store",
+      "endDate": "2026-12-02 23:59:00",
+      "worth": "$4.99",
+      "description": "Score Contractor: The Clean Up Part 2 for free via Epic Games Store! Take control of a powerful loader and clear construction sites filled with rubble, broken concrete, and debris.",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your Epic Games Store account.\r\n3. Click the button to add the game to your library",
+      "cover": "https://www.gamerpower.com/offers/1b/6afc554f06761.jpg"
+    },
+    {
+      "id": 3346,
+      "title": "My Darkest Witch (IndieGala) Giveaway",
+      "link": "https://www.gamerpower.com/my-darkest-witch-pc-giveaway",
+      "platforms": "PC, DRM-Free",
+      "endDate": "",
+      "worth": "$4.99",
+      "description": "Score My Darkest Witch for free on IndieGala! My Darkest Witch is a 2d survival arena game with endless waves of enemies.",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
+      "cover": "https://www.gamerpower.com/offers/1b/69061997da81d.jpg"
+    },
+    {
+      "id": 3340,
+      "title": "ANCIENT EVIL (IndieGala) Giveaway",
+      "link": "https://www.gamerpower.com/ancient-evil-pc-giveaway",
+      "platforms": "PC, DRM-Free",
+      "endDate": "",
+      "worth": "$4.99",
+      "description": "Download ANCIENT EVIL for free via IndieGala! Ancient Evil is a 2d tactical RPG with puzzle elements. Don´t miss it!",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
+      "cover": "https://www.gamerpower.com/offers/1b/69024dade7c16.jpg"
+    },
+    {
+      "id": 3331,
+      "title": "Last Room (IndieGala) Giveaway",
+      "link": "https://www.gamerpower.com/last-room-pc-giveaway",
+      "platforms": "PC, DRM-Free",
+      "endDate": "",
+      "worth": "$29.99",
+      "description": "Dive into a world of puzzles today! Download Last Room for free on IndieGala! Last Room is a 3d puzzle game with interactive environments, medieval mysteries and secret levels.",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
+      "cover": "https://www.gamerpower.com/offers/1b/68f91bd81c328.jpg"
+    },
+    {
+      "id": 3328,
+      "title": "Best Plumber (IndieGala) Giveaway",
+      "link": "https://www.gamerpower.com/best-plumber-pc-giveaway",
+      "platforms": "PC, DRM-Free",
+      "endDate": "",
+      "worth": "$29.99",
+      "description": "Ever dreamed of being a plumber? Probably not... but now’s your chance! Grab Best Plumber for free on IndieGala and step into the boots of a young plumber!",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
+      "cover": "https://www.gamerpower.com/offers/1b/68f40b259de93.jpg"
+    },
+    {
+      "id": 3324,
+      "title": "Battle Ram (IndieGala) Giveaway",
+      "link": "https://www.gamerpower.com/battle-ram-pc-giveaway",
+      "platforms": "PC, DRM-Free",
+      "endDate": "",
+      "worth": "$29.99",
+      "description": "Become the battle lamb you were born to be! Battle Ram is free this week on IndieGala, download it now! Battle Ram is a 2d action-packed game with lambs and battling robots.",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
+      "cover": "https://www.gamerpower.com/offers/1b/68efabd65f913.jpg"
+    },
+    {
+      "id": 3316,
+      "title": "Leaper (IndieGala) Giveaway",
+      "link": "https://www.gamerpower.com/leaper-pc-giveaway",
+      "platforms": "PC, DRM-Free",
+      "endDate": "",
+      "worth": "$4.99",
+      "description": "Time to put your reflexes to the test! Download Leaper for free on IndieGala! Leaper is a 2d side-scrolling platformer with colorful pixel graphics and precise jumping mechanics. Check it out!",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
+      "cover": "https://www.gamerpower.com/offers/1b/68e6513c31514.jpg"
+    },
+    {
+      "id": 3446,
+      "title": "GigaBash (Stove) Giveaway",
+      "link": "https://www.gamerpower.com/gigabash-pc-giveaway",
+      "platforms": "PC",
+      "endDate": "",
+      "worth": "$24.99",
+      "description": "Score GigaBash for free via Stove and claim your place as king among Titans! GigaBash is a multiplayer arena brawler with gigantic film-inspired kaiju and fully destructible environments.",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your STOVE Store account.\r\n3. Click the button \"Cart\" to add the game to your library",
+      "cover": "https://www.gamerpower.com/offers/1b/69567c4ee0fa3.jpg"
+    },
+    {
+      "id": 3251,
+      "title": "Sharknado VR (Rift) Giveaway",
+      "link": "https://www.gamerpower.com/sharknado-vr-rift-giveaway",
+      "platforms": "VR",
+      "endDate": "",
+      "worth": "$1.99",
+      "description": "Ready to relive Sharknado? Grab Sharknado VR (Rift S, Rift) for free via Meta. Sharknado VR puts you in the middle of the action. Can you survive the flying sharks?",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your Meta account to access the game.\r\n3. Click the button \"Get\" before the offer expires.",
+      "cover": "https://www.gamerpower.com/offers/1b/689aece93310e.jpg"
+    },
+    {
+      "id": 2204,
+      "title": "Dual Chroma: Academy Carols (itch.io) Giveaway",
+      "link": "https://www.gamerpower.com/dual-chroma-academy-carols-itch-io-giveaway",
+      "platforms": "PC, Itch.io, DRM-Free",
+      "endDate": "",
+      "worth": "$2.00",
+      "description": "Grab Dual Chroma: Academy Carols for free on itch.io! Dual Chroma: Academy Carols is a slice-of-life Visual Novel. Check it out, If you are a fan of this type of game!",
+      "instructions": "1. Click the button \"Download or Claim\" before the offer expires.\r\n2. Login into your itch.io account to access the game.",
+      "cover": "https://www.gamerpower.com/offers/1b/63c6f67bb9c8b.jpg"
+    }
+  ],
+  "itad": [
+    {
+      "id": "019f3ec2-a4cc-70a8-b0a5-9106b68daadc",
+      "plain": "stellar-end-demo-version",
+      "title": "Stellar End Demo Version",
+      "store": "Humble Store",
+      "cut": 100,
+      "price": 0,
+      "priceCurrency": "CNY",
+      "regularPrice": 0.07,
+      "regularCurrency": "CNY",
+      "url": "https://itad.link/019f3ec2-a4c2-70e8-b4df-1231a2b9a417/?app=1rl7p4",
+      "voucher": null,
+      "platforms": [
+        "Windows"
+      ],
+      "cover": "",
+      "expiry": null,
+      "storeFamily": "humble",
+      "offerType": "giveaway",
+      "region": "CN"
+    },
+    {
+      "title": "Holiday Encore 2026: Arc Systems Works: Evo Collection",
+      "store": "Humble Bundle",
+      "expiry": 1796058035,
+      "gameCount": 9,
+      "offerType": "bundle",
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Farc-system-works-evo-collection-holiday-encore",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble",
+      "cover": "https://hb-prd.imgix.net/product-media/a7f3fa91dc1cac29c133ce43665dc07f90c8fdf4.png"
+    },
+    {
+      "title": "Creator Day & Black Friday 2026",
+      "store": "Itch.io",
+      "expiry": 1797008208,
+      "gameCount": 3,
+      "offerType": "bundle",
+      "url": "https://itch.io/s/225969/creator-day-black-friday-2026",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "other"
+    },
+    {
+      "title": "Build Your Own Boomer Shooter Bundle",
+      "store": "Fanatical",
+      "expiry": 1797174000,
+      "gameCount": 30,
+      "offerType": "bundle",
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fbuild-your-own-boomer-shooter-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical"
+    },
+    {
+      "title": "Builder's Blueprint Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1797483609,
+      "gameCount": 9,
+      "offerType": "bundle",
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fbuilders-blueprint-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble",
+      "cover": "https://hb-prd.imgix.net/product-media/7e7d4f8a4a7d60b09d9b0e531a17e852ff825952.jpg"
+    },
+    {
+      "title": "Build Your Own Casual Bundle",
+      "store": "Fanatical",
+      "expiry": 1798466400,
+      "gameCount": 17,
+      "offerType": "bundle",
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fbuild-your-own-casual-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical"
+    },
+    {
+      "title": "Deck the Halls with Deckbuilders Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1797051599,
+      "gameCount": 7,
+      "offerType": "bundle",
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fdeck-the-halls-with-deckbuilders",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble",
+      "cover": "https://hb-prd.imgix.net/product-media/5f5e243fd26a7fd714bafc13fc7b8ba0e42d5be1.jpg"
+    },
+    {
+      "title": "Build Your Own Capcom Collection (Black Friday Edition)",
+      "store": "Fanatical",
+      "expiry": 1796083145,
+      "gameCount": 27,
+      "offerType": "bundle",
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fpick-and-mix%2Fcapcom-collection-build-your-own-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical"
+    },
+    {
+      "title": "Covert Operations: Stealth Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1796878821,
+      "gameCount": 14,
+      "offerType": "bundle",
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fcovert-operations-stealth-bundle",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble",
+      "cover": "https://hb-prd.imgix.net/product-media/a15cad60a576fbed372f691ea9788c65cae925f2.jpg"
+    },
+    {
+      "title": "Better with Friends Co-op Buddy Packs",
+      "store": "Humble Bundle",
+      "expiry": 1796706008,
+      "gameCount": 9,
+      "offerType": "bundle",
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fbetter-with-friends-co-op-buddy-packs",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble",
+      "cover": "https://hb-prd.imgix.net/product-media/bfbc43d900692b38eec1aca229d80a4e42b6ee71.jpg"
+    },
+    {
+      "title": "Cursed Gate Bundle",
+      "store": "IndieGala",
+      "expiry": 1800273634,
+      "gameCount": 9,
+      "offerType": "bundle",
+      "url": "https://www.indiegala.com/bundle/cursed-gate-bundle?ref=itad",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "indiegala",
+      "cover": "https://www.indiegalacdn.com/bundle_cover/og_image/cursed-gate-bundle-fb.jpg?v=20261121"
+    },
+    {
+      "title": "Jacksepticeye's Thankmas 2026 Collection",
+      "store": "Digiphile",
+      "expiry": 1796536836,
+      "gameCount": 11,
+      "offerType": "bundle",
+      "url": "https://www.digiphile.co/thankmas?linkId=lp_988272&sourceId=itad&tenantId=digiphile",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "other",
+      "cover": "https://cdn.digiphilestatic.com/bundles/10792e44-b240-43b3-96ac-084ca479ac49.jpg"
+    },
+    {
+      "title": "Tripwire Interactive: Mayhem & Combat Bundle",
+      "store": "GreenManGaming",
+      "expiry": 1796752800,
+      "gameCount": 12,
+      "offerType": "bundle",
+      "url": "https://greenmangaming.sjv.io/c/2545989/3298418/15105?u=https%3A%2F%2Fwww.greenmangamingbundles.com%2Fbundles%2Ftripwire-interactive-mayhem-combat-bundle%2F",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "other",
+      "cover": "https://media.greenmangamingbundles.com/media/images/HomepageBanner_TripW.original.jpg"
+    },
+    {
+      "title": "Humble 15: Survival of the Fittest Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1796706047,
+      "gameCount": 12,
+      "offerType": "bundle",
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fsurvival-fittest",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble",
+      "cover": "https://hb-prd.imgix.net/product-media/de507d57919d9e3ec2eea740ffccde297ed4291a.jpg"
+    },
+    {
+      "title": "Movember Charity Bundle (2026)",
+      "store": "Fanatical",
+      "expiry": 1798646400,
+      "gameCount": 12,
+      "offerType": "bundle",
+      "url": "https://www.awin1.com/cread.php?awinmid=118821&awinaffid=235265&ued=https%3A%2F%2Fwww.fanatical.com%2Fen%2Fbundle%2Fmovember-charity-bundle-2026",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "fanatical",
+      "cover": "https://cdn-ext.fanatical.com/production/product/1280x720/dea286f9-b20e-4872-a9ec-da43fc243dc7.jpeg"
+    },
+    {
+      "title": "Seriously Unserious Collection Bundle",
+      "store": "Humble Bundle",
+      "expiry": 1796446851,
+      "gameCount": 13,
+      "offerType": "bundle",
+      "url": "https://humblebundleinc.sjv.io/c/2545989/2091208/25796?u=https%3A%2F%2Fwww.humblebundle.com%2Fgames%2Fseriously-unserious-collection",
+      "isPending": false,
+      "isMature": false,
+      "storeFamily": "humble",
+      "cover": "https://hb-prd.imgix.net/product-media/58d1db3013c3993e22ffff373bbd12e578a807d8.jpg"
+    }
+  ]
+}
