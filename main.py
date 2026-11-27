@@ -22,7 +22,7 @@ from steam_fetch import fetch_steam
 from itad_fetch import fetch_itad, redistribute_itad_deals
 from gog_fetch import fetch_gog
 from xbox_fetch import fetch_xbox
-from gamerpower_fetch import fetch_gamerpower, is_steam_giveaway
+from gamerpower_fetch import fetch_gamerpower, giveaway_stores, gog_store_giveaway
 from render_html import render_html, render_history_page, convert_epic_new_format
 from history_db import open_db, get_latest_meta, get_latest_image_rel, insert_record, list_snapshots
 
@@ -145,11 +145,12 @@ async def fetch_all(output_dir: str = "site", previous=None) -> Dict[str, Any]:
     snapshot = {"fetchedAt": checked_at, "sources": SOURCE_URLS, "sourceStatus": statuses}
     for key in PRIMARY_PLATFORMS:
         old = previous.get(key)
-        if key == "steam":
+        if key in ("steam", "gog"):
             old = [row for row in old or [] if row.get("source") != "gamerpower"]
         elif key == "gamerpower":
             # Steam 激活活动在快照中归入 Steam，缓存按实际采集来源还原。
-            old = list(old or []) + [row for row in previous.get("steam") or [] if row.get("source") == "gamerpower"]
+            old = list(old or []) + [row for store in ("steam", "gog") for row in previous.get(store) or []
+                                     if row.get("source") == "gamerpower"]
         groups = _epic_groups(old or []) if key == "epic" else {"items": old or []}
         primary = {k: [row for row in rows if row.get("source") != "itad"] for k, rows in groups.items()}
         primary = primary if key == "epic" else primary["items"]
@@ -182,8 +183,10 @@ async def fetch_all(output_dir: str = "site", previous=None) -> Dict[str, Any]:
     )
     other_giveaways = []
     for game in snapshot["gamerpower"]:
-        if is_steam_giveaway(game):
-            snapshot["steam"].append({**game, "source": "gamerpower", "offerType": "externalGiveaway"})
+        stores = giveaway_stores(game)
+        if stores:
+            kind = "storeGiveaway" if stores[0] == "gog" and gog_store_giveaway(game) else "externalGiveaway"
+            snapshot[stores[0]].append({**game, "source": "gamerpower", "offerType": kind})
         else:
             other_giveaways.append(game)
     snapshot["gamerpower"] = other_giveaways
@@ -368,58 +371,31 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     template_path = "epic-freebies.html.template"
     html_output_path = os.path.join(output_dir, "index.html")
 
-    created = False
-    if current_hash != last_hash:
+    created = current_hash != last_hash
+    if created:
         latest_ts = _timestamp_cn()
-        webp_name = f"{latest_ts}白嫖信息.webp"
-        image_rel = f"records/{webp_name}"
+        insert_record(conn, ts=latest_ts, fetched_at=snapshot.get("fetchedAt"), hash_value=current_hash,
+                      snapshot=snapshot, image_rel=None)
 
-        # 先生成主页 HTML（页脚包含历史入口/最新图片）
-        if os.path.exists(template_path):
-            html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts, share_webp_url=None)
-            Path(html_output_path).write_text(html_content, encoding="utf-8")
-            print(f"\nHTML 已生成到 {html_output_path}")
-        else:
-            print(f"\n警告: 找不到模板文件 {template_path}，跳过 HTML 生成")
+    # 每个快照只渲染一次新版海报。旧图片保留原链接，导出失败会在下次更新时重试。
+    from generate_image import generate_share_screenshot
+    for ts, old_image in conn.execute("SELECT ts, image FROM records ORDER BY id DESC").fetchall():
+        image_rel = f"records/{ts}-cards.webp"
+        image_path = history_dir / image_rel
+        if old_image == image_rel and image_path.is_file():
+            continue
+        raw, = conn.execute("SELECT snapshot FROM records WHERE ts = ?", (ts,)).fetchone()
+        if generate_share_screenshot(json.loads(raw), image_path):
+            with conn:
+                conn.execute("UPDATE records SET image = ? WHERE ts = ?", (image_rel, ts))
 
-        # 生成历史图片（仅在新增历史时生成）
-        try:
-            from generate_image import generate_webp_from_html
-
-            webp_path = records_dir / webp_name
-            generate_webp_from_html(html_output_path, str(webp_path), 1200)
-            if not webp_path.is_file():
-                raise RuntimeError("未生成 WebP 文件")
-            html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts, share_webp_url=f"history/{image_rel}")
-            Path(html_output_path).write_text(html_content, encoding="utf-8")
-            print(f"\n[HISTORY] 新增历史图片: {webp_path.as_posix()}")
-        except (Exception, SystemExit) as e:
-            print(f"\n生成历史图片失败: {e}")
-            image_rel = None
-
-        # 写入 SQLite
-        insert_record(
-            conn,
-            ts=latest_ts,
-            fetched_at=snapshot.get("fetchedAt"),
-            hash_value=current_hash,
-            snapshot=snapshot,
-            image_rel=image_rel,
-        )
-        created = True
-    else:
-        # 未变化：仍生成主页 HTML，但 latest_ts 指向上一次记录
-        if os.path.exists(template_path):
-            latest_image_rel = get_latest_image_rel(conn)
-            html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts, share_webp_url=f"history/{latest_image_rel}" if latest_image_rel else None)
-            Path(html_output_path).write_text(html_content, encoding="utf-8")
-            print(f"\nHTML 已生成到 {html_output_path}")
-        else:
-            print(f"\n警告: 找不到模板文件 {template_path}，跳过 HTML 生成")
-        print("\n[HISTORY] 本次抓取结果与上次一致，不新增历史记录。")
+    latest_image_rel = get_latest_image_rel(conn)
+    html_content = render_html(snapshot, template_path, latest_history_ts=latest_ts,
+                               share_webp_url=f"history/{latest_image_rel}" if latest_image_rel else None)
+    Path(html_output_path).write_text(html_content, encoding="utf-8")
 
     # === 生成历史页面（渲染为卡片样式）===
-    snapshots: List[Dict[str, Any]] = list_snapshots(conn, limit=60)
+    snapshots: List[Dict[str, Any]] = list_snapshots(conn, limit=60, with_images=True)
 
     history_page_dir = site_dir / "history"
     _ensure_dir(history_page_dir)

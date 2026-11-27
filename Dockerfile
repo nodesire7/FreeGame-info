@@ -11,7 +11,7 @@ COPY requirements.txt /app/requirements.txt
 RUN python -m pip install --upgrade pip && pip install -r /app/requirements.txt
 
 # Playwright & Chromium dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends libatomic1 \
+RUN apt-get update && apt-get install -y --no-install-recommends libatomic1 fonts-noto-cjk \
     && python -m playwright install --with-deps chromium \
     && rm -rf /var/lib/apt/lists/*
 

@@ -65,7 +65,7 @@ docker compose --env-file env up -d web
 - 🎮 **PlayStation Plus**：抓取会员免费游戏
 - 🎮 **IsThereAnyDeal**：通过官方 API 拉取 `100% OFF` 免费游戏
 - 📄 **静态 HTML 页面**：美观的单页应用
-- 🖼️ **分享拼图生成**：使用 Canvas API 生成长图（支持 PNG/WebP）
+- 🖼️ **分享拼图生成**：网页、归档和分享图共用字号、字族和配色；构建端与浏览器使用同一份 Canvas 绘图代码导出 WebP。
 - 🗃️ **历史数据归档（SQLite）**：仅在数据变化时写入 `history/date.db`，图片保存到 `history/records/`
 - 🤖 **GitHub Actions**：自动定时更新并部署到 GitHub Pages
 
@@ -212,7 +212,7 @@ export ITAD_COUNTRY=CN  # 可选，默认 CN
 
 ### GOG、Xbox 和跨平台赠送
 
-GOG 查询中国区目录里有原价、现价为零的促销。Xbox 从微软香港区的 Game Pass「最近加入」目录获取订阅条目。GamerPower 补充跨商店的完整游戏赠送与兑换码活动，保留适用平台、领取条件、截止信息和活动原文链接。[GamerPower 数据接口](https://www.gamerpower.com/api-read)
+GOG 页签同时收录中国区目录零元促销及 GamerPower 的 GOG 赠送，官方首页横幅和第三方领码分别展示。Xbox 从微软香港区的 Game Pass「最近加入」目录获取订阅条目。GamerPower 补充跨商店的完整游戏赠送与兑换码活动，保留适用平台、领取条件、截止信息和活动原文链接。[GamerPower 数据接口](https://www.gamerpower.com/api-read)
 
 公开 JSON 中的 `sourceStatus` 记录各来源最近一次检查和成功取数的时间。来源请求失败时页面会标明使用上次结果或暂时无法获取。ITAD 的折扣和组合包独立更新。
 

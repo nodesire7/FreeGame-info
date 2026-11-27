@@ -8,22 +8,11 @@ import os
 import re
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from gamerpower_fetch import is_steam_giveaway
+from gamerpower_fetch import giveaway_stores, gog_store_giveaway
 from typing import Any, Dict, List, Optional
 
-# 常量 - Red Hacker Brutalist Style
-SHARE_CANVAS_WIDTH = 1080
-SHARE_PADDING = 48
-SHARE_TITLE_BLOCK_HEIGHT = 200
-SHARE_SECTION_GAP = 64
-SHARE_CARD_HEIGHT = 180
-SHARE_CARD_GAP = 16
-SHARE_CARD_RADIUS = 0
-SHARE_CARD_INSET = 16
-SHARE_COVER_WIDTH = 200
-SHARE_COVER_RADIUS = 0
 MAX_SHARE_ITEMS = 4
-SHARE_FONT_FAMILY = "Noto Sans SC"
+ASSETS = Path(__file__).resolve().parent
 
 
 def escape_html(text: str) -> str:
@@ -261,10 +250,11 @@ PLATFORMS = {
 OFFER_GROUPS = {
     "epic_now": ("本期限免", "在活动期间登录 Epic 账号，将游戏添加到游戏库。", "限时领取"),
     "epic_upcoming": ("即将开放", "按预计开放时间排列，具体安排以商店公告为准。", "活动预告"),
+    "gog_external": ("站外领取 · GOG 兑换", "先到活动主办方领取，再按活动说明兑换到 GOG 账号。", "站外赠送"),
     "steam_external": ("站外领取 · Steam 激活", "GamerPower 收录的完整游戏赠送，领取条件和剩余名额以活动页为准。", "站外赠送"),
     "steam": ("Steam 商店限免", "游戏和追加内容均可能入选。领取追加内容前，请确认是否需要本体。", "零元优惠"),
     "psn": ("PlayStation 活动", "月度游戏需要有效的 PS Plus 会员资格，适用地区以商店为准。", "会员游戏"),
-    "gog": ("GOG 免费游戏", "中国区商店的零元折扣与限时赠送，具体期限见商品页。", "免费游戏"),
+    "gog": ("GOG 商店限免", "在 GOG 商店或首页赠送横幅领取。", "商店限免"),
     "xbox": ("Xbox 活动", "收录香港 Xbox Game Pass Ultimate 主机目录近期新增的游戏以及零元优惠。会员游戏在订阅有效且仍在库时可玩。", "商店活动"),
     "gamerpower": ("跨平台赠送活动", "GamerPower 收录的完整游戏赠送。区服、账号和剩余兑换码数量以活动页为准。", "赠送活动"),
     "itad_deals": ("零元折扣", "优惠来自 IsThereAnyDeal 收录的商店。", "零元优惠"),
@@ -304,28 +294,39 @@ def offer_groups(snapshot):
         epic = convert_epic_new_format(epic)
     itad = normalize_itad_data(snapshot.get("itad"))
     upcoming = sorted(epic.get("upcoming") or [], key=lambda g: offer_timestamp(g.get("freeStartAt")) or float("inf"))
-    steam = snapshot.get("steam") or []
-    steam_groups = [("steam", [game for game in steam if game.get("source") != "gamerpower"])]
-    external = [game for game in steam if game.get("source") == "gamerpower"]
     giveaways = snapshot.get("gamerpower") or []
-    # 旧快照把所有站外活动都存放在 gamerpower 列表中。
-    external.extend(game for game in giveaways if is_steam_giveaway(game))
-    if external or "gamerpower" in snapshot:
-        steam_groups.insert(0 if external and not steam_groups[0][1] else 1, ("steam_external", external))
+    def store_groups(store):
+        rows = snapshot.get(store) or []
+        direct = [game for game in rows if game.get("source") != "gamerpower"]
+        external = []
+        # 老快照将站外来源存入跨平台列表，包括由 GOG 自己发放的首页赠送。
+        for game in [*giveaways, *(r for key in ("steam", "gog") for r in snapshot.get(key) or []
+                                    if r.get("source") == "gamerpower")]:
+            if store not in giveaway_stores(game):
+                continue
+            if store == "gog" and gog_store_giveaway(game):
+                direct.append({**game, "source": "gamerpower", "offerType": "storeGiveaway"})
+            else:
+                external.append(game)
+        groups = [(store, direct)]
+        if external or "gamerpower" in snapshot:
+            groups.insert(0 if external and not direct else 1, (store + "_external", external))
+        return groups
+
     groups = {
         "epic": [("epic_now", epic.get("now") or []), ("epic_upcoming", upcoming)],
-        "steam": steam_groups,
+        "steam": store_groups("steam"),
         "psn": [("psn", snapshot.get("psn") or [])],
-        "gog": [("gog", snapshot.get("gog") or [])],
+        "gog": store_groups("gog"),
         "xbox": [("xbox", snapshot.get("xbox") or [])],
         "itad": [("itad_deals", itad["deals"]), ("itad_bundles", itad["bundles"])],
     }
     if "gamerpower" in snapshot or "gamerpower" in (snapshot.get("sourceStatus") or {}):
-        groups["gamerpower"] = [("gamerpower", [game for game in giveaways if not is_steam_giveaway(game)])]
+        groups["gamerpower"] = [("gamerpower", [game for game in giveaways if not giveaway_stores(game)])]
     return groups
 
 
-def render_offer(game, group, *, archived=False):
+def render_offer(game, group, *, archived=False, for_share=False):
     platform = group.split("_")[0]
     label = OFFER_GROUPS[group][2]
     is_itad = platform == "itad" or str(game.get("source", "")).lower() == "itad"
@@ -335,7 +336,7 @@ def render_offer(game, group, *, archived=False):
         label = "会员游戏"
     if game.get("isPending"):
         label = "活动预告"
-    img_url = source_url(game.get("headerImage") or game.get("cover") or game.get("image"))
+    img_url = source_url(game.get("poster") or game.get("headerImage") or game.get("cover") or game.get("image"))
     art = ""
     if img_url:
         art = (f'<img src="{img_url}" alt="" loading="lazy" decoding="async" '
@@ -345,13 +346,13 @@ def render_offer(game, group, *, archived=False):
                'onerror="this.hidden=true">')
     imprint = {"epic": "Epic", "steam": "Steam", "psn": "PS Plus", "xbox": "Xbox", "gog": "GOG",
                "itad": "ITAD", "gamerpower": "GP"}[platform]
-    title = escape_html(text_value(game.get("title")) or "未命名活动")
+    title = escape_html(text_value(game.get("storeTitle") or game.get("title")) or "未命名活动")
     start = offer_timestamp(game.get("freeStartAt"))
     end = offer_timestamp(game.get("freeEndAt") or game.get("expiry"))
     start_label = f"开放 {format_full_datetime(start)}" if start else ""
     end_label = f"截止 {format_full_datetime(end)}" if end else ""
     period = text_value(game.get("period") or game.get("date"))
-    external = platform == "gamerpower" or group == "steam_external"
+    external = platform == "gamerpower" or group.endswith("_external") or game.get("source") == "gamerpower"
     if external and game.get("endDate"):
         period = f"截止 {text_value(game['endDate'])}（来源未注明时区）"
     unknown_window = "离库时间未公布" if label == "会员游戏" and platform == "xbox" else "截止时间未公布"
@@ -400,11 +401,19 @@ def render_offer(game, group, *, archived=False):
     detail = (f'<details class="more"><summary>{"领取步骤与资料" if external and game.get("instructions") else "更多游戏资料"}</summary><dl class="facts">{"".join(more)}</dl></details>' if more else "")
     url = source_url(game.get("link") or game.get("url"))
     action = {"itad_bundles": "查看礼包", "steam_external": "查看领取条件", "gamerpower": "查看领取条件"}.get(group, "查看商店")
+    if group == "gog_external":
+        action = "查看领取条件"
+    if group == "gog" and game.get("offerType") == "storeGiveaway":
+        url = source_url(game.get("claimUrl")) or "https://www.gog.com/en/#giveaway"
+        action, label = "去 GOG 领取", "商店限免" if game.get("claimUrl") else "首页赠送"
     button = f'<a class="store-link" href="{url}" target="_blank" rel="noopener noreferrer">{action}<span aria-hidden="true"> ↗</span></a>' if url else ""
     source = "GamerPower" if external else PLATFORMS[platform][0]
     byline = '<a href="https://isthereanydeal.com/" target="_blank" rel="noopener noreferrer">IsThereAnyDeal</a>' if is_itad else escape_html(source)
-    if group == "steam_external":
-        byline = '<a href="https://www.gamerpower.com/giveaways/steam/free-games" target="_blank" rel="noopener noreferrer">GamerPower</a>'
+    if external and platform in ("steam", "gog"):
+        byline = f'<a href="{source_url(game.get("link"))}" target="_blank" rel="noopener noreferrer">GamerPower</a>'
+    if for_share:
+        return {"title": html.unescape(title), "platform": imprint, "primary": label + " · " + ("IsThereAnyDeal" if is_itad else source),
+                "secondary": window, "description": description, "coverUrl": html.unescape(img_url)}
     tone = "upcoming" if label == "活动预告" else "member" if label == "会员游戏" else "bundle" if group == "itad_bundles" else "available"
     heading = f'<a href="{url}" target="_blank" rel="noopener noreferrer">{title}</a>' if url else title
     return f"""<article class="offer">
@@ -437,7 +446,7 @@ def render_group(key, items, status, archived=False):
     component = (status.get("components") or {}).get(key.removeprefix("itad_")) or {}
     state = component.get("state", status.get("state"))
     freshness = {"ok": "已更新", "unavailable": "此次未能获取", "cached": "沿用上次记录"}.get(component.get("state"), "")
-    if key == "steam_external":
+    if key.endswith("_external"):
         freshness = {"cached": "沿用上次记录", "unavailable": "此次未能获取"}.get(state, "")
         component = status
     if freshness:
@@ -453,7 +462,7 @@ def render_group(key, items, status, archived=False):
 
 
 def get_share_client_script() -> str:
-    """获取分享客户端脚本（完整版本）- Red Hacker Brutalist Style"""
+    """绑定来源导航、分享下载和倒计时。"""
     return """(function() {
   'use strict';
 
@@ -567,7 +576,9 @@ def get_share_client_script() -> str:
         }
       }
 
-      const blob = await renderShareCanvas(payload, null);
+      const canvas = await renderGamePoster(payload);
+      const blob = await new Promise((resolve, reject) => canvas.toBlob(
+        result => result ? resolve(result) : reject(new Error('图片导出失败')), 'image/webp', 0.9));
       await triggerDownload(blob, payload.suggestedFileName);
       button.textContent = '已生成';
       setTimeout(function() {
@@ -583,464 +594,6 @@ def get_share_client_script() -> str:
       button.dataset.generating = 'false';
       button.blur();
     }
-  }
-
-  async function renderShareCanvas(payload, qrCodeDataUrl) {
-    const config = payload.config;
-    const sections = payload.sections;
-    const height = measureCanvasHeight(sections, config);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = config.width;
-    canvas.height = height;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      throw new Error('Canvas 2D context is unavailable');
-    }
-
-    ctx.textBaseline = 'top';
-
-    // === BLACK BACKGROUND ===
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, config.width, height);
-
-    // === WHITE DOT GRID PATTERN ===
-    const dotSpacing = 28;
-    const dotRadius = 1;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    for (let x = dotSpacing / 2; x < config.width; x += dotSpacing) {
-      for (let y = dotSpacing / 2; y < height; y += dotSpacing) {
-        ctx.beginPath();
-        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    // === TITLE BLOCK ===
-    let cursorY = config.padding;
-
-    // Red bar at top (6px)
-    ctx.fillStyle = '#d10000';
-    ctx.fillRect(0, 0, config.width, 6);
-
-    // White title: "白嫖游戏速报" in bold 52px
-    ctx.fillStyle = '#ffffff';
-    ctx.font = font(config.fontWeights.bold, 52, config.fontFamily);
-    ctx.fillText('白嫖游戏速报', config.padding, cursorY);
-    cursorY += 64;
-
-    // Gray subtitle
-    ctx.fillStyle = '#888888';
-    ctx.font = font(config.fontWeights.regular, 18, config.fontFamily);
-    ctx.fillText('GBTGAME · 游戏活动速报', config.padding, cursorY);
-    cursorY += 28;
-
-    // Timestamp line
-    ctx.fillStyle = '#666666';
-    ctx.font = font(config.fontWeights.light, 14, config.fontFamily);
-    ctx.fillText(
-      'GENERATED: ' + payload.generatedAtDisplay + ' · ' + payload.totalItems + ' ITEMS',
-      config.padding,
-      cursorY,
-    );
-    cursorY = config.padding + config.titleBlockHeight;
-
-    // === SECTIONS ===
-    const cardWidth = config.width - config.padding * 2;
-
-    for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
-      const section = sections[sectionIndex];
-
-      // Section header: red vertical bar + white uppercase bold
-      ctx.fillStyle = '#d10000';
-      ctx.fillRect(config.padding, cursorY, 4, 40);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = font(config.fontWeights.bold, 32, config.fontFamily);
-      ctx.fillText(section.title.toUpperCase(), config.padding + 16, cursorY + 32);
-      cursorY += 56;
-
-      // Draw items
-      for (let itemIndex = 0; itemIndex < section.items.length; itemIndex += 1) {
-        if (itemIndex > 0) {
-          cursorY += config.cardGap;
-        }
-        if (section.type === 'itad') {
-          await drawItadCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
-        } else {
-          await drawCard(ctx, section.items[itemIndex], config, config.padding, cursorY, cardWidth);
-        }
-        cursorY += config.cardHeight;
-      }
-
-      if (sectionIndex !== sections.length - 1) {
-        cursorY += config.sectionGap;
-      }
-    }
-
-    // === FOOTER WITH QR CODE ===
-    const footerHeight = 160;
-    cursorY = height - footerHeight;
-
-    // Black footer bar
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, cursorY, config.width, footerHeight);
-
-    // White top border 6px
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, cursorY, config.width, 6);
-
-    // Red accent bar on left side of footer
-    ctx.fillStyle = '#d10000';
-    ctx.fillRect(0, cursorY, 8, footerHeight);
-
-    // Draw QR code at bottom center
-    if (qrCodeDataUrl) {
-      const qrSize = config.qrSize || 100;
-      const qrX = (config.width - qrSize) / 2;
-      const qrY = cursorY + 16;
-
-      const qrImg = new Image();
-      await new Promise(function(resolve, reject) {
-        qrImg.onload = resolve;
-        qrImg.onerror = reject;
-        qrImg.src = qrCodeDataUrl;
-      });
-      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-    }
-
-    // Text below QR
-    const qrSize = config.qrSize || 100;
-    ctx.fillStyle = '#ffffff';
-    ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
-    ctx.textAlign = 'center';
-    ctx.fillText(
-      '扫描获取最新限免 · GBTGAME.ME',
-      config.width / 2,
-      cursorY + qrSize + 32,
-    );
-    ctx.textAlign = 'left';
-
-    return await new Promise(function(resolve, reject) {
-      canvas.toBlob(
-        function(result) {
-          if (result) {
-            resolve(result);
-          } else {
-            reject(new Error('Failed to export share canvas'));
-          }
-        },
-        'image/png',
-        0.92,
-      );
-    });
-  }
-
-  function measureCanvasHeight(sections, config) {
-    const footerHeight = 160;
-    let total = config.padding * 2 + config.titleBlockHeight;
-    for (let i = 0; i < sections.length; i += 1) {
-      const section = sections[i];
-      total += 56; // section header
-      total += section.items.length * config.cardHeight;
-      if (section.items.length > 1) {
-        total += (section.items.length - 1) * config.cardGap;
-      }
-      if (i !== sections.length - 1) {
-        total += config.sectionGap;
-      }
-    }
-    total += footerHeight;
-    return Math.ceil(total);
-  }
-
-  async function drawCard(ctx, item, config, x, y, width) {
-    // BLACK CARD with WHITE 4px border (NO rounded corners)
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(x, y, width, config.cardHeight);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(x, y, width, config.cardHeight);
-
-    const coverX = x + config.cardInset;
-    const coverY = y + config.cardInset;
-    const coverHeight = config.cardHeight - config.cardInset * 2;
-    const coverWidth = config.coverWidth;
-
-    // Cover with WHITE 4px border, no radius
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(coverX, coverY, coverWidth, coverHeight);
-
-    // Load and draw cover image
-    const coverImage = await loadCover(item.coverUrl);
-    if (coverImage) {
-      const scale = Math.max(
-        coverWidth / coverImage.width,
-        coverHeight / coverImage.height,
-      );
-      const drawWidth = coverImage.width * scale;
-      const drawHeight = coverImage.height * scale;
-      const dx = coverX + (coverWidth - drawWidth) / 2;
-      const dy = coverY + (coverHeight - drawHeight) / 2;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(coverX, coverY, coverWidth, coverHeight);
-      ctx.clip();
-      ctx.drawImage(coverImage, dx, dy, drawWidth, drawHeight);
-      ctx.restore();
-    } else {
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillRect(coverX, coverY, coverWidth, coverHeight);
-      ctx.fillStyle = '#444444';
-      ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
-      ctx.textAlign = 'center';
-      ctx.fillText('NO IMAGE', coverX + coverWidth / 2, coverY + coverHeight / 2);
-      ctx.textAlign = 'left';
-    }
-
-    // Content area (right side, 60%)
-    const textX = coverX + coverWidth + config.cardInset;
-    const textWidth = x + width - config.cardInset - textX;
-    let cursorY = y + config.cardInset;
-
-    // Title: white bold italic 22px uppercase
-    ctx.fillStyle = '#ffffff';
-    ctx.font = font(config.fontWeights.bold, 22, config.fontFamily);
-    ctx.fillText(item.title.toUpperCase(), textX, cursorY);
-    cursorY += 30;
-
-    // Description: gray 14px, max 2 lines
-    if (item.description) {
-      cursorY = drawWrappedText(ctx, item.description, {
-        x: textX,
-        y: cursorY,
-        width: textWidth,
-        lineHeight: 20,
-        font: font(config.fontWeights.regular, 14, config.fontFamily),
-        color: '#888888',
-        maxLines: 2,
-      });
-      cursorY += 4;
-    }
-
-    // Price tag: red background #d10000 with white text
-    if (item.tertiary) {
-      const priceText = '原价 ' + item.tertiary;
-      ctx.fillStyle = '#d10000';
-      const priceWidth = ctx.measureText(priceText).width + 16;
-      ctx.fillRect(textX, cursorY, priceWidth, 24);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = font(config.fontWeights.regular, 12, config.fontFamily);
-      ctx.fillText(priceText, textX + 8, cursorY + 16);
-      cursorY += 32;
-    }
-
-    // Timer: red bold italic 20px
-    if (item.primary) {
-      ctx.fillStyle = '#d10000';
-      ctx.font = font(config.fontWeights.bold, 20, config.fontFamily);
-      ctx.fillText(item.primary, textX, cursorY);
-      cursorY += 28;
-    }
-
-    // CTA button: white background, black text
-    const btnText = '立即抢夺';
-    ctx.fillStyle = '#ffffff';
-    const btnWidth = 120;
-    const btnHeight = 32;
-    ctx.fillRect(textX, cursorY, btnWidth, btnHeight);
-    ctx.fillStyle = '#000000';
-    ctx.font = font(config.fontWeights.bold, 14, config.fontFamily);
-    ctx.fillText(btnText, textX + 12, cursorY + 22);
-  }
-
-  async function drawItadCard(ctx, item, config, x, y, width) {
-    // BLACK CARD with WHITE 4px border
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(x, y, width, config.cardHeight);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(x, y, width, config.cardHeight);
-
-    const coverX = x + config.cardInset;
-    const coverY = y + config.cardInset;
-    const coverHeight = config.cardHeight - config.cardInset * 2;
-    const coverWidth = config.coverWidth;
-
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(coverX, coverY, coverWidth, coverHeight);
-
-    const coverImage = await loadCover(item.coverUrl);
-    if (coverImage) {
-      const scale = Math.max(
-        coverWidth / coverImage.width,
-        coverHeight / coverImage.height,
-      );
-      const drawWidth = coverImage.width * scale;
-      const drawHeight = coverImage.height * scale;
-      const dx = coverX + (coverWidth - drawWidth) / 2;
-      const dy = coverY + (coverHeight - drawHeight) / 2;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(coverX, coverY, coverWidth, coverHeight);
-      ctx.clip();
-      ctx.drawImage(coverImage, dx, dy, drawWidth, drawHeight);
-      ctx.restore();
-    } else {
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillRect(coverX, coverY, coverWidth, coverHeight);
-      ctx.fillStyle = '#444444';
-      ctx.font = font(config.fontWeights.regular, 14, config.fontFamily);
-      ctx.textAlign = 'center';
-      ctx.fillText('NO IMAGE', coverX + coverWidth / 2, coverY + coverHeight / 2);
-      ctx.textAlign = 'left';
-    }
-
-    ctx.fillStyle = '#d10000';
-    ctx.font = font(config.fontWeights.bold, 14, config.fontFamily);
-    ctx.fillRect(coverX, y + config.cardHeight - 34, coverWidth, 24);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText((item.store || 'ITAD').toUpperCase(), coverX + 8, y + config.cardHeight - 26);
-
-    const textX = coverX + coverWidth + config.cardInset;
-    const textWidth = x + width - config.cardInset - textX;
-    let cursorY = y + config.cardInset;
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
-    ctx.fillText(item.title.toUpperCase(), textX, cursorY);
-    cursorY += 26;
-
-    if (item.tertiary) {
-      cursorY = drawWrappedText(ctx, item.tertiary, {
-        x: textX,
-        y: cursorY,
-        width: textWidth,
-        lineHeight: 18,
-        font: font(config.fontWeights.regular, 12, config.fontFamily),
-        color: '#888888',
-        maxLines: 2,
-      });
-      cursorY += 6;
-    }
-
-    if (item.primary) {
-      ctx.fillStyle = '#d10000';
-      ctx.font = font(config.fontWeights.bold, 18, config.fontFamily);
-      ctx.fillText(item.primary, textX, cursorY);
-      cursorY += 26;
-    }
-
-    if (item.description) {
-      cursorY = drawWrappedText(ctx, item.description, {
-        x: textX,
-        y: cursorY,
-        width: textWidth,
-        lineHeight: 18,
-        font: font(config.fontWeights.regular, 12, config.fontFamily),
-        color: '#777777',
-        maxLines: 2,
-      });
-      cursorY += 8;
-    }
-
-    const btnText = '立即抢夺';
-    ctx.fillStyle = '#ffffff';
-    const btnWidth = 100;
-    const btnHeight = 28;
-    ctx.fillRect(textX, cursorY, btnWidth, btnHeight);
-    ctx.fillStyle = '#000000';
-    ctx.font = font(config.fontWeights.bold, 12, config.fontFamily);
-    ctx.fillText(btnText, textX + 8, cursorY + 18);
-  }
-
-  async function loadCover(url) {
-    if (!url) {
-      return null;
-    }
-    try {
-      const image = new Image();
-      image.crossOrigin = 'anonymous';
-      image.decoding = 'async';
-      const result = await new Promise(function(resolve, reject) {
-        image.onload = function() {
-          resolve(image);
-        };
-        image.onerror = function() {
-          reject(new Error('Image load failed'));
-        };
-        image.src = url;
-      });
-      return result;
-    } catch (error) {
-      console.debug('Share cover load failed', error);
-      return null;
-    }
-  }
-
-  function drawWrappedText(ctx, text, options) {
-    if (!text) {
-      return options.y;
-    }
-    ctx.font = options.font;
-    ctx.fillStyle = options.color;
-    ctx.textAlign = 'left';
-
-    const lines = wrapText(ctx, text, options.width, options.maxLines);
-    let cursor = options.y;
-    for (let i = 0; i < lines.length; i += 1) {
-      ctx.fillText(lines[i], options.x, cursor);
-      cursor += options.lineHeight;
-    }
-    return cursor;
-  }
-
-  function wrapText(ctx, text, maxWidth, maxLines) {
-    if (!text) {
-      return [];
-    }
-    const normalized = text.replace(/\\s+/g, ' ').trim();
-    if (!normalized) {
-      return [];
-    }
-    const characters = Array.from(normalized);
-    const lines = [];
-    let current = '';
-
-    for (let i = 0; i < characters.length; i += 1) {
-      const candidate = current + characters[i];
-      if (ctx.measureText(candidate).width > maxWidth && current) {
-        lines.push(current);
-        current = characters[i];
-      } else {
-        current = candidate;
-      }
-    }
-    if (current) {
-      lines.push(current);
-    }
-
-    if (typeof maxLines === 'number' && maxLines > 0 && lines.length > maxLines) {
-      const truncated = lines.slice(0, maxLines);
-      let lastLine = truncated[maxLines - 1];
-      while (
-        lastLine.length > 0 &&
-        ctx.measureText(lastLine + '…').width > maxWidth
-      ) {
-        lastLine = lastLine.slice(0, -1);
-      }
-      truncated[maxLines - 1] = lastLine ? lastLine + '…' : '…';
-      return truncated;
-    }
-
-    return lines;
-  }
-
-  function font(weight, size, family) {
-    return weight + ' ' + size + 'px ' + family;
   }
 
   function triggerDownload(blob, fileName) {
@@ -1101,368 +654,24 @@ def get_share_client_script() -> str:
 
 
 def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    """构建分享数据"""
+    from generate_image import poster_branding
     sections = []
-    
-    # 处理 EPIC 数据（兼容新旧格式）
-    epic_data = snapshot.get("epic", {})
-    if isinstance(epic_data, list):
-        # 新格式：扁平数组，需要转换
-        epic_converted = convert_epic_new_format(epic_data)
-        epic_now = epic_converted["now"]
-        epic_upcoming = epic_converted["upcoming"]
-    else:
-        # 旧格式：字典包含 now/upcoming
-        epic_now = epic_data.get("now", [])
-        epic_upcoming = epic_data.get("upcoming", [])
-    
-    steam = snapshot.get("steam", [])
-    
-    # 处理 PSN 数据（兼容新旧格式）
-    psn_data = snapshot.get("psn", [])
-    if psn_data and isinstance(psn_data, list) and len(psn_data) > 0:
-        first_psn = psn_data[0] if psn_data else {}
-        if "status" in first_psn and not first_psn.get("source") and not first_psn.get("publisher"):
-            psn = convert_psn_new_format(psn_data)
-        else:
-            psn = psn_data
-    else:
-        psn = []
-
-    gog = snapshot.get("gog", [])
-    xbox = snapshot.get("xbox", [])
-
-    if epic_now:
-        sections.append(
-            {
-                "title": "EPIC 正在免费",
-                "items": [
-                    map_epic_share_item(item, "now")
-                    for item in epic_now[:MAX_SHARE_ITEMS]
-                ],
-            }
-        )
-    if epic_upcoming:
-        sections.append(
-            {
-                "title": "EPIC 即将免费",
-                "items": [
-                    map_epic_share_item(item, "upcoming")
-                    for item in epic_upcoming[:MAX_SHARE_ITEMS]
-                ],
-            }
-        )
-    if steam:
-        sections.append(
-            {
-                "title": "Steam 限免精选",
-                "items": [
-                    map_steam_share_item(item) for item in steam[:MAX_SHARE_ITEMS]
-                ],
-            }
-        )
-    if psn:
-        sections.append(
-            {
-                "title": "PlayStation 会员福利",
-                "items": [
-                    map_psn_share_item(item) for item in psn[:MAX_SHARE_ITEMS]
-                ],
-            }
-        )
-
-    itad = normalize_itad_data(snapshot.get("itad"))
-    for group_name, group_items in group_itad_deals(itad.get("deals", [])):
-        if group_items:
-            sections.append(
-                {
-                    "title": f"ITAD {group_name} 100% OFF",
-                    "type": "itad",
-                    "items": [
-                        map_itad_share_item(item) for item in group_items[:MAX_SHARE_ITEMS]
-                    ],
-                }
-            )
-    bundles = itad.get("bundles", [])
-    if bundles:
-        sections.append(
-            {
-                "title": "ITAD Bundles",
-                "items": [
-                    map_itad_share_item(item, bundle_mode=True) for item in bundles[:MAX_SHARE_ITEMS]
-                ],
-            }
-        )
-
-    if gog:
-        sections.append(
-            {
-                "title": "GOG 限免",
-                "items": [
-                    map_gog_share_item(item) for item in gog[:MAX_SHARE_ITEMS]
-                ],
-            }
-        )
-    if xbox:
-        sections.append(
-            {
-                "title": "Xbox 活动",
-                "items": [
-                    map_xbox_share_item(item) for item in xbox[:MAX_SHARE_ITEMS]
-                ],
-            }
-        )
-
-    giveaways = snapshot.get("gamerpower") or []
-    if giveaways:
-        sections.append({"title": "GamerPower 跨平台赠送", "items": [
-            {"title": text_value(g.get("title")), "primary": "赠送活动",
-             "secondary": text_value(g.get("platforms")), "tertiary": "领取条件见活动页",
-             "description": text_value(g.get("description")), "coverUrl": g.get("cover", "")}
-            for g in giveaways[:MAX_SHARE_ITEMS]
-        ]})
-
+    for platform, groups in offer_groups(snapshot).items():
+        for group, items in groups:
+            if not items:
+                continue
+            title = OFFER_GROUPS[group][0]
+            if platform in ("epic", "itad"):
+                title = PLATFORMS[platform][0] + " · " + title
+            sections.append({"title": title, "items": [
+                render_offer(game, group, archived=True, for_share=True) for game in items[:MAX_SHARE_ITEMS]
+            ]})
     if not sections:
         return None
-
-    fetched_at = snapshot.get("fetchedAt")
-    if fetched_at:
-        dt = datetime.fromisoformat(fetched_at.replace("Z", "+00:00"))
-        generated_at_timestamp = int(dt.timestamp() * 1000)
-    else:
-        # 使用中国时区
-        china_tz = timezone(timedelta(hours=8))
-        generated_at_timestamp = int(datetime.now(china_tz).timestamp() * 1000)
-
-    total_items = sum(len(section["items"]) for section in sections)
-
-    # 使用中国时区生成文件名
-    china_tz = timezone(timedelta(hours=8))
-    suggested_file_name = f"GBTGame限免拼图-{datetime.now(china_tz).strftime('%Y%m%d-%H%M')}.webp"
-
-    return {
-        "generatedAtDisplay": format_full_datetime(generated_at_timestamp),
-        "generatedAtTimestamp": generated_at_timestamp,
-        "totalItems": total_items,
-        "suggestedFileName": suggested_file_name,
-        "sections": sections,
-        "config": {
-            "width": SHARE_CANVAS_WIDTH,
-            "padding": SHARE_PADDING,
-            "titleBlockHeight": SHARE_TITLE_BLOCK_HEIGHT,
-            "sectionGap": SHARE_SECTION_GAP,
-            "cardHeight": SHARE_CARD_HEIGHT,
-            "cardGap": SHARE_CARD_GAP,
-            "cardRadius": SHARE_CARD_RADIUS,
-            "cardInset": SHARE_CARD_INSET,
-            "coverWidth": SHARE_COVER_WIDTH,
-            "coverRadius": SHARE_COVER_RADIUS,
-            "fontWeights": {"light": 300, "regular": 400, "semibold": 600, "bold": 900},
-            "fontFamily": f'"{SHARE_FONT_FAMILY}","Microsoft YaHei","PingFang SC","Heiti SC",sans-serif',
-            "qrSize": 100,
-            "qrMargin": 6,
-        },
-    }
-
-
-def map_epic_share_item(game: Dict[str, Any], variant: str) -> Dict[str, Any]:
-    """映射 Epic 分享项"""
-    primary = "活动时间待定"
-    secondary = ""
-
-    is_free_now = game.get("isFreeNow", False)
-    free_end_at = game.get("freeEndAt")
-    free_start_at = game.get("freeStartAt")
-
-    if is_free_now and free_end_at:
-        primary = format_remaining(free_end_at, prefix="剩余", finished_text="已结束")
-        secondary = f"截止：{format_datetime(free_end_at)}"
-    elif variant == "upcoming" and free_start_at:
-        primary = format_remaining(
-            free_start_at, prefix="距离开放还剩", finished_text="已开放"
-        )
-        if free_end_at:
-            secondary = f"限免窗口：{format_datetime(free_start_at)} - {format_datetime(free_end_at)}"
-        else:
-            secondary = f"开始：{format_datetime(free_start_at)}"
-    elif free_start_at or free_end_at:
-        primary = f"活动时间：{format_date_range(free_start_at, free_end_at)}"
-
-    price = game.get("originalPriceDesc") or game.get("originalPrice") or ""
-    platforms = game.get("platforms", [])
-    platform_text = " / ".join(filter(None, platforms)) if platforms else ""
-    
-    # 获取发行商和开发商
-    publisher = game.get("publisher", "")
-    creator = game.get("creator", "")
-
-    tertiary_parts = []
-    if price:
-        tertiary_parts.append(f"原价 {price}")
-    if publisher:
-        tertiary_parts.append(f"发行 {publisher}")
-    if creator and creator != publisher:
-        tertiary_parts.append(f"开发 {creator}")
-    if platform_text:
-        tertiary_parts.append(f"平台 {platform_text}")
-
-    return {
-        "title": sanitize_text(game.get("title", "")),
-        "primary": primary,
-        "secondary": secondary,
-        "tertiary": " · ".join(tertiary_parts),
-        "description": sanitize_text(game.get("description", "")),
-        "coverUrl": game.get("cover"),
-    }
-
-
-def map_steam_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
-    """映射 Steam 分享项"""
-    if game.get("source") == "gamerpower":
-        return {"title": sanitize_text(game.get("title")), "primary": "站外领取 · Steam 激活",
-                "secondary": "GamerPower", "tertiary": sanitize_text(game.get("platforms")),
-                "description": sanitize_text(game.get("description")), "coverUrl": game.get("cover")}
-    discount = (
-        f"折扣 {sanitize_text(game.get('discountText', ''))}"
-        if game.get("discountText")
-        else "折扣信息：待定"
-    )
-    price = (
-        f"现价 {sanitize_text(game.get('finalPrice', ''))}"
-        if game.get("finalPrice")
-        else ""
-    )
-
-    tertiary_parts = []
-    if game.get("originalPrice"):
-        tertiary_parts.append(f"原价 {sanitize_text(game['originalPrice'])}")
-    if game.get("releaseDate"):
-        tertiary_parts.append(f"发行 {sanitize_text(game['releaseDate'])}")
-    platforms = game.get("platforms", [])
-    if platforms:
-        tertiary_parts.append(f"平台 {sanitize_text(' / '.join(platforms))}")
-
-    return {
-        "title": sanitize_text(game.get("title", "")),
-        "primary": discount,
-        "secondary": price,
-        "tertiary": " · ".join(tertiary_parts),
-        "description": sanitize_text(game.get("reviewSummary", "")),
-        "coverUrl": game.get("image"),
-    }
-
-
-def map_psn_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
-    """映射 PlayStation 分享项"""
-    tertiary_parts = []
-    if game.get("platforms"):
-        tertiary_parts.append(f"平台 {sanitize_text(game['platforms'])}")
-
-    # 兼容新旧格式（新格式用 cover，旧格式用 image）
-    cover_url = game.get("cover") or game.get("image", "")
-
-    return {
-        "title": sanitize_text(game.get("title", "")),
-        "primary": "零元优惠" if game.get("source") == "itad" else sanitize_text(game.get("highlight", "PS Plus 会员福利")),
-        "secondary": (
-            f"可领取时间：{sanitize_text(game['period'])}" if game.get("period") else ""
-        ),
-        "tertiary": " · ".join(tertiary_parts),
-        "description": sanitize_text(game.get("description", "")),
-        "coverUrl": cover_url,
-    }
-
-
-def map_itad_share_item(game: Dict[str, Any], bundle_mode: bool = False) -> Dict[str, Any]:
-    """映射 ITAD 分享项"""
-    expiry = game.get("expiry")
-    china_tz = timezone(timedelta(hours=8))
-    now_ts = int(datetime.now(china_tz).timestamp())
-
-    if expiry:
-        diff = expiry - now_ts
-        if diff > 0:
-            total_seconds = diff
-            days = total_seconds // 86400
-            hours = (total_seconds % 86400) // 3600
-            minutes = (total_seconds % 3600) // 60
-            seconds = total_seconds % 60
-            if days > 0:
-                primary = f"剩余 {days} 天 {hours:02d}:{minutes:02d}:{seconds:02d}"
-            elif hours > 0:
-                primary = f"剩余 {hours:02d}:{minutes:02d}:{seconds:02d}"
-            else:
-                primary = f"剩余 {minutes:02d}:{seconds:02d}"
-        else:
-            primary = "已过期"
-    else:
-        primary = "时间待定"
-
-    tertiary_bits = []
-    if bundle_mode:
-        if game.get("gameCount"):
-            tertiary_bits.append(f"{game['gameCount']} 款")
-        if game.get("store"):
-            tertiary_bits.append(sanitize_text(game.get("store", "Bundle")))
-        description = sanitize_text(game.get("description") or game.get("details") or "")
-    else:
-        tertiary_bits.append(f"-{game.get('cut', 100)}% OFF")
-        if game.get("platforms"):
-            tertiary_bits.append("平台 " + sanitize_text(" / ".join(game.get("platforms") or [])))
-        description = ""
-
-    return {
-        "title": sanitize_text(game.get("title", "")),
-        "primary": primary,
-        "secondary": f"来自 {sanitize_text(game.get('store', 'ITAD'))}",
-        "tertiary": " · ".join(tertiary_bits),
-        "description": description,
-        "coverUrl": game.get("cover", ""),
-        "store": sanitize_text(game.get("store", "ITAD")),
-        "gameCount": game.get("gameCount", 0),
-    }
-
-
-def map_gog_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
-    """映射 GOG 分享项"""
-    tertiary_parts = []
-    if game.get("originalPrice"):
-        tertiary_parts.append(f"原价 {sanitize_text(game['originalPrice'])}")
-    if game.get("publisher"):
-        tertiary_parts.append(f"发行 {sanitize_text(game['publisher'])}")
-    genres = game.get("genres", [])
-    if genres:
-        tertiary_parts.append(f"类型 {' / '.join(sanitize_text(g) for g in genres[:3])}")
-
-    return {
-        "title": sanitize_text(game.get("title", "")),
-        "primary": sanitize_text(game.get("price", "Free")),
-        "secondary": f"平台 GOG",
-        "tertiary": " · ".join(tertiary_parts),
-        "description": sanitize_text(game.get("description", "")),
-        "coverUrl": game.get("cover", ""),
-    }
-
-
-def map_xbox_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
-    """映射 Xbox 分享项"""
-    tertiary_parts = []
-    if game.get("originalPrice"):
-        tertiary_parts.append(f"原价 {sanitize_text(game['originalPrice'])}")
-    if game.get("publisher"):
-        tertiary_parts.append(f"发行 {sanitize_text(game['publisher'])}")
-    platforms = game.get("platforms", ["Xbox"])
-    if platforms:
-        tertiary_parts.append(f"平台 {' / '.join(sanitize_text(p) for p in platforms)}")
-
-    return {
-        "title": sanitize_text(game.get("title", "")),
-        "primary": sanitize_text(game.get("price", "Game Pass 免费")),
-        "secondary": "平台 Xbox",
-        "tertiary": " · ".join(tertiary_parts),
-        "description": sanitize_text(game.get("description", "")),
-        "coverUrl": game.get("cover", ""),
-    }
+    stamp = snapshot_time(snapshot.get("fetchedAt"))
+    return {**poster_branding(), "generatedAtDisplay": stamp, "sections": sections,
+            "totalItems": sum(len(s["items"]) for s in sections),
+            "suggestedFileName": "游戏活动速报-" + stamp.replace(":", "").replace(" ", "-") + ".webp"}
 
 
 def serialize_for_client(payload: Optional[Dict[str, Any]]) -> str:
@@ -1492,7 +701,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
                     f'aria-selected="{str(active).lower()}" aria-controls="free-panel-{key}" data-tab="{key}" tabindex="{0 if active else -1}">'
                     f'<span>{name}</span><b>{counts[key]}</b></button>')
         status = (snapshot.get("sourceStatus") or {}).get(key) or {}
-        contents = [render_group(group, items, statuses.get("gamerpower") if group == "steam_external" else status) for group, items in sections]
+        contents = [render_group(group, items, statuses.get("gamerpower") if group.endswith("_external") else status) for group, items in sections]
         panels.append(f'<div class="epic-freebies__panel{"" if active else " hidden"}" id="free-panel-{key}" role="tabpanel" '
                       f'aria-labelledby="tab-{key}" data-panel="{key}"><div class="panel-source"><strong>{name}</strong>'
                       f'{render_source(snapshot, key)}</div>{"".join(contents)}</div>')
@@ -1510,7 +719,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         "SHARE_BUTTON_FILENAME": escape_attribute(Path(share_webp_url).name if share_webp_url else ((payload or {}).get("suggestedFileName") or "限免速报.png")),
         "SHARE_BUTTON_DISABLED": "" if payload or share_webp_url else 'aria-disabled="true" tabindex="-1"',
         "SHARE_DATA_JSON": serialize_for_client(payload),
-        "CLIENT_SCRIPT": get_share_client_script(), "ARCHIVE_LINKS": "".join(links),
+        "CLIENT_SCRIPT": (ASSETS / "share-render.js").read_text() + "\n" + get_share_client_script(), "ARCHIVE_LINKS": "".join(links),
     }
     return re.sub(r"\{\{([A-Z_]+)\}\}", lambda match: values[match[1]], template)
 
@@ -1528,11 +737,13 @@ def render_history_page(records: list[dict[str, Any]], *, template_path: str, ba
         groups = offer_groups(snap)
         count = sum(len(items) for sections in groups.values() for _, items in sections)
         blocks.append(f'<details class="record"><summary><strong>{escape_html(snapshot_time(snap.get("fetchedAt")) or "日期待定")}</strong><span>{count} 项活动</span></summary>')
+        if snap.get("archiveImage"):
+            blocks.append(f'<p class="archive-download"><a class="share-button" href="{escape_attribute(snap["archiveImage"])}" download>下载这期分享图</a></p>')
         for key, sections in groups.items():
             blocks.append(f'<section class="archive-platform"><div class="panel-source"><strong>{PLATFORMS[key][0]}</strong>{render_source(snap, key)}</div>')
             status = (snap.get("sourceStatus") or {}).get(key) or {}
             for group, items in sections:
-                group_status = (snap.get("sourceStatus") or {}).get("gamerpower") if group == "steam_external" else status
+                group_status = (snap.get("sourceStatus") or {}).get("gamerpower") if group.endswith("_external") else status
                 blocks.append(render_group(group, items, group_status, archived=True))
             blocks.append('</section>')
         blocks.append('</details>')

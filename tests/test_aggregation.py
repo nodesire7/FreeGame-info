@@ -77,6 +77,26 @@ class AggregationTests(unittest.TestCase):
             self.assertEqual(entry.findtext("title"), "Game Key")
             self.assertIn("上次核对", entry.findtext("description"))
 
+    def test_gog_channel_archive_and_share_follow_actual_redemption(self):
+        from render_html import build_share_payload, offer_groups, render_offer
+        banner = {"id": 11, "title": "Banner", "platforms": "PC, GOG, DRM-Free",
+                  "instructions": "Go to the GOG home page and click the giveaway banner."}
+        key = {"id": 12, "title": "Key", "platforms": "GOG", "instructions": "Claim a key from the publisher."}
+        drm = {"id": 13, "title": "DRM-free", "platforms": "PC, DRM-Free"}
+        old = {"gamerpower": [banner, key, drm]}
+        first = self.collect({}, gamerpower=old["gamerpower"])
+        self.assertEqual(first["gamerpower"], [drm])
+        self.assertEqual([g["id"] for g in first["gog"]], [11, 12])
+        self.assertEqual(self.collect(first, gamerpower=RuntimeError())["gog"], first["gog"])
+        self.assertEqual(self.collect(first, gog=RuntimeError())["gog"], [])
+        for snap in (old, first):
+            groups = dict(offer_groups(snap)["gog"])
+            self.assertEqual([row["id"] for row in groups["gog"]], [11])
+            self.assertEqual([row["id"] for row in groups["gog_external"]], [12])
+            self.assertIn("https://www.gog.com/en/#giveaway", render_offer(groups["gog"][0], "gog"))
+            sections = build_share_payload(snap)["sections"]
+            self.assertEqual([i["title"] for s in sections for i in s["items"]].count("Banner"), 1)
+
     def test_epic_time_and_itad_bundle_changes(self):
         epic = [{"title": "Game", "status": "ACTIVE", "date": "2026/11/28 12:45:13"}]
         snapshot = self.collect({}, epic=epic)

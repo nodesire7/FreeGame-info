@@ -74,15 +74,18 @@ def insert_record(
     conn.commit()
 
 
-def list_snapshots(conn: sqlite3.Connection, *, limit: int = 60) -> List[Dict[str, Any]]:
+def list_snapshots(conn: sqlite3.Connection, *, limit: int = 60, with_images: bool = False) -> List[Dict[str, Any]]:
     rows = conn.execute(
-        "SELECT snapshot FROM records ORDER BY id DESC LIMIT ?",
+        "SELECT snapshot, image FROM records ORDER BY id DESC LIMIT ?",
         (limit,),
     ).fetchall()
     snapshots: List[Dict[str, Any]] = []
-    for (snap_str,) in rows:
+    for snap_str, image in rows:
         try:
-            snapshots.append(json.loads(snap_str))
+            snapshot = json.loads(snap_str)
+            if with_images:
+                snapshot["archiveImage"] = image
+            snapshots.append(snapshot)
         except Exception:
             continue
     return snapshots
