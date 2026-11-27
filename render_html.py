@@ -336,7 +336,13 @@ def render_offer(game, group, *, archived=False):
     if game.get("isPending"):
         label = "活动预告"
     img_url = source_url(game.get("headerImage") or game.get("cover") or game.get("image"))
-    art = f'<img src="{img_url}" alt="" loading="lazy" decoding="async" onerror="this.hidden=true">' if img_url else ""
+    art = ""
+    if img_url:
+        art = (f'<img src="{img_url}" alt="" loading="lazy" decoding="async" '
+               'onload="if(this.naturalWidth > this.naturalHeight * 1.35){'
+               'this.parentElement.classList.add(&quot;wide&quot;);'
+               'this.parentElement.style.setProperty(&quot;--art-image&quot;, &quot;url(&quot; + JSON.stringify(this.currentSrc) + &quot;)&quot;);}" '
+               'onerror="this.hidden=true">')
     imprint = {"epic": "Epic", "steam": "Steam", "psn": "PS Plus", "xbox": "Xbox", "gog": "GOG",
                "itad": "ITAD", "gamerpower": "GP"}[platform]
     title = escape_html(text_value(game.get("title")) or "未命名活动")
@@ -390,7 +396,7 @@ def render_offer(game, group, *, archived=False):
             more.append(f'<div><dt>{name}</dt><dd>{escape_html(text_value(value))}</dd></div>')
     if len(description) > 140:
         more.insert(0, f'<div><dt>完整简介</dt><dd>{escape_html(description)}</dd></div>')
-        description = description[:135].rstrip() + "…"
+        description = re.sub(r"(?<=\s)[a-zA-Z]+$", "", description[:135]).rstrip() + "…"
     detail = (f'<details class="more"><summary>{"领取步骤与资料" if external and game.get("instructions") else "更多游戏资料"}</summary><dl class="facts">{"".join(more)}</dl></details>' if more else "")
     url = source_url(game.get("link") or game.get("url"))
     action = {"itad_bundles": "查看礼包", "steam_external": "查看领取条件", "gamerpower": "查看领取条件"}.get(group, "查看商店")

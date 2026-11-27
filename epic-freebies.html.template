@@ -371,6 +371,15 @@ button,summary {
     height:100%;
     object-fit:cover;
 }
+.art.wide::before {
+    content:"";
+    position:absolute;
+    inset:-12px;
+    background:var(--art-image) center / cover;
+    filter:blur(8px) brightness(.65);
+}
+.art.wide span { visibility:hidden; }
+.art.wide img { object-fit:contain; }
 .art img[hidden] { display:none; }
 .offer-copy {
     min-width:0;
