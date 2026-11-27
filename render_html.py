@@ -674,6 +674,14 @@ def build_share_payload(snapshot: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "suggestedFileName": "游戏活动速报-" + stamp.replace(":", "").replace(" ", "-") + ".webp"}
 
 
+def render_reader_qr():
+    from generate_image import poster_branding
+    code = poster_branding()
+    return (f'<a class="reader-qr" href="{escape_attribute(code["qrUrl"])}">'
+            f'<img src="{code["qrImage"]}" alt="游戏快报二维码" width="111" height="111">'
+            '<span>扫码看最新快报</span></a>')
+
+
 def serialize_for_client(payload: Optional[Dict[str, Any]]) -> str:
     """序列化分享数据为客户端 JSON"""
     if not payload:
@@ -718,7 +726,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
         "SHARE_BUTTON_URL": escape_attribute(share_webp_url or "#"),
         "SHARE_BUTTON_FILENAME": escape_attribute(Path(share_webp_url).name if share_webp_url else ((payload or {}).get("suggestedFileName") or "限免速报.png")),
         "SHARE_BUTTON_DISABLED": "" if payload or share_webp_url else 'aria-disabled="true" tabindex="-1"',
-        "SHARE_DATA_JSON": serialize_for_client(payload),
+        "SHARE_DATA_JSON": serialize_for_client(payload), "READER_QR": render_reader_qr(),
         "CLIENT_SCRIPT": (ASSETS / "share-render.js").read_text() + "\n" + get_share_client_script(), "ARCHIVE_LINKS": "".join(links),
     }
     return re.sub(r"\{\{([A-Z_]+)\}\}", lambda match: values[match[1]], template)
@@ -753,7 +761,7 @@ def render_history_page(records: list[dict[str, Any]], *, template_path: str, ba
     <script data-cfasync="false" async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9956808351564739"></script>{style}</head>
     <body><header class="top"><div class="wrap"><a class="brand" href="../"><img width="28" height="28" src="../logo.png" alt="">GBTGAME</a>
     <nav aria-label="站点导航"><a href="../">活动速报</a><a aria-current="page" href="./">历史归档</a><a href="../feed.xml">RSS 订阅</a></nav></div></header>
-    <main class="wrap archive"><div class="mast"><div><h1>历史归档</h1><p>展开抓取记录，查看当时收录的活动、价格与领取期限。</p></div></div>
+    <main class="wrap archive"><div class="mast"><div><h1>历史归档</h1><p>展开抓取记录，查看当时收录的活动、价格与领取期限。</p></div>{render_reader_qr()}</div>
     <div class="archive-heading"><h2>按时间浏览</h2><span>最近 {len(records)} 条记录・北京时间</span></div>{detail}</main>
     <footer class="wrap"><a href="../">返回活动速报</a><a href="date.db">下载历史数据库</a></footer></body></html>"""
 

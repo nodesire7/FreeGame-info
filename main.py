@@ -380,7 +380,7 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     # 每个快照只渲染一次新版海报。旧图片保留原链接，导出失败会在下次更新时重试。
     from generate_image import generate_share_screenshot
     for ts, old_image in conn.execute("SELECT ts, image FROM records ORDER BY id DESC").fetchall():
-        image_rel = f"records/{ts}-cards.webp"
+        image_rel = f"records/{ts}-qr.webp"
         image_path = history_dir / image_rel
         if old_image == image_rel and image_path.is_file():
             continue

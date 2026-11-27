@@ -26,7 +26,7 @@ def generate_qr_base64(data, size=100):
 @lru_cache(maxsize=8)
 def poster_branding(url=SITE):
     logo = base64.b64encode((ASSETS / "logo.png").read_bytes()).decode("ascii")
-    return {"logo": "data:image/png;base64," + logo,
+    return {"qrUrl": url, "logo": "data:image/png;base64," + logo,
             "qrImage": "data:image/png;base64," + generate_qr_base64(url)}
 
 

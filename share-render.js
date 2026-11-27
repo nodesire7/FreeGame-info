@@ -65,6 +65,14 @@ async function renderGamePoster(payload) {
         }
     }
     const qr = await load(payload.qrImage);
+    if (!qr) throw new Error('分享图二维码未能加载');
+    const qrSize = 111;
+    function drawQR(y) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(qr, width - margin - qrSize, y, qrSize, qrSize);
+        ctx.restore();
+    }
     const mark = await load(payload.logo);
     const cardWidth = width - margin * 2;
     const textWidth = cardWidth - inset * 2 - posterWidth - gap;
@@ -78,7 +86,7 @@ async function renderGamePoster(payload) {
     const sections = payload.sections.map(section => ({
         ...section, heights: section.items.map(item => Math.max(posterHeight, cardText(item, 0, 0)) + inset * 2)
     }));
-    const start = 130, sectionHead = 38, sectionGap = number('space-6'), footer = 105;
+    const start = 164, sectionHead = 38, sectionGap = number('space-6'), footer = qrSize + 24;
     const contentHeight = sections.reduce((total, section) => total + sectionHead + sectionGap +
         section.heights.reduce((sum, h) => sum + h + gap, 0), start);
     const height = contentHeight + footer;
@@ -90,9 +98,11 @@ async function renderGamePoster(payload) {
     ctx.fillStyle = token('canvas'); ctx.fillRect(0, 0, width, height);
     if (mark) ctx.drawImage(mark, margin, 19, 24, 24);
     write('GBTGAME', margin + (mark ? 32 : 0), 21, font(17, 700), ink, 280, 1, 24);
-    write('白嫖游戏速报', margin, 52, font(34, 700, token('heading-font')), ink, cardWidth, 1, 45);
+    drawQR(12);
+    write('扫码看最新快报', width - margin - qrSize, 127, font(number('type-meta')), muted, qrSize, 1, 18);
+    write('白嫖游戏速报', margin, 52, font(34, 700, token('heading-font')), ink, cardWidth - qrSize - gap, 1, 45);
     write(payload.generatedAtDisplay + ' 北京时间　精选 ' + payload.totalItems + ' 项活动',
-        margin, 98, font(number('type-meta')), muted, cardWidth, 1, 20);
+        margin, 98, font(number('type-meta')), muted, cardWidth - qrSize - gap, 1, 20);
     let y = start;
     for (const section of sections) {
         write(section.title, margin, y, font(number('type-section'), 700), ink, cardWidth, 1, sectionHead);
@@ -121,8 +131,8 @@ async function renderGamePoster(payload) {
         y += sectionGap;
     }
     ctx.fillStyle = token('line'); ctx.fillRect(margin, y, cardWidth, 1);
-    if (qr) ctx.drawImage(qr, width - margin - 80, y + 12, 80, 80);
+    drawQR(y + 12);
     write('查看最新领取活动', margin, y + 26, font(18, 650), ink, cardWidth - 90, 1, 25);
-    write('gameinfo.gbtgame.me', margin, y + 53, font(number('type-body')), accent, cardWidth - 90, 1, 20);
+    write(new URL(payload.qrUrl || 'https://gameinfo.gbtgame.me/').host, margin, y + 53, font(number('type-body')), accent, cardWidth - 90, 1, 20);
     return canvas;
 }

@@ -170,6 +170,23 @@ button,summary {
     margin:10px 0 0;
 }
 
+.mast-tools {
+    display:flex;
+    align-items:center;
+    gap:var(--space-4);
+}
+.reader-qr {
+    display:inline-grid;
+    justify-items:center;
+    gap:var(--space-1);
+    color:var(--muted);
+    font-size:var(--type-meta);
+    text-decoration:none;
+    flex:none;
+}
+.reader-qr img { display:block; width:111px; height:111px; image-rendering:pixelated; }
+.reader-qr:hover span { text-decoration:underline; }
+
 .mast-meta {
     display:flex;
     flex-direction:column;
@@ -592,11 +609,12 @@ footer a {
     .mast p {
         font-size:var(--type-body);
     }
+    .mast-tools { margin-top:var(--space-3); justify-content:space-between; }
+    .archive .mast .reader-qr { margin-top:var(--space-3); }
     .mast-meta {
-        margin-top:15px;
-        flex-direction:row;
-        justify-content:space-between;
-        align-items:center;
+        flex-direction:column;
+        align-items:flex-start;
+        white-space:normal;
         gap:8px;
     }
     .mast-meta small {
@@ -680,7 +698,7 @@ footer a {
 <header class="top"><div class="wrap"><a class="brand" href="./"><img src="logo.png" width="28" height="28" alt="">GBTGAME</a>
 <nav aria-label="站点导航"><a href="./" aria-current="page">活动速报</a><a href="history/">历史归档</a><a href="feed.xml">RSS 订阅</a></nav></div></header>
 <main class="wrap"><header class="mast"><div><h1>白嫖游戏速报</h1><p>追踪限时领取、会员游戏与跨平台礼包。</p></div>
-<div class="mast-meta"><small>更新于 {{FETCHED_AT}}（北京时间）</small><a class="share-button" data-share-button href="{{SHARE_BUTTON_URL}}" download="{{SHARE_BUTTON_FILENAME}}" {{SHARE_BUTTON_DISABLED}}>{{SHARE_BUTTON_LABEL}}</a></div></header>
+<div class="mast-tools"><div class="mast-meta"><small>更新于 {{FETCHED_AT}}（北京时间）</small><a class="share-button" data-share-button href="{{SHARE_BUTTON_URL}}" download="{{SHARE_BUTTON_FILENAME}}" {{SHARE_BUTTON_DISABLED}}>{{SHARE_BUTTON_LABEL}}</a></div>{{READER_QR}}</div></header>
 <div class="browse"><aside class="directory"><h2>按来源浏览<small>共 {{TOTAL_COUNT}} 项</small></h2>
 <nav class="platform-tabs" aria-label="游戏活动来源" role="tablist">{{PLATFORM_TABS}}</nav></aside>
 <div class="epic-freebies__panels">{{PLATFORM_PANELS}}</div></div>
