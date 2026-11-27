@@ -83,41 +83,13 @@ def _build_link(game: Dict[str, Any]) -> str:
 
 
 def _pick_cover(game: Dict[str, Any]) -> str:
-    """
-    提取游戏封面图
-    优先使用 OfferImageWide，其次使用 Thumbnail
-    """
-    images = game.get("keyImages")
-    if not isinstance(images, list):
-        return ""
-    
-    # 优先查找 OfferImageWide
-    for img in images:
-        if isinstance(img, dict):
-            img_type = img.get("type", "")
-            if img_type == "OfferImageWide":
-                url = img.get("url")
-                if url:
-                    return url
-    
-    # 其次查找 Thumbnail
-    for img in images:
-        if isinstance(img, dict):
-            img_type = img.get("type", "")
-            if img_type == "Thumbnail":
-                url = img.get("url")
-                if url:
-                    return url
-    
-    # 如果都没有，使用第一张图片
-    if images:
-        first_img = images[0]
-        if isinstance(first_img, dict):
-            url = first_img.get("url")
-            if url:
-                return url
-    
-    return ""
+    """优先取商店竖版海报，兼容只有横图的旧商品。"""
+    images = [img for img in game.get("keyImages") or [] if isinstance(img, dict) and img.get("url")]
+    for kind in ("OfferImageTall", "DieselStoreFrontTall", "Thumbnail", "OfferImageWide"):
+        for image in images:
+            if image.get("type") == kind:
+                return image["url"]
+    return images[0]["url"] if images else ""
 
 
 def _extract_description(game: Dict[str, Any]) -> str:

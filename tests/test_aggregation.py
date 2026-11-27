@@ -60,6 +60,23 @@ class AggregationTests(unittest.TestCase):
                               itad={"deals": deals, "bundles": []})
         self.assertEqual([r["title"] for r in result["epic"]["now"]], ["Bread and Fred", "Bread & Fred Deluxe"])
 
+    def test_external_steam_giveaways_follow_their_own_source_and_expire(self):
+        key = {"title": "Game Key", "id": 42, "platforms": "PC, Steam", "link": "https://example.com/key"}
+        other = {"title": "Other", "platforms": "PC, DRM-Free"}
+        first = self.collect({}, gamerpower=[key, other])
+        self.assertEqual([row["id"] for row in first["steam"]], [42])
+        self.assertEqual(first["gamerpower"], [other])
+        second = self.collect(first, gamerpower=RuntimeError(), steam=RuntimeError())
+        third = self.collect(second, gamerpower=RuntimeError())
+        self.assertEqual(third["steam"], first["steam"])
+        self.assertEqual(third["sourceStatus"]["gamerpower"]["asOf"], first["fetchedAt"])
+        self.assertEqual(self.collect(third, steam=RuntimeError())["steam"], [])
+        with tempfile.TemporaryDirectory() as output:
+            main.generate_feed(third, output)
+            entry = ElementTree.parse(Path(output) / "feed.xml").find(".//item[category='Steam']")
+            self.assertEqual(entry.findtext("title"), "Game Key")
+            self.assertIn("上次核对", entry.findtext("description"))
+
     def test_epic_time_and_itad_bundle_changes(self):
         epic = [{"title": "Game", "status": "ACTIVE", "date": "2026/11/28 12:45:13"}]
         snapshot = self.collect({}, epic=epic)

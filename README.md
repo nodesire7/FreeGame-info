@@ -179,7 +179,9 @@ https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?loca
 
 ### Steam
 
-抓取 Steam 商店的"限时特惠 + 免费"搜索结果页：
+Steam 页签同时展示中国区商店零元特惠和通过站外渠道领取的 Steam 游戏。后者来自 GamerPower 的有效完整游戏赠送列表，单列领取条件和活动链接。
+
+商店数据来自 Steam 的“限时特惠 + 免费”搜索结果页：
 
 ```
 https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese

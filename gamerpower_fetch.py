@@ -11,6 +11,13 @@ def _text(value):
     return value.strip() if isinstance(value, str) and value.strip() != "N/A" else ""
 
 
+def is_steam_giveaway(game):
+    platforms = game.get("platforms") or ""
+    if isinstance(platforms, str):
+        platforms = platforms.split(",")
+    return any(str(name).strip().casefold() == "steam" for name in platforms)
+
+
 async def fetch_gamerpower():
     timeout = aiohttp.ClientTimeout(total=25)
     async with aiohttp.ClientSession(timeout=timeout, trust_env=True) as session:

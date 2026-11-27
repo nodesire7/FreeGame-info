@@ -44,7 +44,7 @@ async def fetch_xbox() -> List[Dict[str, Any]]:
             continue
         info = product["LocalizedProperties"][0]
         images = {img.get("ImagePurpose"): img.get("Uri") for img in info.get("Images", [])}
-        cover = next((images[k] for k in ("TitledHeroArt", "BoxArt", "Poster") if images.get(k)), "")
+        cover = next((images[k] for k in ("Poster", "BoxArt", "TitledHeroArt") if images.get(k)), "")
         result.append({
             "id": product_id, "title": info["ProductTitle"],
             "link": f"https://www.xbox.com/zh-HK/games/store/-/{product_id}",

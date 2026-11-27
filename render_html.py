@@ -8,6 +8,7 @@ import os
 import re
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from gamerpower_fetch import is_steam_giveaway
 from typing import Any, Dict, List, Optional
 
 # 常量 - Red Hacker Brutalist Style
@@ -260,7 +261,8 @@ PLATFORMS = {
 OFFER_GROUPS = {
     "epic_now": ("本期限免", "在活动期间登录 Epic 账号，将游戏添加到游戏库。", "限时领取"),
     "epic_upcoming": ("即将开放", "按预计开放时间排列，具体安排以商店公告为准。", "活动预告"),
-    "steam": ("Steam 零元优惠", "游戏和追加内容均可能入选。领取追加内容前，请确认是否需要本体。", "零元优惠"),
+    "steam_external": ("站外领取 · Steam 激活", "GamerPower 收录的完整游戏赠送，领取条件和剩余名额以活动页为准。", "站外赠送"),
+    "steam": ("Steam 商店限免", "游戏和追加内容均可能入选。领取追加内容前，请确认是否需要本体。", "零元优惠"),
     "psn": ("PlayStation 活动", "月度游戏需要有效的 PS Plus 会员资格，适用地区以商店为准。", "会员游戏"),
     "gog": ("GOG 免费游戏", "中国区商店的零元折扣与限时赠送，具体期限见商品页。", "免费游戏"),
     "xbox": ("Xbox 活动", "收录香港 Xbox Game Pass Ultimate 主机目录近期新增的游戏以及零元优惠。会员游戏在订阅有效且仍在库时可玩。", "商店活动"),
@@ -302,16 +304,24 @@ def offer_groups(snapshot):
         epic = convert_epic_new_format(epic)
     itad = normalize_itad_data(snapshot.get("itad"))
     upcoming = sorted(epic.get("upcoming") or [], key=lambda g: offer_timestamp(g.get("freeStartAt")) or float("inf"))
+    steam = snapshot.get("steam") or []
+    steam_groups = [("steam", [game for game in steam if game.get("source") != "gamerpower"])]
+    external = [game for game in steam if game.get("source") == "gamerpower"]
+    giveaways = snapshot.get("gamerpower") or []
+    # 旧快照把所有站外活动都存放在 gamerpower 列表中。
+    external.extend(game for game in giveaways if is_steam_giveaway(game))
+    if external or "gamerpower" in snapshot:
+        steam_groups.insert(0 if external and not steam_groups[0][1] else 1, ("steam_external", external))
     groups = {
         "epic": [("epic_now", epic.get("now") or []), ("epic_upcoming", upcoming)],
-        "steam": [("steam", snapshot.get("steam") or [])],
+        "steam": steam_groups,
         "psn": [("psn", snapshot.get("psn") or [])],
         "gog": [("gog", snapshot.get("gog") or [])],
         "xbox": [("xbox", snapshot.get("xbox") or [])],
         "itad": [("itad_deals", itad["deals"]), ("itad_bundles", itad["bundles"])],
     }
     if "gamerpower" in snapshot or "gamerpower" in (snapshot.get("sourceStatus") or {}):
-        groups["gamerpower"] = [("gamerpower", snapshot.get("gamerpower") or [])]
+        groups["gamerpower"] = [("gamerpower", [game for game in giveaways if not is_steam_giveaway(game)])]
     return groups
 
 
@@ -326,14 +336,17 @@ def render_offer(game, group, *, archived=False):
     if game.get("isPending"):
         label = "活动预告"
     img_url = source_url(game.get("headerImage") or game.get("cover") or game.get("image"))
-    art = f'<img src="{img_url}" alt="" loading="lazy" decoding="async">' if img_url else '<span>暂无封面</span>'
+    art = f'<img src="{img_url}" alt="" loading="lazy" decoding="async" onerror="this.hidden=true">' if img_url else ""
+    imprint = {"epic": "Epic", "steam": "Steam", "psn": "PS Plus", "xbox": "Xbox", "gog": "GOG",
+               "itad": "ITAD", "gamerpower": "GP"}[platform]
     title = escape_html(text_value(game.get("title")) or "未命名活动")
     start = offer_timestamp(game.get("freeStartAt"))
     end = offer_timestamp(game.get("freeEndAt") or game.get("expiry"))
     start_label = f"开放 {format_full_datetime(start)}" if start else ""
     end_label = f"截止 {format_full_datetime(end)}" if end else ""
     period = text_value(game.get("period") or game.get("date"))
-    if platform == "gamerpower" and game.get("endDate"):
+    external = platform == "gamerpower" or group == "steam_external"
+    if external and game.get("endDate"):
         period = f"截止 {text_value(game['endDate'])}（来源未注明时区）"
     unknown_window = "离库时间未公布" if label == "会员游戏" and platform == "xbox" else "截止时间未公布"
     window = "　".join(part for part in (start_label, end_label) if part) or period or unknown_window
@@ -375,19 +388,25 @@ def render_offer(game, group, *, archived=False):
     ]:
         if value:
             more.append(f'<div><dt>{name}</dt><dd>{escape_html(text_value(value))}</dd></div>')
-    detail = (f'<details class="more"><summary>更多游戏资料</summary><dl class="facts">{"".join(more)}</dl></details>' if more else "")
+    if len(description) > 140:
+        more.insert(0, f'<div><dt>完整简介</dt><dd>{escape_html(description)}</dd></div>')
+        description = description[:135].rstrip() + "…"
+    detail = (f'<details class="more"><summary>{"领取步骤与资料" if external and game.get("instructions") else "更多游戏资料"}</summary><dl class="facts">{"".join(more)}</dl></details>' if more else "")
     url = source_url(game.get("link") or game.get("url"))
-    action = {"itad_bundles": "查看礼包", "gamerpower": "查看领取条件"}.get(group, "查看商店")
+    action = {"itad_bundles": "查看礼包", "steam_external": "查看领取条件", "gamerpower": "查看领取条件"}.get(group, "查看商店")
     button = f'<a class="store-link" href="{url}" target="_blank" rel="noopener noreferrer">{action}<span aria-hidden="true"> ↗</span></a>' if url else ""
-    source = "GamerPower" if platform == "gamerpower" else PLATFORMS[platform][0]
+    source = "GamerPower" if external else PLATFORMS[platform][0]
     byline = '<a href="https://isthereanydeal.com/" target="_blank" rel="noopener noreferrer">IsThereAnyDeal</a>' if is_itad else escape_html(source)
+    if group == "steam_external":
+        byline = '<a href="https://www.gamerpower.com/giveaways/steam/free-games" target="_blank" rel="noopener noreferrer">GamerPower</a>'
     tone = "upcoming" if label == "活动预告" else "member" if label == "会员游戏" else "bundle" if group == "itad_bundles" else "available"
+    heading = f'<a href="{url}" target="_blank" rel="noopener noreferrer">{title}</a>' if url else title
     return f"""<article class="offer">
-        <div class="art" data-platform="{platform}">{art}</div>
+        <div class="art" aria-hidden="true" data-platform="{platform}"><span>{imprint}</span>{art}</div>
         <div class="offer-copy"><div class="offer-byline"><span class="condition {tone}">{label}</span><span>{byline}</span></div>
-        <h3>{title}</h3>{f'<p class="description">{escape_html(description)}</p>' if description else ''}
-        {f'<dl class="facts">{"".join(facts)}</dl>' if facts else ''}{detail}
-        <div class="offer-foot"><div class="window">{escape_html(window)}{timer}</div>{button}</div></div></article>"""
+        <h3>{heading}</h3><div class="window">{escape_html(window)}{timer}</div>{f'<p class="description">{escape_html(description)}</p>' if description else ''}
+        {f'<dl class="facts">{"".join(facts)}</dl>' if facts else ''}
+        <div class="offer-foot">{detail}{button}</div></div></article>"""
 
 
 def render_source(snapshot, platform):
@@ -412,6 +431,9 @@ def render_group(key, items, status, archived=False):
     component = (status.get("components") or {}).get(key.removeprefix("itad_")) or {}
     state = component.get("state", status.get("state"))
     freshness = {"ok": "已更新", "unavailable": "此次未能获取", "cached": "沿用上次记录"}.get(component.get("state"), "")
+    if key == "steam_external":
+        freshness = {"cached": "沿用上次记录", "unavailable": "此次未能获取"}.get(state, "")
+        component = status
     if freshness:
         stamp = snapshot_time(component.get("asOf") if state == "cached" else component.get("checkedAt"))
         freshness = f'<span class="component-state">{freshness} {escape_html(stamp)}</span>'
@@ -1290,6 +1312,10 @@ def map_epic_share_item(game: Dict[str, Any], variant: str) -> Dict[str, Any]:
 
 def map_steam_share_item(game: Dict[str, Any]) -> Dict[str, Any]:
     """映射 Steam 分享项"""
+    if game.get("source") == "gamerpower":
+        return {"title": sanitize_text(game.get("title")), "primary": "站外领取 · Steam 激活",
+                "secondary": "GamerPower", "tertiary": sanitize_text(game.get("platforms")),
+                "description": sanitize_text(game.get("description")), "coverUrl": game.get("cover")}
     discount = (
         f"折扣 {sanitize_text(game.get('discountText', ''))}"
         if game.get("discountText")
@@ -1460,7 +1486,7 @@ def render_html(snapshot: Dict[str, Any], template_path: str, latest_history_ts:
                     f'aria-selected="{str(active).lower()}" aria-controls="free-panel-{key}" data-tab="{key}" tabindex="{0 if active else -1}">'
                     f'<span>{name}</span><b>{counts[key]}</b></button>')
         status = (snapshot.get("sourceStatus") or {}).get(key) or {}
-        contents = [render_group(group, items, status) for group, items in sections]
+        contents = [render_group(group, items, statuses.get("gamerpower") if group == "steam_external" else status) for group, items in sections]
         panels.append(f'<div class="epic-freebies__panel{"" if active else " hidden"}" id="free-panel-{key}" role="tabpanel" '
                       f'aria-labelledby="tab-{key}" data-panel="{key}"><div class="panel-source"><strong>{name}</strong>'
                       f'{render_source(snapshot, key)}</div>{"".join(contents)}</div>')
@@ -1500,7 +1526,8 @@ def render_history_page(records: list[dict[str, Any]], *, template_path: str, ba
             blocks.append(f'<section class="archive-platform"><div class="panel-source"><strong>{PLATFORMS[key][0]}</strong>{render_source(snap, key)}</div>')
             status = (snap.get("sourceStatus") or {}).get(key) or {}
             for group, items in sections:
-                blocks.append(render_group(group, items, status, archived=True))
+                group_status = (snap.get("sourceStatus") or {}).get("gamerpower") if group == "steam_external" else status
+                blocks.append(render_group(group, items, group_status, archived=True))
             blocks.append('</section>')
         blocks.append('</details>')
     detail = "".join(blocks) or '<p class="empty">暂无历史记录。</p>'

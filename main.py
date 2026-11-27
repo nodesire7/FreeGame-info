@@ -22,7 +22,7 @@ from steam_fetch import fetch_steam
 from itad_fetch import fetch_itad, redistribute_itad_deals
 from gog_fetch import fetch_gog
 from xbox_fetch import fetch_xbox
-from gamerpower_fetch import fetch_gamerpower
+from gamerpower_fetch import fetch_gamerpower, is_steam_giveaway
 from render_html import render_html, render_history_page, convert_epic_new_format
 from history_db import open_db, get_latest_meta, get_latest_image_rel, insert_record, list_snapshots
 
@@ -145,6 +145,11 @@ async def fetch_all(output_dir: str = "site", previous=None) -> Dict[str, Any]:
     snapshot = {"fetchedAt": checked_at, "sources": SOURCE_URLS, "sourceStatus": statuses}
     for key in PRIMARY_PLATFORMS:
         old = previous.get(key)
+        if key == "steam":
+            old = [row for row in old or [] if row.get("source") != "gamerpower"]
+        elif key == "gamerpower":
+            # Steam 激活活动在快照中归入 Steam，缓存按实际采集来源还原。
+            old = list(old or []) + [row for row in previous.get("steam") or [] if row.get("source") == "gamerpower"]
         groups = _epic_groups(old or []) if key == "epic" else {"items": old or []}
         primary = {k: [row for row in rows if row.get("source") != "itad"] for k, rows in groups.items()}
         primary = primary if key == "epic" else primary["items"]
@@ -175,6 +180,13 @@ async def fetch_all(output_dir: str = "site", previous=None) -> Dict[str, Any]:
     snapshot["itad"] = redistribute_itad_deals(
         itad_data, snapshot["epic"], snapshot["steam"], snapshot["psn"], snapshot["gog"], snapshot["xbox"]
     )
+    other_giveaways = []
+    for game in snapshot["gamerpower"]:
+        if is_steam_giveaway(game):
+            snapshot["steam"].append({**game, "source": "gamerpower", "offerType": "externalGiveaway"})
+        else:
+            other_giveaways.append(game)
+    snapshot["gamerpower"] = other_giveaways
     return snapshot
 
 
@@ -276,7 +288,7 @@ def generate_feed(snapshot: Dict[str, Any], output_dir: str) -> None:
                 part = "bundles" if key == "bundles" else "deals"
                 status = (itad_status.get("components") or {}).get(part, itad_status)
             else:
-                source_status = statuses.get(key) or {}
+                source_status = statuses.get("gamerpower" if game.get("source") == "gamerpower" else key) or {}
                 status = source_status.get("primary", source_status)
             description = game.get("description") or game.get("shortDescription") or game.get("details") or ""
             if status.get("state") == "cached":
@@ -288,7 +300,7 @@ def generate_feed(snapshot: Dict[str, Any], output_dir: str) -> None:
             ET.SubElement(item, "category").text = label
             ET.SubElement(item, "description").text = str(description)[:240]
             ET.SubElement(item, "pubDate").text = format_rss_date(datetime.fromisoformat(timestamp.replace("Z", "+00:00")))
-            identity = [key, game.get("id") or link, title]
+            identity = ["gamerpower" if game.get("source") == "gamerpower" else key, game.get("id") or link, title]
             guid = hashlib.sha256(json.dumps(identity, ensure_ascii=False).encode("utf-8")).hexdigest()
             ET.SubElement(item, "guid", {"isPermaLink": "false"}).text = guid
     # Merchant descriptions occasionally contain controls that XML 1.0 disallows.
