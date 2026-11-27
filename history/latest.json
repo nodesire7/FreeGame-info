@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-28T02:31:23.761750+08:00",
+  "fetchedAt": "2026-11-28T02:44:19.029118+08:00",
   "sources": {
     "epic": "https://store.epicgames.com/zh-CN/free-games",
     "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese",
@@ -12,48 +12,48 @@
   "sourceStatus": {
     "epic": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-      "asOf": "2026-11-28T02:31:23.761750+08:00"
+      "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+      "asOf": "2026-11-28T02:44:19.029118+08:00"
     },
     "steam": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-      "asOf": "2026-11-28T02:31:23.761750+08:00"
+      "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+      "asOf": "2026-11-28T02:44:19.029118+08:00"
     },
     "psn": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-      "asOf": "2026-11-28T02:31:23.761750+08:00"
+      "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+      "asOf": "2026-11-28T02:44:19.029118+08:00"
     },
     "gog": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-      "asOf": "2026-11-28T02:31:23.761750+08:00"
+      "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+      "asOf": "2026-11-28T02:44:19.029118+08:00"
     },
     "xbox": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-      "asOf": "2026-11-28T02:31:23.761750+08:00"
+      "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+      "asOf": "2026-11-28T02:44:19.029118+08:00"
     },
     "gamerpower": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-      "asOf": "2026-11-28T02:31:23.761750+08:00"
+      "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+      "asOf": "2026-11-28T02:44:19.029118+08:00"
     },
     "itad": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-      "asOf": "2026-11-28T02:31:23.761750+08:00",
+      "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+      "asOf": "2026-11-28T02:44:19.029118+08:00",
       "components": {
         "deals": {
           "state": "ok",
-          "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-          "asOf": "2026-11-28T02:31:23.761750+08:00"
+          "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+          "asOf": "2026-11-28T02:44:19.029118+08:00"
         },
         "bundles": {
           "state": "ok",
-          "checkedAt": "2026-11-28T02:31:23.761750+08:00",
-          "asOf": "2026-11-28T02:31:23.761750+08:00"
+          "checkedAt": "2026-11-28T02:44:19.029118+08:00",
+          "asOf": "2026-11-28T02:44:19.029118+08:00"
         }
       }
     }
@@ -220,7 +220,25 @@
       ]
     }
   ],
-  "gog": [],
+  "gog": [
+    {
+      "id": 3860,
+      "title": "Dead Age 2 (GOG) Giveaway",
+      "link": "https://www.gamerpower.com/dead-age-2-gog-giveaway",
+      "platforms": "PC, GOG, DRM-Free",
+      "endDate": "2026-11-30 14:40:09",
+      "worth": "$17.99",
+      "description": "Download Dead Age 2 for free via GOG! Dead Age 2 is a fun indie survival RPG with rogue-like features, fast-paced turn-based combat and survival all in one.",
+      "instructions": "1. Click the \"Go to giveaway\" green button and you will be redirected to the GOG home page\r\n2. Scroll down until you find the game banner.\r\n3. Click the \"Get it Free\" button and login into your GOG account to unlock the game.",
+      "cover": "https://www.gamerpower.com/offers/1b/6b0969de22e37.jpg",
+      "claimChannel": "gogBanner",
+      "freeEndAt": 1796047259000,
+      "storeTitle": "Dead Age 2",
+      "poster": "https://images.gog-statics.com/598e417b19d737ce12af0e2c5136cd420d502d760d3cceac7d2cb71afb4e37c9.jpg",
+      "source": "gamerpower",
+      "offerType": "storeGiveaway"
+    }
+  ],
   "xbox": [
     {
       "id": "9NFZHXPSB473",
@@ -1106,17 +1124,6 @@
       "description": "Mysterious House is free this week on Indiegala! Mysterious House is a indie 2d platformer filled with challenging puzzles and obstacles.",
       "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
       "cover": "https://www.gamerpower.com/offers/1b/68fcca241e9d0.jpg"
-    },
-    {
-      "id": 3860,
-      "title": "Dead Age 2 (GOG) Giveaway",
-      "link": "https://www.gamerpower.com/dead-age-2-gog-giveaway",
-      "platforms": "PC, GOG, DRM-Free",
-      "endDate": "2026-11-30 14:40:09",
-      "worth": "$17.99",
-      "description": "Download Dead Age 2 for free via GOG! Dead Age 2 is a fun indie survival RPG with rogue-like features, fast-paced turn-based combat and survival all in one.",
-      "instructions": "1. Click the \"Go to giveaway\" green button and you will be redirected to the GOG home page\r\n2. Scroll down until you find the game banner.\r\n3. Click the \"Get it Free\" button and login into your GOG account to unlock the game.",
-      "cover": "https://www.gamerpower.com/offers/1b/6b0969de22e37.jpg"
     },
     {
       "id": 3858,
