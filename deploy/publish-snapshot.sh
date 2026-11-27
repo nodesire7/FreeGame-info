@@ -56,6 +56,47 @@ git -C account pull --ff-only --no-rebase origin main
 bash source/deploy/sync-account-pages.sh pending/site account
 push_changes account main
 
+# Pages and CDN propagation is asynchronous. Leave pending intact on timeout.
+python - "$release" <<'PYVERIFY'
+import hashlib
+import sys
+import time
+from pathlib import Path
+from urllib.parse import quote
+from urllib.request import Request, urlopen
+from concurrent.futures import ThreadPoolExecutor
+
+root = Path("pending/site")
+marker = f'<meta name="freegame-build" content="{sys.argv[1]}">'.encode()
+snapshot = "白嫖信息.json"
+digest = hashlib.sha256((root / snapshot).read_bytes()).digest()
+
+def current(base):
+    try:
+        for path in ("", "history/", quote(snapshot)):
+            request = Request(base + path, headers={"User-Agent": "FreeGame-Publisher/1.0"})
+            with urlopen(request, timeout=12) as response:
+                data = response.read()
+            if path == quote(snapshot):
+                if hashlib.sha256(data).digest() != digest:
+                    return False
+            elif marker not in data:
+                return False
+        return True
+    except OSError:
+        return False
+
+hosts = ("https://gameinfo.gbtgame.me/", "https://nodesire7.github.io/")
+with ThreadPoolExecutor(max_workers=2) as pool:
+    for attempt in range(30):
+        if all(list(pool.map(current, hosts))):
+            print("Both public sites verified:", sys.argv[1])
+            break
+        time.sleep(10)
+    else:
+        sys.exit("Waiting for Pages to serve the pushed snapshot")
+PYVERIFY
+
 printf '%s %s\n' "$(cat pending/source-sha)" "$(date +%s)" > last-success.tmp
 mv last-success.tmp last-success
 rm -rf -- pending

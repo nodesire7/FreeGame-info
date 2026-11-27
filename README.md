@@ -2,8 +2,6 @@
 
 追踪游戏限免、会员游戏、跨平台赠送与组合包。
 
-[![Build & Deploy](https://github.com/nodesire7/FreeGame-info/actions/workflows/pages.yml/badge.svg)](https://github.com/nodesire7/FreeGame-info/actions/workflows/pages.yml)
-
 ## 在线站点
 
 **项目站** [gameinfo.gbtgame.me](https://gameinfo.gbtgame.me/) · **账号根站** [nodesire7.github.io](https://nodesire7.github.io/)
@@ -31,8 +29,7 @@
 ### Releases（版本包）
 
 - **定位**：Releases 用于“快速部署”（提供 Docker Compose 等配置），**不是最终生成的页面**
-- **触发时机**：仅在 **合并/推送到 `main`** 时自动创建 Release（`schedule` 自动更新页面 **不会** 生成 Release）
-- **版本号规则**：按顺序自动递增，起始为 **`v1.0`**（后续 `v1.1`、`v1.2`...）
+- 已发布版本的部署包仍可从 Releases 下载。
 - **内容**：Release 附带“全平台通用”的快速部署包
   - `deploy.zip`（Windows 推荐）
   - `deploy.tar.gz`（Linux/macOS 推荐）
@@ -67,7 +64,7 @@ docker compose --env-file env up -d web
 - 📄 **静态 HTML 页面**：美观的单页应用
 - 🖼️ **分享拼图生成**：网页、归档和分享图共用字号、字族和配色；构建端与浏览器使用同一份 Canvas 绘图代码导出 WebP。
 - 🗃️ **历史数据归档（SQLite）**：仅在数据变化时写入 `history/date.db`，图片保存到 `history/records/`
-- 🤖 **GitHub Actions**：自动定时更新并部署到 GitHub Pages
+- **服务器 Docker** 每 3 小时刷新数据，并把同一期静态文件推送到两个 GitHub Pages 发布分支。
 
 ## 本地使用
 
@@ -112,18 +109,15 @@ python render_html.py
 python generate_image.py site/index.html site/history/records/时间戳白嫖信息.webp
 ```
 
-## GitHub Actions 自动化
+## 服务器自动发布
 
-仓库包含定时任务工作流（`.github/workflows/pages.yml`）：
+服务器上常驻的 `freegame-publisher` 容器每 60 秒检查源码分支 `main`。源码变化时立即开始生成，平时每次发布成功后每隔 3 小时刷新数据。容器使用持久卷保留历史、版本和待推送的同一批文件，失败后自动重试。配置见 [服务器 Compose](deploy/compose.publisher.yml)。
 
-- **定时运行**：每 3 小时抓取一次（UTC 时间：0:00、3:00、6:00...）
-- **手动触发**：在 Actions 页面点击 "Run workflow"
-- **双站发布**：先发布项目站，再使用仅授权账号根站仓库的部署密钥（Actions secret `ROOT_PAGES_DEPLOY_KEY`），推送同一份静态产物，并核验两个公网地址。自定义域名配置和第三方域名验证文件属于项目站。
-- **历史归档**：仅在数据变化时写入 SQLite，并生成历史列表页与图片
-- **Release**：仅 `push(main)` 触发，自动创建版本号 Release 并上传 `deploy.zip` / `deploy.tar.gz`
-- **Docker**：仅 `push(main)` 触发，推送镜像到 Docker Hub：`nodesire77/game_info`
+项目站从 `FreeGame-info/gh-pages` 提供服务，账号根站从 `nodesire7.github.io/main` 提供服务。`FreeGame-info/history` 保存 SQLite、快照和海报。三个分支的提交都由服务器推送。两站使用 GitHub Pages 的分支发布功能。
 
-## Docker（自动推送）
+运维目录为 `/opt/freegame-publisher`。`state/` 保存发布进度；`keys/project` 和 `keys/account` 分别对应两个仓库的可写部署密钥；`keys/known_hosts` 用于验证 GitHub 的 SSH 主机；`itad_api_key` 只供容器读取。用 `docker logs --tail 50 freegame-publisher` 查看发布记录。更新 Python 或浏览器依赖时，需同步重建发布容器的运行环境。
+
+## Docker 本地运行
 
 镜像地址：`nodesire77/game_info`
 
@@ -154,14 +148,6 @@ docker run -d --name game_info -p 8080:8080 -v "$(pwd)/data:/data" -e INTERVAL_S
 当前：所有历史快照存储在 SQLite：`history/date.db`（Pages 展示为 `history/date.db`）。
 
 后续可扩展接入（规划）：Redis / MySQL / PostgreSQL（作为历史存储后端）。
-
-### 如何启用
-
-1. Fork 本仓库
-2. 在仓库 Settings → Pages：
-   - Source 选择：**GitHub Actions**
-3. 在 Actions 页面手动触发一次运行
-4. 访问 `https://你的用户名.github.io/FreeGame-info/`
 
 ## 数据源说明
 

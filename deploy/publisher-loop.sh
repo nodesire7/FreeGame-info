@@ -34,7 +34,8 @@ fi
 while true; do
   if git -C source pull --ff-only --quiet origin main; then
     head=$(git -C source rev-parse HEAD)
-    read -r last_head last_epoch < last-success || { last_head=''; last_epoch=0; }
+    last_head=''; last_epoch=0
+    if [[ -s last-success ]]; then read -r last_head last_epoch < last-success; fi
     if [[ -d pending || "$head" != "$last_head" ]] || (( $(date +%s) >= last_epoch + ${FETCH_INTERVAL:-10800} )); then
       if ! bash source/deploy/publish-snapshot.sh; then
         echo "[retry] Publication failed; retrying in ${POLL_INTERVAL:-60}s" >&2
