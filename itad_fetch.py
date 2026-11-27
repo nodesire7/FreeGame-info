@@ -209,6 +209,11 @@ def _format_itad_price(d: Dict[str, Any]) -> str:
     return ""
 
 
+def _store_title(title: str) -> str:
+    # Some catalogs spell a standalone ampersand as "and" (Bread & Fred).
+    return " ".join("and" if word == "&" else word for word in title.casefold().split())
+
+
 def redistribute_itad_deals(
     itad_data: Dict[str, Any],
     epic_data: Optional[Dict[str, Any]] = None,
@@ -236,7 +241,8 @@ def redistribute_itad_deals(
             leftover_deals.append(deal)
             continue
         title = deal["title"]
-        if any(row.get("title", "").strip().casefold() == title.strip().casefold()
+        title_key = _store_title(title)
+        if any(_store_title(row.get("title") or "") == title_key
                and row.get("offerType") != "subscription" for row in target):
             continue
         expiry = deal.get("expiry")

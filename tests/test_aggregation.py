@@ -52,6 +52,14 @@ class AggregationTests(unittest.TestCase):
         self.assertEqual(statuses["bundles"]["state"], "ok")
         self.assertEqual(self.collect(third)["steam"], [])
 
+    def test_matching_store_offer_keeps_official_record_and_separate_editions(self):
+        titles = ["Bread & Fred", "Bread & Fred Deluxe"]
+        deals = [{"title": title, "url": f"https://example.com/{i}", "store": "Epic",
+                  "storeFamily": "epic", "cut": 100} for i, title in enumerate(titles)]
+        result = self.collect({}, epic={"now": [{"title": "Bread and Fred"}], "upcoming": []},
+                              itad={"deals": deals, "bundles": []})
+        self.assertEqual([r["title"] for r in result["epic"]["now"]], ["Bread and Fred", "Bread & Fred Deluxe"])
+
     def test_epic_time_and_itad_bundle_changes(self):
         epic = [{"title": "Game", "status": "ACTIVE", "date": "2026/11/28 12:45:13"}]
         snapshot = self.collect({}, epic=epic)
