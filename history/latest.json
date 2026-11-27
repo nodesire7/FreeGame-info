@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-28T02:13:40.709851+08:00",
+  "fetchedAt": "2026-11-28T02:15:23.667500+08:00",
   "sources": {
     "epic": "https://store.epicgames.com/zh-CN/free-games",
     "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese",
@@ -12,48 +12,48 @@
   "sourceStatus": {
     "epic": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-      "asOf": "2026-11-28T02:13:40.709851+08:00"
+      "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+      "asOf": "2026-11-28T02:15:23.667500+08:00"
     },
     "steam": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-      "asOf": "2026-11-28T02:13:40.709851+08:00"
+      "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+      "asOf": "2026-11-28T02:15:23.667500+08:00"
     },
     "psn": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-      "asOf": "2026-11-28T02:13:40.709851+08:00"
+      "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+      "asOf": "2026-11-28T02:15:23.667500+08:00"
     },
     "gog": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-      "asOf": "2026-11-28T02:13:40.709851+08:00"
+      "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+      "asOf": "2026-11-28T02:15:23.667500+08:00"
     },
     "xbox": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-      "asOf": "2026-11-28T02:13:40.709851+08:00"
+      "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+      "asOf": "2026-11-28T02:15:23.667500+08:00"
     },
     "gamerpower": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-      "asOf": "2026-11-28T02:13:40.709851+08:00"
+      "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+      "asOf": "2026-11-28T02:15:23.667500+08:00"
     },
     "itad": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-      "asOf": "2026-11-28T02:13:40.709851+08:00",
+      "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+      "asOf": "2026-11-28T02:15:23.667500+08:00",
       "components": {
         "deals": {
           "state": "ok",
-          "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-          "asOf": "2026-11-28T02:13:40.709851+08:00"
+          "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+          "asOf": "2026-11-28T02:15:23.667500+08:00"
         },
         "bundles": {
           "state": "ok",
-          "checkedAt": "2026-11-28T02:13:40.709851+08:00",
-          "asOf": "2026-11-28T02:13:40.709851+08:00"
+          "checkedAt": "2026-11-28T02:15:23.667500+08:00",
+          "asOf": "2026-11-28T02:15:23.667500+08:00"
         }
       }
     }
@@ -95,28 +95,6 @@
         "offerType": "giveaway",
         "region": "CN",
         "originalPriceDesc": "19.99 CNY",
-        "isFreeNow": true,
-        "freeStartAt": null,
-        "publisher": "",
-        "creator": ""
-      },
-      {
-        "id": "018d937f-4f22-70b0-ad8a-16e6fc31ab04",
-        "title": "Bread & Fred",
-        "link": "https://itad.link/0196fd3b-a651-723a-bc51-dd083f5df149/?app=1rl7p4",
-        "cover": "https://assets.isthereanydeal.com/018d937f-4f22-70b0-ad8a-16e6fc31ab04/banner600.jpg?t=1786148523",
-        "originalPrice": "47 CNY",
-        "price": "免费",
-        "description": "Epic Game Store 限时免费",
-        "platforms": [],
-        "freeEndAt": 1796313600000,
-        "expiry": 1796313600,
-        "status": "ACTIVE",
-        "date": "",
-        "source": "itad",
-        "offerType": "giveaway",
-        "region": "CN",
-        "originalPriceDesc": "47 CNY",
         "isFreeNow": true,
         "freeStartAt": null,
         "publisher": "",
