@@ -739,7 +739,7 @@ footer a {
                         </script></div></main>
 <footer class="wrap"><span>GBTGAME</span><a href="https://github.com/nodesire7/">Nodesire7</a><a href="mailto:amocnfk@gmail.com">联系作者</a><a href="https://github.com/nodesire7/FreeGame-info">项目仓库</a>{{ARCHIVE_LINKS}}</footer>
 <script type="application/json" id="share-payload">{{SHARE_DATA_JSON}}</script>
-<script>{{CLIENT_SCRIPT}}</script><script>
+<script data-cfasync="false">{{CLIENT_SCRIPT}}</script><script>
     (function(byra){
     var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
     s.settings = byra || {}; s.src = "\/\/baggymaintenance.com\/c_D.9v6Zba2\/5GlWSRWWQE9wN\/jXke0POkT\/kAwiMuSa0v2cOBTWQT5VORTeAY1B";

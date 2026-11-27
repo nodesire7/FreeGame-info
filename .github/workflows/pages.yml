@@ -76,9 +76,19 @@ jobs:
           python main.py site --history-dir history-wt/history
           touch site/.nojekyll
 
-      - name: Generate ads.txt and CNAME
+      - name: Prepare public files and mark the release
         run: |
           cp ads.txt site/ads.txt
+          python3 - <<'PYMARK'
+          import os
+          from pathlib import Path
+          release = f"{os.environ['GITHUB_RUN_ID']}-{os.environ['GITHUB_RUN_ATTEMPT']}"
+          tag = f'<meta name="freegame-build" content="{release}">'
+          for page in (Path("site/index.html"), Path("site/history/index.html")):
+              html = page.read_text(encoding="utf-8")
+              assert html.count("</head>") == 1
+              page.write_text(html.replace("</head>", tag + "</head>"), encoding="utf-8")
+          PYMARK
           echo "gameinfo.gbtgame.me" > site/CNAME
 
       - name: Persist history store (only when changed)
@@ -134,15 +144,22 @@ jobs:
         if: github.repository == 'nodesire7/FreeGame-info'
         shell: bash
         run: |
-          query="build=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          release="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          marker="<meta name=\"freegame-build\" content=\"$release\">"
           snapshot='%E7%99%BD%E5%AB%96%E4%BF%A1%E6%81%AF.json'
           matches() {
-            curl -fsSL --connect-timeout 5 --max-time 15 "$1?$query" -o "$RUNNER_TEMP/pages-check" &&
+            curl -fsSL --connect-timeout 5 --max-time 15 "$1" -o "$RUNNER_TEMP/pages-check" &&
               cmp -s "$RUNNER_TEMP/pages-check" "$2"
+          }
+          has_release_marker() {
+            curl -fsSL --connect-timeout 5 --max-time 15 "$1" -o "$RUNNER_TEMP/pages-check" &&
+              grep -Fq "$marker" "$RUNNER_TEMP/pages-check"
           }
           for attempt in {1..36}; do
             if matches "https://nodesire7.github.io/" account-pages/index.html &&
                matches "https://nodesire7.github.io/$snapshot" 'site/白嫖信息.json' &&
+               has_release_marker "https://gameinfo.gbtgame.me/" &&
+               has_release_marker "https://gameinfo.gbtgame.me/history/" &&
                matches "https://gameinfo.gbtgame.me/$snapshot" 'site/白嫖信息.json'; then
               echo "Both public sites serve the new build."
               exit 0
