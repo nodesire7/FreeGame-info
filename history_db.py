@@ -42,7 +42,7 @@ def open_db(history_dir: Path) -> sqlite3.Connection:
 def get_latest_meta(conn: sqlite3.Connection) -> Tuple[Optional[str], Optional[str]]:
     """返回 (latest_hash, latest_ts)"""
     row = conn.execute(
-        "SELECT hash, ts FROM records ORDER BY id DESC LIMIT 1"
+        "SELECT hash, ts FROM records ORDER BY ts DESC LIMIT 1"
     ).fetchone()
     if not row:
         return None, None
@@ -52,7 +52,7 @@ def get_latest_meta(conn: sqlite3.Connection) -> Tuple[Optional[str], Optional[s
 def get_latest_image_rel(conn: sqlite3.Connection) -> Optional[str]:
     """返回最新一条记录的归档图片路径"""
     row = conn.execute(
-        "SELECT image FROM records ORDER BY id DESC LIMIT 1"
+        "SELECT image FROM records ORDER BY ts DESC LIMIT 1"
     ).fetchone()
     return row[0] if row else None
 
@@ -76,7 +76,7 @@ def insert_record(
 
 def list_snapshots(conn: sqlite3.Connection, *, limit: int = 60, with_images: bool = False) -> List[Dict[str, Any]]:
     rows = conn.execute(
-        "SELECT snapshot, image FROM records ORDER BY id DESC LIMIT ?",
+        "SELECT snapshot, image FROM records ORDER BY ts DESC LIMIT ?",
         (limit,),
     ).fetchall()
     snapshots: List[Dict[str, Any]] = []
@@ -94,7 +94,7 @@ def list_snapshots(conn: sqlite3.Connection, *, limit: int = 60, with_images: bo
 def list_records(conn: sqlite3.Connection, *, limit: int = 200) -> List[Dict[str, Any]]:
     """供页面/调试使用，返回不含 snapshot 大字段的元信息列表。"""
     rows = conn.execute(
-        "SELECT ts, fetched_at, hash, image FROM records ORDER BY id DESC LIMIT ?",
+        "SELECT ts, fetched_at, hash, image FROM records ORDER BY ts DESC LIMIT ?",
         (limit,),
     ).fetchall()
     return [

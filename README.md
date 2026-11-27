@@ -10,18 +10,18 @@
 
 ### 历史数据访问（SQLite）
 
-只有当本次抓取结果与上次不同，才会新增一条历史记录。
+活动新增、下架，或价格、领取条件、期限等内容变化时才归档。刷新时间、来源检查状态、封面和活动排序变化不会单独触发归档。所有历史快照按时间倒序展示，每页 5 期。
 
-- **历史列表页面**: `https://nodesire7.github.io/FreeGame-info/history/`
-- **历史数据库（SQLite）**: `https://nodesire7.github.io/FreeGame-info/history/date.db`
-- **历史图片**: `https://nodesire7.github.io/FreeGame-info/history/records/{时间戳}白嫖信息.webp`
+- **历史列表页面**: `https://gameinfo.gbtgame.me/history/`
+- **历史数据库（SQLite）**: `https://gameinfo.gbtgame.me/history/date.db`
+- **历史图片**: `https://gameinfo.gbtgame.me/history/records/{时间戳}白嫖信息.webp`
 - **本次快照 JSON（始终为最新一次抓取结果）**: `https://nodesire7.github.io/FreeGame-info/白嫖信息.json`
 
 时间戳格式：`YYYYMMDDHHmmss`（例如：`20251214202455`）
 
 **示例**：
-- 数据库: https://nodesire7.github.io/FreeGame-info/history/date.db
-- 图片: https://nodesire7.github.io/FreeGame-info/history/records/20251214202455白嫖信息.webp
+- 数据库: https://gameinfo.gbtgame.me/history/date.db
+- 图片: https://gameinfo.gbtgame.me/history/records/20251214202455白嫖信息.webp
 - 本次快照: https://nodesire7.github.io/FreeGame-info/白嫖信息.json
 
 > 💡 提示：在主页底部可以找到“历史记录”入口与“最新归档”链接。

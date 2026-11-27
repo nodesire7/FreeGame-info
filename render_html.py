@@ -737,7 +737,30 @@ def _extract_style_block(template: str) -> str:
     return m.group(0) if m else "<style></style>"
 
 
-def render_history_page(records: list[dict[str, Any]], *, template_path: str, base_title: str = "历史记录 | 白嫖游戏信息") -> str:
+def archive_pager(page, pages):
+    if pages <= 1:
+        return ""
+    def href(n):
+        return "./" if n == 1 else f"page-{n}.html"
+    links = []
+    if page > 1:
+        links.append(f'<a rel="prev" href="{href(page - 1)}">上一页</a>')
+    previous = 0
+    for n in sorted({1, pages, page, max(1, page - 1), min(pages, page + 1)}):
+        if n > previous + 1:
+            links.append('<span aria-hidden="true">…</span>')
+        if n == page:
+            links.append(f'<span aria-current="page" aria-label="第 {n} 页">{n}</span>')
+        else:
+            links.append(f'<a href="{href(n)}" aria-label="第 {n} 页">{n}</a>')
+        previous = n
+    if page < pages:
+        links.append(f'<a rel="next" href="{href(page + 1)}">下一页</a>')
+    return '<nav class="archive-pager" aria-label="归档分页">' + "".join(links) + '</nav>'
+
+
+def render_history_page(records: list[dict[str, Any]], *, template_path: str, base_title: str = "历史记录 | 白嫖游戏信息",
+                        page: int = 1, pages: int = 1, total: int | None = None) -> str:
     template = Path(template_path).read_text(encoding="utf-8")
     style = _extract_style_block(template)
     blocks = []
@@ -755,6 +778,10 @@ def render_history_page(records: list[dict[str, Any]], *, template_path: str, ba
                 blocks.append(render_group(group, items, group_status, archived=True))
             blocks.append('</section>')
         blocks.append('</details>')
+    total = len(records) if total is None else total
+    pager = archive_pager(page, pages)
+    if pages > 1:
+        base_title += f" · 第 {page} 页"
     detail = "".join(blocks) or '<p class="empty">暂无历史记录。</p>'
     return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{escape_html(base_title)}</title><link rel="icon" href="../logo.png"><link rel="alternate" type="application/rss+xml" href="../feed.xml">
@@ -762,7 +789,7 @@ def render_history_page(records: list[dict[str, Any]], *, template_path: str, ba
     <body><header class="top"><div class="wrap"><a class="brand" href="../"><img width="28" height="28" src="../logo.png" alt="">GBTGAME</a>
     <nav aria-label="站点导航"><a href="../">活动速报</a><a aria-current="page" href="./">历史归档</a><a href="../feed.xml">RSS 订阅</a></nav></div></header>
     <main class="wrap archive"><div class="mast"><div><h1>历史归档</h1><p>展开抓取记录，查看当时收录的活动、价格与领取期限。</p></div>{render_reader_qr()}</div>
-    <div class="archive-heading"><h2>按时间浏览</h2><span>最近 {len(records)} 条记录・北京时间</span></div>{detail}</main>
+    <div class="archive-heading"><h2>按时间浏览</h2><span>共 {total} 期 · 第 {page}/{pages} 页 · 北京时间</span></div>{pager}{detail}{pager}</main>
     <footer class="wrap"><a href="../">返回活动速报</a><a href="date.db">下载历史数据库</a></footer></body></html>"""
 
 

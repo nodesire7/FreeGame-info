@@ -505,6 +505,9 @@ footer a {
     max-width:1000px;
 }
 
+.archive-pager { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-1); margin:var(--space-4) 0; }
+.archive-pager a, .archive-pager [aria-current] { padding:5px 10px; border-radius:5px; }
+.archive-pager [aria-current] { background:#e4edf8; color:var(--ink); font-weight:700; }
 .archive-download { margin:var(--space-3) var(--space-4) var(--space-6); }
 
 .archive-heading {

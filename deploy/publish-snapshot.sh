@@ -20,7 +20,7 @@ if [[ ! -d pending ]]; then
 from pathlib import Path
 import sys
 root = Path(sys.argv[1])
-for path in [root / "index.html", root / "history/index.html"]:
+for path in [root / "index.html", root / "history/index.html", *(root / "history").glob("page-*.html")]:
     html = path.read_text()
     if html.count("</head>") != 1:
         raise ValueError(f"Invalid page: {path}")

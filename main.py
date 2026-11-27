@@ -8,6 +8,7 @@ import json
 import os
 import re
 import shutil
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from email.utils import format_datetime as format_rss_date
 from xml.etree import ElementTree as ET
 from argparse import ArgumentParser
@@ -23,8 +24,8 @@ from itad_fetch import fetch_itad, redistribute_itad_deals
 from gog_fetch import fetch_gog
 from xbox_fetch import fetch_xbox
 from gamerpower_fetch import fetch_gamerpower, giveaway_stores, gog_store_giveaway
-from render_html import render_html, render_history_page, convert_epic_new_format
-from history_db import open_db, get_latest_meta, get_latest_image_rel, insert_record, list_snapshots
+from render_html import offer_groups, render_html, render_history_page, convert_epic_new_format
+from history_db import open_db, get_latest_image_rel, insert_record, list_snapshots
 
 
 PRIMARY_PLATFORMS = ("epic", "steam", "psn", "gog", "xbox", "gamerpower")
@@ -202,34 +203,86 @@ def _timestamp_cn() -> str:
 
 
 def _canonicalize_for_hash(snapshot: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    用于"是否变更"的去重：只保留决定性字段，避免 fetchedAt/描述变动导致重复记录。
-    """
-    def pick(items, fields):
-        entries = [{field: item[field] for field in fields if field in item} for item in items]
-        return sorted(entries, key=lambda row: json.dumps(row, ensure_ascii=False, sort_keys=True))
+    """比较活动本身。抓取时间、来源检查状态、素材和展示次序均不参与比较。"""
+    fields = ("id", "title", "storeTitle", "store", "link", "url", "claimUrl", "claimChannel",
+              "region", "offerType", "status", "isFreeNow", "isPending", "isMature",
+              "freeStartAt", "freeEndAt", "expiry", "endDate", "date", "period",
+              "originalPrice", "originalPriceDesc", "regularPrice", "regularCurrency", "price", "priceCurrency",
+              "finalPrice", "currency", "worth", "cut", "discountText", "voucher",
+              "gameCount", "platforms", "drm", "instructions", "description", "shortDescription", "details")
 
-    platform_fields = ("id", "title", "link", "expiry", "freeStartAt", "freeEndAt", "endDate", "date",
-                       "offerType", "status", "isFreeNow", "discountText", "finalPrice", "worth", "platforms")
-    epic = snapshot.get("epic") or {"now": [], "upcoming": []}
-    if isinstance(epic, list):
-        epic = _epic_groups(epic)
-    itad_fields = ("id", "title", "url", "expiry", "store", "cut", "price", "gameCount", "isPending")
-    itad = _itad_parts(snapshot.get("itad") or [])
-    result = {
-        "epic": {group: pick(epic.get(group) or [], platform_fields) for group in ("now", "upcoming")},
-        "itad": {part: pick(rows, itad_fields) for part, rows in itad.items()},
-    }
-    for key in PRIMARY_PLATFORMS:
-        if key != "epic":
-            result[key] = pick(snapshot.get(key) or [], platform_fields)
-    return result
+    def normalize_url(value):
+        url = urlsplit(value)
+        tracking = {"snr", "gclid", "fbclid", "mc_cid", "mc_eid"}
+        if url.hostname == "itad.link":
+            tracking.add("app")
+        query = [(k, v) for k, v in parse_qsl(url.query, keep_blank_values=True)
+                 if not k.lower().startswith("utm_") and k.lower() not in tracking]
+        return urlunsplit((url.scheme, url.netloc, url.path, urlencode(sorted(query)), url.fragment))
+
+    def offer_key(game, group):
+        row = {}
+        for field in fields:
+            value = game.get(field)
+            if value is None or value == "" or value == []:
+                continue
+            if isinstance(value, str):
+                value = " ".join(value.split())
+                if value.startswith(("https://", "http://")):
+                    value = normalize_url(value)
+            if field == "platforms" and isinstance(value, str):
+                value = [part.strip() for part in value.split(",") if part.strip()]
+            if field in ("platforms", "drm") and isinstance(value, list):
+                value = sorted(value, key=str)
+            row[field] = value
+        if group.endswith("_external"):
+            row["offerType"] = "externalGiveaway"
+        return json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+    return {group: sorted(offer_key(game, group) for game in games)
+            for sections in offer_groups(snapshot).values() for group, games in sections if games}
 
 
 def _snapshot_hash(snapshot: Dict[str, Any]) -> str:
     canon = _canonicalize_for_hash(snapshot)
     raw = json.dumps(canon, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def archive_if_changed(conn, snapshot):
+    current_hash = _snapshot_hash(snapshot)
+    with conn:
+        conn.execute("BEGIN IMMEDIATE")
+        last = conn.execute("SELECT ts, hash, snapshot FROM records ORDER BY ts DESC LIMIT 1").fetchone()
+        if last and (last[1] == current_hash or _snapshot_hash(json.loads(last[2])) == current_hash):
+            return last[0], False
+        ts = _timestamp_cn()
+        if conn.execute("SELECT 1 FROM records WHERE ts = ?", (ts,)).fetchone():
+            ts = datetime.now(_china_tz()).strftime("%Y%m%d%H%M%S%f")
+        insert_record(conn, ts=ts, fetched_at=snapshot.get("fetchedAt"), hash_value=current_hash,
+                      snapshot=snapshot, image_rel=None)
+        return ts, True
+
+
+ARCHIVES_PER_PAGE = 5
+
+
+def write_history_pages(conn, directory, template_path):
+    directory.mkdir(parents=True, exist_ok=True)
+    total, = conn.execute("SELECT count(*) FROM records").fetchone()
+    pages = max(1, (total + ARCHIVES_PER_PAGE - 1) // ARCHIVES_PER_PAGE)
+    rows = conn.execute("SELECT snapshot, image FROM records ORDER BY ts DESC")
+    for page in range(1, pages + 1):
+        snapshots = [dict(json.loads(raw), archiveImage=image)
+                     for raw, image in rows.fetchmany(ARCHIVES_PER_PAGE)]
+        name = "index.html" if page == 1 else f"page-{page}.html"
+        html = render_history_page(snapshots, template_path=template_path, page=page,
+                                   pages=pages, total=total)
+        (directory / name).write_text(html, encoding="utf-8")
+    for path in directory.glob("page-*.html"):
+        match = re.fullmatch(r"page-(\d+)\.html", path.name)
+        if match and int(match[1]) > pages:
+            path.unlink()
 
 
 def _ensure_dir(p: Path) -> None:
@@ -365,17 +418,9 @@ def main() -> Tuple[Optional[str], Optional[str]]:
         print(f"验证文件已复制到 {txt_dest}")
 
     # === 历史去重（SQLite）：仅当本次与上次不同才新增记录 ===
-    current_hash = _snapshot_hash(snapshot)
-    last_hash, latest_ts = get_latest_meta(conn)
-
+    latest_ts, created = archive_if_changed(conn, snapshot)
     template_path = "epic-freebies.html.template"
     html_output_path = os.path.join(output_dir, "index.html")
-
-    created = current_hash != last_hash
-    if created:
-        latest_ts = _timestamp_cn()
-        insert_record(conn, ts=latest_ts, fetched_at=snapshot.get("fetchedAt"), hash_value=current_hash,
-                      snapshot=snapshot, image_rel=None)
 
     # 每个快照只渲染一次新版海报。旧图片保留原链接，导出失败会在下次更新时重试。
     from generate_image import generate_share_screenshot
@@ -395,15 +440,7 @@ def main() -> Tuple[Optional[str], Optional[str]]:
     Path(html_output_path).write_text(html_content, encoding="utf-8")
 
     # === 生成历史页面（渲染为卡片样式）===
-    snapshots: List[Dict[str, Any]] = list_snapshots(conn, limit=60, with_images=True)
-
-    history_page_dir = site_dir / "history"
-    _ensure_dir(history_page_dir)
-    history_index = history_page_dir / "index.html"
-    history_index.write_text(
-        render_history_page(snapshots, template_path="epic-freebies.html.template"),
-        encoding="utf-8",
-    )
+    write_history_pages(conn, site_dir / "history", template_path)
 
     # === 生成 RSS Feed ===
     generate_feed(snapshot, output_dir)
