@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-28T02:05:08.014579+08:00",
+  "fetchedAt": "2026-11-28T02:07:59.054173+08:00",
   "sources": {
     "epic": "https://store.epicgames.com/zh-CN/free-games",
     "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese",
@@ -10,52 +10,52 @@
     "gamerpower": "https://www.gamerpower.com/giveaways"
   },
   "sourceStatus": {
-    "itad": {
-      "state": "unavailable",
-      "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-      "asOf": null,
-      "components": {
-        "deals": {
-          "state": "unavailable",
-          "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-          "asOf": null
-        },
-        "bundles": {
-          "state": "ok",
-          "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-          "asOf": "2026-11-28T02:05:08.014579+08:00"
-        }
-      }
-    },
     "epic": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-      "asOf": "2026-11-28T02:05:08.014579+08:00"
+      "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+      "asOf": "2026-11-28T02:07:59.054173+08:00"
     },
     "steam": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-      "asOf": "2026-11-28T02:05:08.014579+08:00"
+      "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+      "asOf": "2026-11-28T02:07:59.054173+08:00"
     },
     "psn": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-      "asOf": "2026-11-28T02:05:08.014579+08:00"
+      "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+      "asOf": "2026-11-28T02:07:59.054173+08:00"
     },
     "gog": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-      "asOf": "2026-11-28T02:05:08.014579+08:00"
+      "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+      "asOf": "2026-11-28T02:07:59.054173+08:00"
     },
     "xbox": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-      "asOf": "2026-11-28T02:05:08.014579+08:00"
+      "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+      "asOf": "2026-11-28T02:07:59.054173+08:00"
     },
     "gamerpower": {
       "state": "ok",
-      "checkedAt": "2026-11-28T02:05:08.014579+08:00",
-      "asOf": "2026-11-28T02:05:08.014579+08:00"
+      "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+      "asOf": "2026-11-28T02:07:59.054173+08:00"
+    },
+    "itad": {
+      "state": "ok",
+      "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+      "asOf": "2026-11-28T02:07:59.054173+08:00",
+      "components": {
+        "deals": {
+          "state": "ok",
+          "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+          "asOf": "2026-11-28T02:07:59.054173+08:00"
+        },
+        "bundles": {
+          "state": "ok",
+          "checkedAt": "2026-11-28T02:07:59.054173+08:00",
+          "asOf": "2026-11-28T02:07:59.054173+08:00"
+        }
+      }
     }
   },
   "epic": {
@@ -77,6 +77,50 @@
         "cover": "https://cdn1.epicgames.com/spt-assets/545b4dd8bb364c12b719268198a93ef3/bread-and-fred-3jnwn.jpg",
         "originalPriceDesc": "47.00",
         "isFreeNow": true
+      },
+      {
+        "id": "019f62ea-4de4-734f-ac26-d94cb55fef39",
+        "title": "Contractor: The Clean Up Part II",
+        "link": "https://itad.link/019f62ea-4dd6-715c-ba5c-17520a280a59/?app=1rl7p4",
+        "cover": "https://assets.isthereanydeal.com/019f62ea-4de4-734f-ac26-d94cb55fef39/banner600.png?t=1784223611",
+        "originalPrice": "19.99 CNY",
+        "price": "免费",
+        "description": "Epic Game Store 限时免费",
+        "platforms": [],
+        "freeEndAt": 1796205600000,
+        "expiry": 1796205600,
+        "status": "ACTIVE",
+        "date": "",
+        "source": "itad",
+        "offerType": "giveaway",
+        "region": "CN",
+        "originalPriceDesc": "19.99 CNY",
+        "isFreeNow": true,
+        "freeStartAt": null,
+        "publisher": "",
+        "creator": ""
+      },
+      {
+        "id": "018d937f-4f22-70b0-ad8a-16e6fc31ab04",
+        "title": "Bread & Fred",
+        "link": "https://itad.link/0196fd3b-a651-723a-bc51-dd083f5df149/?app=1rl7p4",
+        "cover": "https://assets.isthereanydeal.com/018d937f-4f22-70b0-ad8a-16e6fc31ab04/banner600.jpg?t=1786148523",
+        "originalPrice": "47 CNY",
+        "price": "免费",
+        "description": "Epic Game Store 限时免费",
+        "platforms": [],
+        "freeEndAt": 1796313600000,
+        "expiry": 1796313600,
+        "status": "ACTIVE",
+        "date": "",
+        "source": "itad",
+        "offerType": "giveaway",
+        "region": "CN",
+        "originalPriceDesc": "47 CNY",
+        "isFreeNow": true,
+        "freeStartAt": null,
+        "publisher": "",
+        "creator": ""
       }
     ],
     "upcoming": [
@@ -1019,6 +1063,31 @@
       "region": "HK",
       "status": "ACTIVE",
       "source": "xbox"
+    },
+    {
+      "id": "01a187ad-2374-72d9-9769-d98c525b3eee",
+      "title": "TrayCade",
+      "link": "https://itad.link/01a187ad-2368-72dd-afc8-0c82c317116b/?app=1rl7p4",
+      "cover": "",
+      "originalPrice": "49 CNY",
+      "price": "免费",
+      "description": "Microsoft Store 限时免费",
+      "platforms": [
+        "Windows"
+      ],
+      "freeEndAt": null,
+      "expiry": null,
+      "status": "ACTIVE",
+      "date": "",
+      "source": "itad",
+      "offerType": "giveaway",
+      "region": "CN",
+      "platform": "Microsoft Store",
+      "publisher": "",
+      "releaseDate": "",
+      "genres": [],
+      "features": [],
+      "languages": ""
     }
   ],
   "gamerpower": [
@@ -1200,6 +1269,27 @@
     }
   ],
   "itad": [
+    {
+      "id": "019f3ec2-a4cc-70a8-b0a5-9106b68daadc",
+      "plain": "stellar-end-demo-version",
+      "title": "Stellar End Demo Version",
+      "store": "Humble Store",
+      "cut": 100,
+      "price": 0,
+      "priceCurrency": "CNY",
+      "regularPrice": 0.07,
+      "regularCurrency": "CNY",
+      "url": "https://itad.link/019f3ec2-a4c2-70e8-b4df-1231a2b9a417/?app=1rl7p4",
+      "voucher": null,
+      "platforms": [
+        "Windows"
+      ],
+      "cover": "",
+      "expiry": null,
+      "storeFamily": "humble",
+      "offerType": "giveaway",
+      "region": "CN"
+    },
     {
       "title": "Holiday Encore 2026: Arc Systems Works: Evo Collection",
       "store": "Humble Bundle",
