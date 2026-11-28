@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-28T15:30:40.313141+08:00",
+  "fetchedAt": "2026-11-28T18:31:44.481207+08:00",
   "sources": {
     "epic": "https://store.epicgames.com/zh-CN/free-games",
     "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese",
@@ -12,48 +12,48 @@
   "sourceStatus": {
     "epic": {
       "state": "ok",
-      "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-      "asOf": "2026-11-28T15:30:40.313141+08:00"
+      "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+      "asOf": "2026-11-28T18:31:44.481207+08:00"
     },
     "steam": {
       "state": "ok",
-      "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-      "asOf": "2026-11-28T15:30:40.313141+08:00"
+      "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+      "asOf": "2026-11-28T18:31:44.481207+08:00"
     },
     "psn": {
       "state": "ok",
-      "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-      "asOf": "2026-11-28T15:30:40.313141+08:00"
+      "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+      "asOf": "2026-11-28T18:31:44.481207+08:00"
     },
     "gog": {
       "state": "ok",
-      "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-      "asOf": "2026-11-28T15:30:40.313141+08:00"
+      "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+      "asOf": "2026-11-28T18:31:44.481207+08:00"
     },
     "xbox": {
       "state": "ok",
-      "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-      "asOf": "2026-11-28T15:30:40.313141+08:00"
+      "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+      "asOf": "2026-11-28T18:31:44.481207+08:00"
     },
     "gamerpower": {
       "state": "ok",
-      "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-      "asOf": "2026-11-28T15:30:40.313141+08:00"
+      "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+      "asOf": "2026-11-28T18:31:44.481207+08:00"
     },
     "itad": {
       "state": "ok",
-      "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-      "asOf": "2026-11-28T15:30:40.313141+08:00",
+      "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+      "asOf": "2026-11-28T18:31:44.481207+08:00",
       "components": {
         "deals": {
           "state": "ok",
-          "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-          "asOf": "2026-11-28T15:30:40.313141+08:00"
+          "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+          "asOf": "2026-11-28T18:31:44.481207+08:00"
         },
         "bundles": {
           "state": "ok",
-          "checkedAt": "2026-11-28T15:30:40.313141+08:00",
-          "asOf": "2026-11-28T15:30:40.313141+08:00"
+          "checkedAt": "2026-11-28T18:31:44.481207+08:00",
+          "asOf": "2026-11-28T18:31:44.481207+08:00"
         }
       }
     }
@@ -1031,28 +1031,6 @@
         "Shooter",
         "Action & adventure"
       ],
-      "features": [],
-      "platforms": [
-        "Xbox"
-      ],
-      "offerType": "subscription",
-      "region": "HK",
-      "status": "ACTIVE",
-      "source": "xbox"
-    },
-    {
-      "id": "9PM3J18QM4Q3",
-      "title": "Minecraft Dungeons II",
-      "link": "https://www.xbox.com/zh-HK/games/store/-/9PM3J18QM4Q3",
-      "cover": "https://store-images.s-microsoft.com/image/apps.26573.14305479850136392.1d44bfb9-b43e-4fae-a421-d6f972529d66.fd3f91b2-3de0-4920-a853-4f5725b2495f",
-      "publisher": "Xbox Game Studios",
-      "releaseDate": "",
-      "date": "",
-      "description": "《Minecraft Dungeons》的全新篇章將於 2026 年秋季揭幕！ 一股全新威脅正蠢蠢欲動，準備降臨這片大地與其居民之上，掀起難以言喻的浩劫。 化身英雄，迎戰前所未見的強敵，踏上塵封已久的古老之地，再次與邪惡勢力正面交鋒！ ",
-      "price": "Game Pass Ultimate 会员可玩",
-      "originalPrice": "",
-      "platform": "Xbox Game Pass",
-      "genres": [],
       "features": [],
       "platforms": [
         "Xbox"
