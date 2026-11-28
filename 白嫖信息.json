@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-28T06:27:15.556026+08:00",
+  "fetchedAt": "2026-11-28T09:28:22.098550+08:00",
   "sources": {
     "epic": "https://store.epicgames.com/zh-CN/free-games",
     "steam": "https://store.steampowered.com/search/?maxprice=free&specials=1&ndl=1&cc=cn&l=schinese",
@@ -12,48 +12,48 @@
   "sourceStatus": {
     "epic": {
       "state": "ok",
-      "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-      "asOf": "2026-11-28T06:27:15.556026+08:00"
+      "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+      "asOf": "2026-11-28T09:28:22.098550+08:00"
     },
     "steam": {
       "state": "ok",
-      "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-      "asOf": "2026-11-28T06:27:15.556026+08:00"
+      "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+      "asOf": "2026-11-28T09:28:22.098550+08:00"
     },
     "psn": {
       "state": "ok",
-      "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-      "asOf": "2026-11-28T06:27:15.556026+08:00"
+      "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+      "asOf": "2026-11-28T09:28:22.098550+08:00"
     },
     "gog": {
       "state": "ok",
-      "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-      "asOf": "2026-11-28T06:27:15.556026+08:00"
+      "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+      "asOf": "2026-11-28T09:28:22.098550+08:00"
     },
     "xbox": {
       "state": "ok",
-      "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-      "asOf": "2026-11-28T06:27:15.556026+08:00"
+      "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+      "asOf": "2026-11-28T09:28:22.098550+08:00"
     },
     "gamerpower": {
       "state": "ok",
-      "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-      "asOf": "2026-11-28T06:27:15.556026+08:00"
+      "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+      "asOf": "2026-11-28T09:28:22.098550+08:00"
     },
     "itad": {
       "state": "ok",
-      "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-      "asOf": "2026-11-28T06:27:15.556026+08:00",
+      "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+      "asOf": "2026-11-28T09:28:22.098550+08:00",
       "components": {
         "deals": {
           "state": "ok",
-          "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-          "asOf": "2026-11-28T06:27:15.556026+08:00"
+          "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+          "asOf": "2026-11-28T09:28:22.098550+08:00"
         },
         "bundles": {
           "state": "ok",
-          "checkedAt": "2026-11-28T06:27:15.556026+08:00",
-          "asOf": "2026-11-28T06:27:15.556026+08:00"
+          "checkedAt": "2026-11-28T09:28:22.098550+08:00",
+          "asOf": "2026-11-28T09:28:22.098550+08:00"
         }
       }
     }
@@ -1115,6 +1115,39 @@
   ],
   "gamerpower": [
     {
+      "id": 3863,
+      "title": "Lonely in the Winter (itch.io) Giveaway",
+      "link": "https://www.gamerpower.com/lonely-in-the-winter-itch-io-giveaway",
+      "platforms": "PC, Itch.io, DRM-Free",
+      "endDate": "2026-12-06 23:59:00",
+      "worth": "$2.99",
+      "description": "Claim Lonely in the Winter for free via itch.io! Lonely in the Winter is a small 2d rpg game with casual gameplay.",
+      "instructions": "1. Click the \"Get Giveaway\" button to visit the giveaway page.\r\n2. Click the button \"Download or Claim\" before the offer expires.\r\n3. Login into your itch.io account to access the game.",
+      "cover": "https://www.gamerpower.com/offers/1b/6b0a113ba497d.jpg"
+    },
+    {
+      "id": 3862,
+      "title": "Ba Bị (itch.io) Giveaway",
+      "link": "https://www.gamerpower.com/n-a",
+      "platforms": "PC, Itch.io",
+      "endDate": "2026-12-04 23:59:00",
+      "worth": "$4.99",
+      "description": "Download Ba Bị for free on itch.io! Ba Bị 3D is a puzzle game based on Vietnamese folklore.",
+      "instructions": "1. Click the \"Get Giveaway\" button to visit the giveaway page.\r\n2. Click the button \"Download or Claim\" before the offer expires.\r\n3. Login into your itch.io account to access the game.",
+      "cover": "https://www.gamerpower.com/offers/1b/6b0a1024d09c7.jpg"
+    },
+    {
+      "id": 3861,
+      "title": "Rulebound (itch.io) Giveaway",
+      "link": "https://www.gamerpower.com/rulebound-itch-io-giveaway",
+      "platforms": "PC, Itch.io",
+      "endDate": "2026-12-31 23:59:00",
+      "worth": "$6.99",
+      "description": "Score Rulebound for free via itch.io! Rulebound is a 3d surreal incremental game where survival depends on split attention.",
+      "instructions": "1. Click the \"Get Giveaway\" button to visit the giveaway page.\r\n2. Click the button \"Download or Claim\" before the offer expires.\r\n3. Login into your itch.io account to access the game.",
+      "cover": "https://www.gamerpower.com/offers/1b/6b0a0de4276dc.jpg"
+    },
+    {
       "id": 3334,
       "title": "Mysterious House (IndieGala) Giveaway",
       "link": "https://www.gamerpower.com/mysterious-house-pc-giveaway",
@@ -1223,6 +1256,28 @@
       "description": "Time to put your reflexes to the test! Download Leaper for free on IndieGala! Leaper is a 2d side-scrolling platformer with colorful pixel graphics and precise jumping mechanics. Check it out!",
       "instructions": "1. Click the button to visit the giveaway page.\r\n2. Login into your free IndieGala account.\r\n3. Scroll down and click the \"Add to Your Library\" button to add the game to your library.\r\n4. Go to \"My Library\" to find your game.",
       "cover": "https://www.gamerpower.com/offers/1b/68e6513c31514.jpg"
+    },
+    {
+      "id": 2478,
+      "title": "Boots Quest DX (itch.io) Giveaway",
+      "link": "https://www.gamerpower.com/boots-quest-dx-itch-io-giveaway",
+      "platforms": "PC, Itch.io",
+      "endDate": "2026-11-30 23:59:59",
+      "worth": "$9.99",
+      "description": "Download Boots Quest DX for free on itch.io! Boots Quest DX is a small adventure game with lots of puzzles and items to collect!",
+      "instructions": "1. Click the button to visit the giveaway page.\r\n2. Download directly via itch.io before the offer expires.\r\n3. It´s that easy! Enjoy the game!",
+      "cover": "https://www.gamerpower.com/offers/1b/64cd77c7ac5fe.jpg"
+    },
+    {
+      "id": 2109,
+      "title": "Tim-Tim 2: The Almighty Gnome (itch.io) Giveaway",
+      "link": "https://www.gamerpower.com/tim-tim-2-the-almighty-gnome-itch-io-giveaway",
+      "platforms": "PC",
+      "endDate": "2026-12-02 23:59:01",
+      "worth": "$3.99",
+      "description": "Score Tim-Tim 2: The Almighty Gnome for free on itch.io! Tim-Tim 2: The Almighty Gnome is a 2d adventure game with over 100 maps to explore.",
+      "instructions": "1. Click the button \"Download or Claim\" before the offer expires.\r\n2. Login into your itch.io account to unlock and access the game.",
+      "cover": "https://www.gamerpower.com/offers/1b/63a7d58806279.jpg"
     },
     {
       "id": 3446,
